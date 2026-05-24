@@ -81,7 +81,7 @@ export default function OrdersPage() {
 
   const handleStatusUpdate = async (values) => {
     try {
-      await api.patch(`/api/orders/orders/${editItem.order_number}/`, values);
+      await api.patch(`/api/orders/${editItem.order_number}/`, values);
       toast.success("Order updated");
       setEditItem(null);
       mutate();
@@ -93,7 +93,7 @@ export default function OrdersPage() {
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/api/orders/orders/${deleteItem.order_number}/`);
+      await api.delete(`/api/orders/${deleteItem.order_number}/`);
       toast.success("Order deleted");
       setDeleteItem(null);
       mutate();

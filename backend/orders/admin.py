@@ -296,19 +296,23 @@ class OrderAdmin(ImportExportModelAdmin):
     inlines = [OrderItemInline, OrderPaymentInline, OrderUpdateInline]
     
     fieldsets = (
-        ('📋 Order Information', {
+        ('Order Information', {
             'fields': ('order_number', 'user', 'status', 'payment_status', 'ordered_at'),
             'classes': ('wide',)
         }),
-        ('👤 Customer Details', {
+        ('Customer Details', {
             'fields': ('customer_name', 'customer_email', 'customer_phone'),
             'classes': ('wide',)
         }),
-        ('🚚 Shipping & Delivery', {
-            'fields': ('shipping_address', 'shipping_method', 'tracking_number''street_address', 'city', 'postcode', 'payment_method', 'delivery_date', 'delivery_slot_label',),
+        ('Shipping & Delivery', {
+            'fields': (
+                'shipping_address', 'shipping_method', 'tracking_number',
+                'street_address', 'city', 'postcode', 'payment_method',
+                'delivery_date', 'delivery_slot_label',
+            ),
             'classes': ('wide',)
         }),
-        ('💰 Financial Summary', {
+        ('Financial Summary', {
             'fields': ('cart_subtotal', 'total_amount'),
             'classes': ('collapse',)
         }),

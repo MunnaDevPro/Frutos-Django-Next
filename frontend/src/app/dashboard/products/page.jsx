@@ -158,7 +158,7 @@ function ProductForm({ initialValues, onSubmit, submitLabel = "Save", brands, co
         discount_price: form.discount_price || null,
         wholesale_price: form.wholesale_price || null,
         minimum_purchase: form.minimum_purchase || null,
-        affiliate_commission_rate: form.affiliate_commission_rate || null,
+        affiliate_commission_rate: "",
         stock: form.stock || 0,
         is_active: form.is_active === "true",
         weight: form.weight || null,
@@ -360,7 +360,7 @@ function ProductForm({ initialValues, onSubmit, submitLabel = "Save", brands, co
           </div>
           <div>
             <label className={labelCls}>Affiliate Commission %</label>
-            <input type="number" step="0.01" value={form.affiliate_commission_rate} onChange={e => handleChange("affiliate_commission_rate", e.target.value)} className={inputCls} placeholder="0.00" />
+            <input type="number" step="0.01" value={form.affiliate_commission_rate ?? ""} onChange={e => handleChange("affiliate_commission_rate", e.target.value)} className={inputCls} placeholder="0.00" />
           </div>
           <div>
             <label className={labelCls}>Stock <span className="text-red-500">*</span></label>

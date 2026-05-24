@@ -156,7 +156,7 @@ export const sizesService = createModelService("/api/products/sizes", {
   modelName: "size",
 });
 
-export const ordersService = createModelService("/api/orders/orders", {
+export const ordersService = createModelService("/api/orders", {
   lookupField: "order_number",
   appLabel: "orders",
   modelName: "order",

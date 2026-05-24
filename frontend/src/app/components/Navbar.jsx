@@ -171,17 +171,48 @@ export default function Navbar({ navbarLogoUrl = '', brandName = 'El Árbol' }) 
   const [unreadCount,      setUnreadCount]      = useState(0)   // ← notification badge
 
   // Fetch products
-  useEffect(() => {
-    const base = (process.env.NEXT_PUBLIC_API_URL || 'https://elarbol.icommerce.com.bd/api').replace(/\/$/, '')
-    fetch(`${base}/products/`)
+useEffect(() => {
+  const base = (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api').replace(/\/$/, '')
+  const mediaBase = base.replace('/api', '')
+
+  fetch(`${base}/products/products/`)
     .then(r => { if (!r.ok) throw new Error(); return r.json() })
     .then(data => {
       const arr = Array.isArray(data) ? data : (data.results || [])
-      setAllProducts(arr.map(p => ({ ...p, price: Number(p.price) })))
+      setAllProducts(arr.map(p => {
+
+        // ✅ FIX: /media/ double হওয়া বন্ধ করা
+        let image = p.thumbnail || p.thumbnail_url || p.image_url || p.image || null
+        if (image && !image.startsWith('http')) {
+          const clean = image.replace(/^\/+/, '') // leading slash সরাও
+          image = `${mediaBase}/${clean}`          // mediaBase + /media/products/...
+        }
+        const PLACEHOLDER = 'https://placehold.co/400x400/ECF7E4/00694C?text=No+Image'
+
+        // ✅ Price fix
+        const originalPrice = Number(p.price || 0)
+        const discountPrice = p.discount_price != null ? Number(p.discount_price) : null
+        const displayPrice  = (discountPrice && discountPrice < originalPrice) ? discountPrice : originalPrice
+        const onSale        = discountPrice != null && discountPrice < originalPrice
+
+        // ✅ Category normalize
+        const category = typeof p.category === 'object' && p.category !== null
+          ? p.category.name
+          : (p.sub_category?.category?.name || p.category || '')
+
+        return {
+          ...p,
+          image: image || PLACEHOLDER,
+          price: displayPrice,
+          oldPrice: onSale ? originalPrice : null,
+          onSale,
+          category,
+          slug: p.slug || null,
+        }
+      }))
     })
     .catch(() => {})
-  }, [])
-
+}, [])
   // ── Fetch unread notification count when authenticated ──────────────────
   useEffect(() => {
     if (!isAuthenticated) { setUnreadCount(0); return }
@@ -365,8 +396,16 @@ export default function Navbar({ navbarLogoUrl = '', brandName = 'El Árbol' }) 
                                   {product.category} · {product.origin}
                                 </p>
                               </div>
-                              <span className="text-[13px] font-semibold text-[#00694C] flex-shrink-0">€{product.price.toFixed(2)}</span>
-                            </button>
+                          <div className="flex flex-col items-end flex-shrink-0">
+                            <span className="text-[13px] font-semibold text-[#00694C]">
+                              €{product.price.toFixed(2)}
+                            </span>
+                            {product.oldPrice && (
+                              <span className="text-[11px] text-[#9CA3AF] line-through">
+                                €{product.oldPrice.toFixed(2)}
+                              </span>
+                            )}
+                          </div>                            </button>
                           </li>
                         ))}
                       </ul>
@@ -541,8 +580,16 @@ export default function Navbar({ navbarLogoUrl = '', brandName = 'El Árbol' }) 
                               <p className="text-[14px] font-medium text-[#151E13] truncate">{highlightMatch(product.name, query)}</p>
                               <p className="text-[12px] text-[#6D7A73]">{product.category} · {product.origin}</p>
                             </div>
-                            <span className="text-[13.5px] font-semibold text-[#00694C] flex-shrink-0">€{product.price.toFixed(2)}</span>
-                          </button>
+                              <div className="flex flex-col items-end flex-shrink-0">
+                                <span className="text-[13.5px] font-semibold text-[#00694C]">
+                                  €{product.price.toFixed(2)}
+                                </span>
+                                {product.oldPrice && (
+                                  <span className="text-[11px] text-[#9CA3AF] line-through">
+                                    €{product.oldPrice.toFixed(2)}
+                                  </span>
+                                )}
+                              </div>                          </button>
                         </li>
                       ))}
                     </ul>

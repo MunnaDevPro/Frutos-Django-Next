@@ -1,3 +1,4 @@
+
 # orders/views.py
 import logging
 import traceback
@@ -373,7 +374,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         """
         if self.action == 'create':
             return OrderCreateSerializer
-        elif self.action in ['list', 'retrieve']:
+        elif self.action in ['list', 'retrieve', 'update', 'partial_update']:
             return OrderReadSerializer
         return OrderSerializer
 
@@ -381,11 +382,11 @@ class OrderViewSet(viewsets.ModelViewSet):
         """
         Instantiates and returns the list of permissions that this view requires.
         """
-        if self.action in ['create', 'confirm_payment', 'submit_order']:
-            # Allow both authenticated and unauthenticated users to create orders and confirm payments
+        if self.action in ['create', 'confirm_payment', 'submit_order', 'retrieve']:
+            # Allow both authenticated and unauthenticated users to create orders, confirm payments, and view order confirmation
             permission_classes = [permissions.AllowAny]
-        elif self.action in ['list', 'retrieve', 'update', 'partial_update', 'destroy']:
-            # Require authentication for viewing/modifying orders
+        elif self.action in ['list', 'update', 'partial_update', 'destroy']:
+            # Require authentication for viewing list or modifying orders
             permission_classes = [permissions.IsAuthenticated]
         else:
             permission_classes = [permissions.IsAuthenticated]
@@ -452,6 +453,10 @@ class OrderViewSet(viewsets.ModelViewSet):
 
         # If no filter params, apply default logic
         else:
+            # If it's a retrieve action, allow access to the queryset so get_object can find it by order_number
+            if self.action == 'retrieve':
+                return queryset
+
             # Check if user is admin
             is_admin = user.is_authenticated and (
                 (hasattr(user, 'user_type') and user.user_type == 'ADMIN') or 

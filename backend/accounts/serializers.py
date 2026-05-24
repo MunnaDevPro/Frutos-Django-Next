@@ -28,9 +28,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        token['name']  = getattr(user, 'full_name', None) or getattr(user, 'name', None) or user.email
-        token['email'] = user.email
-        token['username'] = user.email
+        token['name']      = getattr(user, 'full_name', None) or getattr(user, 'name', None) or user.email
+        token['email']     = user.email
+        token['username']  = user.email
+        token['user_type'] = getattr(user, 'user_type', 'CUSTOMER')
         try:
             token['avatar'] = user.profile.resolved_avatar
         except UserProfile.DoesNotExist:

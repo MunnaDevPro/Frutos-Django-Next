@@ -264,6 +264,11 @@ class OrderReadSerializer(serializers.ModelSerializer):
     status_display         = serializers.CharField(source='get_status_display',         read_only=True)
     payment_status_display = serializers.CharField(source='get_payment_status_display', read_only=True)
 
+    # Writable fields for PATCH (admin status update)
+    status         = serializers.CharField(required=False)
+    payment_status = serializers.CharField(required=False)
+    tracking_number = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+
     class Meta:
         model  = Order
         fields = [
@@ -272,6 +277,7 @@ class OrderReadSerializer(serializers.ModelSerializer):
             'customer_name', 'customer_email', 'customer_phone',
             'street_address', 'city', 'postcode',
             'payment_method', 'delivery_date', 'delivery_slot_label',
+            'tracking_number',
             'ordered_at', 'items', 'payment', 'updates',
         ]
 
