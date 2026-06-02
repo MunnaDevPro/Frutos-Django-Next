@@ -1,6 +1,7 @@
+// src/app/dashboard/page.jsx
 "use client";
 
-import { DollarSign, ShoppingCart, Users, Package, Loader2, TrendingUp, Clock, Store } from "lucide-react";
+import { DollarSign, ShoppingCart, Users, Package, Loader2 } from "lucide-react";
 import useSWR from "swr";
 import { AreaChart, Area, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import Container from "@/app/dashboard/_components/Container";
@@ -8,28 +9,74 @@ import StatCard from "@/app/dashboard/_components/StatCard";
 import { fetchAdminDashboardStats } from "@/app/dashboard/_lib/auth";
 import { ordersService } from "@/app/dashboard/_lib/services";
 
-const statusColors = {
-  pending: "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400",
-  processing: "bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400",
-  shipped: "bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400",
-  delivered: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400",
-  cancelled: "bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400",
+const STATUS_COLORS = {
+  pending:    { bg: "bg-amber-50 dark:bg-amber-950/30",    text: "text-amber-700 dark:text-amber-400" },
+  processing: { bg: "bg-blue-50 dark:bg-blue-950/30",      text: "text-blue-700 dark:text-blue-400" },
+  shipped:    { bg: "bg-violet-50 dark:bg-violet-950/30",  text: "text-violet-700 dark:text-violet-400" },
+  delivered:  { bg: "bg-emerald-50 dark:bg-emerald-950/30",text: "text-emerald-700 dark:text-emerald-400" },
+  cancelled:  { bg: "bg-red-50 dark:bg-red-950/30",        text: "text-red-700 dark:text-red-400" },
 };
 
-export default function DashboardHomePage() {
-  const { data: rawStats, isLoading: statsLoading } = useSWR("admin-dashboard-stats", fetchAdminDashboardStats, {
-    revalidateOnFocus: false,
-  });
+const BAR_COLORS = {
+  PENDING: "#f59e0b", PROCESSING: "#3b82f6",
+  SHIPPED: "#8b5cf6", DELIVERED: "#10b981", CANCELLED: "#ef4444",
+};
 
-  // Backend returns { statistics: { total_users, total_products, total_orders, total_revenue, ... }, ... }
+function UserSegmentGrid({ stats, loading }) {
+  if (loading) return (
+    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+      {Array.from({ length: 7 }).map((_, i) => (
+        <div key={i} className="h-20 rounded-lg bg-gray-100 dark:bg-gray-900 animate-pulse" />
+      ))}
+    </div>
+  );
+
+  const segments = [
+    { label: "Customers",    value: stats?.total_customers,   color: "border-l-blue-400" },
+    { label: "Sellers",      value: stats?.total_sellers,     color: "border-l-violet-400" },
+    { label: "Admins",       value: stats?.total_admins,      color: "border-l-red-400" },
+    { label: "Wholesale",    value: stats?.total_wholesale,   color: "border-l-emerald-400" },
+    { label: "WS Approved",  value: stats?.wholesale_approved,color: "border-l-green-400" },
+    { label: "WS Pending",   value: stats?.wholesale_pending, color: "border-l-amber-400" },
+    { label: "Inactive",     value: stats?.inactive_users,    color: "border-l-gray-400" },
+  ];
+
+  return (
+    <div>
+      <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+        User Breakdown
+      </p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+        {segments.map(({ label, value, color }) => (
+          <div
+            key={label}
+            className={`bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 border-l-4 ${color} rounded-lg px-3 py-3`}
+          >
+            <p className="text-xs text-gray-500 dark:text-gray-400 leading-tight mb-1">{label}</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-white">
+              {Number(value || 0).toLocaleString()}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function DashboardHomePage() {
+  const { data: rawStats, isLoading: statsLoading } = useSWR(
+    "admin-dashboard-stats", fetchAdminDashboardStats, { revalidateOnFocus: false }
+  );
   const stats = rawStats?.statistics || rawStats || {};
 
-  // Fetch recent orders (50 for charts, first 6 shown in table)
-  const { data: ordersRaw } = useSWR("dash-recent-orders", () => ordersService.list({ page_size: 50, ordering: "-ordered_at" }), { revalidateOnFocus: false });
-  const allOrders = Array.isArray(ordersRaw) ? ordersRaw : (ordersRaw?.results || []);
+  const { data: ordersRaw } = useSWR(
+    "dash-recent-orders",
+    () => ordersService.list({ page_size: 50, ordering: "-ordered_at" }),
+    { revalidateOnFocus: false }
+  );
+  const allOrders    = Array.isArray(ordersRaw) ? ordersRaw : (ordersRaw?.results || []);
   const recentOrders = allOrders.slice(0, 6);
 
-  // Build last-14-day daily trend
   const dailyTrend = (() => {
     const map = {};
     const now = new Date();
@@ -39,151 +86,147 @@ export default function DashboardHomePage() {
       map[key] = { day: key, orders: 0, revenue: 0 };
     }
     allOrders.forEach(o => {
-      const d = new Date(o.ordered_at);
+      const d   = new Date(o.ordered_at || o.created_at);
       const key = `${d.getMonth() + 1}/${d.getDate()}`;
-      if (map[key]) { map[key].orders += 1; map[key].revenue += Number(o.total_amount || 0); }
+      if (map[key]) {
+        map[key].orders  += 1;
+        map[key].revenue += Number(o.total_amount || 0);
+      }
     });
     return Object.values(map);
   })();
 
-  // Status count for bar chart
   const statusCounts = (() => {
     const m = {};
     allOrders.forEach(o => { m[o.status] = (m[o.status] || 0) + 1; });
     return Object.entries(m).map(([status, count]) => ({ status, count }));
   })();
 
-  const STATUS_BAR_COLORS = { PENDING: "#f59e0b", PROCESSING: "#3b82f6", SHIPPED: "#8b5cf6", DELIVERED: "#10b981", CANCELLED: "#ef4444" };
-
   return (
     <Container title="Dashboard" description="Overview of your store performance">
-      {/* Stats */}
+
+      {/* Top 4 stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statsLoading ? (
-          Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg p-4 h-24 animate-pulse" />
-          ))
-        ) : (
-          <>
-            <StatCard label="Total Users" value={Number(stats?.total_users || 0).toLocaleString()} icon={Users} />
-            <StatCard label="Total Products" value={Number(stats?.total_products || 0).toLocaleString()} icon={Package} />
-            <StatCard label="Total Orders" value={Number(stats?.total_orders || 0).toLocaleString()} icon={ShoppingCart} />
-            <StatCard label="Revenue" value={`৳${Number(stats?.total_revenue || 0).toLocaleString()}`} icon={DollarSign} />
-          </>
-        )}
+        {statsLoading
+          ? Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg p-4 h-24 animate-pulse" />
+            ))
+          : <>
+              <StatCard label="Total Users"    value={Number(stats?.total_users    || 0).toLocaleString()} icon={Users} />
+              <StatCard label="Total Products" value={Number(stats?.total_products || 0).toLocaleString()} icon={Package} />
+              <StatCard label="Total Orders"   value={Number(stats?.total_orders   || 0).toLocaleString()} icon={ShoppingCart} />
+              <StatCard label="Revenue"        value={`৳${Number(stats?.total_revenue || 0).toLocaleString()}`} icon={DollarSign} />
+            </>
+        }
       </div>
 
-      {/* User + Business breakdown */}
-      {!statsLoading && stats?.total_users > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {[
-            ["Customers", stats?.total_customers],
-            ["Sellers", stats?.total_sellers],
-            ["Vendors", stats?.total_vendors],
-            ["Admins", stats?.total_admins],
-            ["Pending Orders", stats?.pending_orders],
-            ["Inactive Users", stats?.inactive_users],
-          ].map(([label, val]) => (
-            <div key={label} className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-3">
-              <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">{Number(val || 0).toLocaleString()}</p>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* User breakdown — no emoji, no vendors */}
+      <UserSegmentGrid stats={stats} loading={statsLoading} />
 
-      {/* Trend Charts */}
-      {allOrders.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* 14-day revenue trend */}
-          <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg p-4">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Revenue — Last 14 Days</h3>
-            <div className="h-44">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={dailyTrend} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="dashRevGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                  <XAxis dataKey="day" tick={{ fontSize: 10 }} stroke="#9ca3af" interval={3} />
-                  <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" />
-                  <Tooltip contentStyle={{ fontSize: "11px", borderRadius: "8px" }} formatter={(v, n) => [n === "revenue" ? `৳${Number(v).toLocaleString()}` : v, n === "revenue" ? "Revenue" : "Orders"]} />
-                  <Area type="monotone" dataKey="revenue" stroke="#4f46e5" fill="url(#dashRevGrad)" strokeWidth={2} dot={false} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Order status bar chart */}
-          <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg p-4">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Orders by Status</h3>
-            <div className="h-44">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={statusCounts} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                  <XAxis dataKey="status" tick={{ fontSize: 10 }} stroke="#9ca3af" />
-                  <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" allowDecimals={false} />
-                  <Tooltip contentStyle={{ fontSize: "11px", borderRadius: "8px" }} />
-                  <Bar dataKey="count" name="Orders" radius={[4, 4, 0, 0]}>
-                    {statusCounts.map((entry, i) => (
-                      <Cell key={i} fill={STATUS_BAR_COLORS[entry.status] || "#6b7280"} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+      {/* Pending Orders — inside breakdown already via WS Pending; show as single stat */}
+      {!statsLoading && (
+        <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 border-l-4 border-l-amber-400 rounded-lg px-4 py-3 flex items-center gap-3 w-fit">
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Pending Orders</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-white">
+              {Number(stats?.pending_orders || 0).toLocaleString()}
+            </p>
           </div>
         </div>
       )}
 
-      {/* Recent Orders */}
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg p-4">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Revenue — Last 14 Days</h3>
+          <div className="h-48">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={dailyTrend} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%"  stopColor="#4f46e5" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                <XAxis dataKey="day" tick={{ fontSize: 10 }} stroke="#9ca3af" interval={3} />
+                <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" />
+                <Tooltip
+                  contentStyle={{ fontSize: "11px", borderRadius: "8px" }}
+                  formatter={(v, n) => [n === "revenue" ? `৳${Number(v).toLocaleString()}` : v, n === "revenue" ? "Revenue" : "Orders"]}
+                />
+                <Area type="monotone" dataKey="revenue" stroke="#4f46e5" fill="url(#revGrad)" strokeWidth={2} dot={false} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg p-4">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Orders by Status</h3>
+          <div className="h-48">
+            {statusCounts.length === 0
+              ? <div className="flex items-center justify-center h-full text-sm text-gray-400">No orders yet</div>
+              : <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={statusCounts} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                    <XAxis dataKey="status" tick={{ fontSize: 10 }} stroke="#9ca3af" />
+                    <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" allowDecimals={false} />
+                    <Tooltip contentStyle={{ fontSize: "11px", borderRadius: "8px" }} />
+                    <Bar dataKey="count" name="Orders" radius={[4, 4, 0, 0]}>
+                      {statusCounts.map((e, i) => (
+                        <Cell key={i} fill={BAR_COLORS[e.status] || "#6b7280"} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+            }
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Orders table */}
       <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg">
-        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-800">
+        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
           <h2 className="text-sm font-medium text-gray-900 dark:text-white">Recent Orders</h2>
+          <span className="text-xs text-gray-400">{allOrders.length} total fetched</span>
         </div>
-        {!ordersRaw ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-800">
-                  <th className="px-4 py-2.5 text-left font-medium text-gray-500 dark:text-gray-400">Order</th>
-                  <th className="px-4 py-2.5 text-left font-medium text-gray-500 dark:text-gray-400">Customer</th>
-                  <th className="px-4 py-2.5 text-left font-medium text-gray-500 dark:text-gray-400">Total</th>
-                  <th className="px-4 py-2.5 text-left font-medium text-gray-500 dark:text-gray-400">Status</th>
-                  <th className="px-4 py-2.5 text-left font-medium text-gray-500 dark:text-gray-400">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentOrders.length === 0 ? (
-                  <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400">No orders yet</td></tr>
-                ) : (
-                  recentOrders.map((order) => (
-                    <tr key={order.id || order.order_number} className="border-b border-gray-100 dark:border-gray-800/50 last:border-0">
-                      <td className="px-4 py-2.5 font-medium text-gray-900 dark:text-white">{order.order_number}</td>
-                      <td className="px-4 py-2.5 text-gray-600 dark:text-gray-300">{order.customer_name}</td>
-                      <td className="px-4 py-2.5 text-gray-700 dark:text-gray-300">৳{Number(order.total_amount).toLocaleString()}</td>
-                      <td className="px-4 py-2.5">
-                        <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${statusColors[order.status?.toLowerCase()] || "bg-gray-100 text-gray-600"}`}>
-                          {order.status_display || order.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2.5 text-gray-500 dark:text-gray-400">
-                        {order.ordered_at ? new Date(order.ordered_at).toLocaleDateString() : "—"}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
+        {!ordersRaw
+          ? <div className="flex items-center justify-center py-12"><Loader2 className="w-5 h-5 animate-spin text-gray-400" /></div>
+          : <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-gray-800">
+                    {["Order", "Customer", "Total", "Status", "Date"].map(h => (
+                      <th key={h} className="px-4 py-2.5 text-left font-medium text-gray-500 dark:text-gray-400">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentOrders.length === 0
+                    ? <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400">No orders yet</td></tr>
+                    : recentOrders.map(order => {
+                        const sc = STATUS_COLORS[order.status?.toLowerCase()] || { bg: "bg-gray-100", text: "text-gray-600" };
+                        return (
+                          <tr key={order.id || order.order_number} className="border-b border-gray-100 dark:border-gray-800/50 last:border-0">
+                            <td className="px-4 py-2.5 font-medium text-gray-900 dark:text-white">{order.order_number}</td>
+                            <td className="px-4 py-2.5 text-gray-600 dark:text-gray-300">{order.customer_name}</td>
+                            <td className="px-4 py-2.5 text-gray-700 dark:text-gray-300">৳{Number(order.total_amount).toLocaleString()}</td>
+                            <td className="px-4 py-2.5">
+                              <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${sc.bg} ${sc.text}`}>
+                                {order.status_display || order.status}
+                              </span>
+                            </td>
+                            <td className="px-4 py-2.5 text-gray-500 dark:text-gray-400">
+                              {order.ordered_at ? new Date(order.ordered_at).toLocaleDateString() : "—"}
+                            </td>
+                          </tr>
+                        );
+                      })
+                  }
+                </tbody>
+              </table>
+            </div>
+        }
       </div>
     </Container>
   );

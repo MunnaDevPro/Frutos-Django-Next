@@ -310,55 +310,340 @@ from rest_framework.response import Response
 
 User = get_user_model()
 
-class AdminUserListView(APIView):
-    """
-    GET  /api/auth/admin/users/   — সব user list (normal + wholesale)
-    POST /api/auth/admin/users/   — নতুন user create
-    """
-    permission_classes = [permissions.IsAuthenticated]
+# class AdminUserListView(APIView):
+#     """
+#     GET  /api/auth/admin/users/   — সব user list (normal + wholesale)
+#     POST /api/auth/admin/users/   — নতুন user create
+#     """
+#     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request):
-        # শুধু ADMIN/SELLER/VENDOR access পাবে
-        if not request.user.user_type in ['ADMIN', 'SELLER']:
-            return Response({'detail': 'Forbidden'}, status=403)
+#     def get(self, request):
+#         # শুধু ADMIN/SELLER/VENDOR access পাবে
+#         if not request.user.user_type in ['ADMIN', 'SELLER']:
+#             return Response({'detail': 'Forbidden'}, status=403)
 
-        search    = request.GET.get('search', '')
-        page      = int(request.GET.get('page', 1))
-        page_size = int(request.GET.get('page_size', 20))
+#         search    = request.GET.get('search', '')
+#         page      = int(request.GET.get('page', 1))
+#         page_size = int(request.GET.get('page_size', 20))
 
-        qs = User.objects.select_related('profile').order_by('-date_joined')
+#         qs = User.objects.select_related('profile').order_by('-date_joined')
 
-        if search:
-            from django.db.models import Q
-            qs = qs.filter(
-                Q(email__icontains=search) |
-                Q(name__icontains=search)
-            )
+#         if search:
+#             from django.db.models import Q
+#             qs = qs.filter(
+#                 Q(email__icontains=search) |
+#                 Q(name__icontains=search)
+#             )
 
-        total = qs.count()
-        start = (page - 1) * page_size
-        users = qs[start:start + page_size]
+#         total = qs.count()
+#         start = (page - 1) * page_size
+#         users = qs[start:start + page_size]
+
+#         data = []
+#         for u in users:
+#             # Wholesale user কিনা check করো
+#             is_wholesale = hasattr(u, 'wholesale_profile')
+#             data.append({
+#                 'id':          u.id,
+#                 'name':        getattr(u, 'name', '') or u.email,
+#                 'email':       u.email,
+#                 'user_type':   getattr(u, 'user_type', 'CUSTOMER'),
+#                 'is_active':   u.is_active,
+#                 'date_joined': u.date_joined,
+#                 'phone':       getattr(u.profile, 'phone', '') if hasattr(u, 'profile') else '',
+#                 'is_wholesale': is_wholesale,
+#                 # Wholesale specific data
+#                 'wholesale_status': getattr(
+#                     getattr(u, 'wholesale_profile', None), 'status', None
+#                 ),
+#                 'business_name': getattr(
+#                     getattr(u, 'wholesale_profile', None), 'business_name', None
+#                 ),
+#             })
+
+#         return Response({
+#             'count':   total,
+#             'results': data,
+#         })
+
+#     def post(self, request):
+#         if request.user.user_type not in ['ADMIN']:
+#             return Response({'detail': 'Forbidden'}, status=403)
+
+#         email     = request.data.get('email', '').strip().lower()
+#         name      = request.data.get('name', '').strip()
+#         password  = request.data.get('password', '')
+#         user_type = request.data.get('user_type', 'CUSTOMER')
+
+#         if not email or not password:
+#             return Response({'detail': 'Email and password required.'}, status=400)
+
+#         if User.objects.filter(email__iexact=email).exists():
+#             return Response({'detail': 'Email already exists.'}, status=400)
+
+#         user = User.objects.create_user(
+#             email=email,
+#             password=password,
+#             name=name,
+#         )
+#         if hasattr(user, 'user_type'):
+#             user.user_type = user_type
+#             user.save()
+
+#         return Response({
+#             'id':        user.id,
+#             'email':     user.email,
+#             'name':      getattr(user, 'name', ''),
+#             'user_type': getattr(user, 'user_type', 'CUSTOMER'),
+#             'is_active': user.is_active,
+#         }, status=201)
+
+
+# class AdminUserDetailView(APIView):
+#     """
+#     PATCH  /api/auth/admin/users/<id>/
+#     DELETE /api/auth/admin/users/<id>/
+#     """
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def patch(self, request, pk):
+#         if request.user.user_type not in ['ADMIN']:
+#             return Response({'detail': 'Forbidden'}, status=403)
+#         try:
+#             user = User.objects.get(pk=pk)
+#         except User.DoesNotExist:
+#             return Response({'detail': 'Not found.'}, status=404)
+
+#         if 'name' in request.data:
+#             user.name = request.data['name']
+#         if 'is_active' in request.data:
+#             user.is_active = request.data['is_active']
+#         if 'user_type' in request.data:
+#             user.user_type = request.data['user_type']
+#         user.save()
+
+#         return Response({'detail': 'Updated successfully.'})
+
+#     def delete(self, request, pk):
+#         if request.user.user_type not in ['ADMIN']:
+#             return Response({'detail': 'Forbidden'}, status=403)
+#         try:
+#             user = User.objects.get(pk=pk)
+#             user.delete()
+#             return Response(status=204)
+#         except User.DoesNotExist:
+#             return Response({'detail': 'Not found.'}, status=404)
+
+# class AdminUserListView(APIView):
+#     """
+#     GET  /api/auth/admin/users/  — normal + wholesale users combined
+#     POST /api/auth/admin/users/  — create normal user
+#     """
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def get(self, request):
+#         if getattr(request.user, 'user_type', None) not in ['ADMIN', 'SELLER']:
+#             return Response({'detail': 'Forbidden'}, status=403)
+
+#         search    = request.GET.get('search', '').strip()
+#         page      = int(request.GET.get('page', 1))
+#         page_size = int(request.GET.get('page_size', 20))
+
+#         from django.db.models import Q
+
+#         # ── Normal users ──────────────────────────────────────────
+#         qs = User.objects.select_related('profile').order_by('-date_joined')
+#         if search:
+#             qs = qs.filter(Q(email__icontains=search) | Q(name__icontains=search))
+
+#         normal_data = []
+#         for u in qs:
+#             normal_data.append({
+#                 'id':               u.id,
+#                 'name':             getattr(u, 'name', '') or u.email,
+#                 'email':            u.email,
+#                 'user_type':        getattr(u, 'user_type', 'CUSTOMER'),
+#                 'is_active':        u.is_active,
+#                 'date_joined':      u.date_joined.isoformat() if u.date_joined else '',
+#                 'business_name':    None,
+#                 'wholesale_status': None,
+#                 'is_wholesale':     False,
+#             })
+
+#         # ── Wholesale users ───────────────────────────────────────
+#         ws_data = []
+#         try:
+#             from wholesale.models import WholesaleUser
+#             ws_qs = WholesaleUser.objects.order_by('-applied_at')
+#             if search:
+#                 ws_qs = ws_qs.filter(
+#                     Q(email__icontains=search) |
+#                     Q(business_name__icontains=search) |
+#                     Q(contact_name__icontains=search)
+#                 )
+#             for i, u in enumerate(ws_qs, start=1):
+#                 ws_data.append({
+#                     'id': f'ws_{i}',
+#                     'name':             u.contact_name or u.email,
+#                     'email':            u.email,
+#                     'user_type':        'WHOLESALE',
+#                     'is_active':        u.is_active,
+#                     'date_joined':      u.applied_at.isoformat() if u.applied_at else '',
+#                     'business_name':    u.business_name,
+#                     'wholesale_status': u.status,
+#                     'is_wholesale':     True,
+#                 })
+#         except Exception:
+#             pass
+
+#         # ── Merge, sort, paginate ─────────────────────────────────
+#         combined = normal_data + ws_data
+#         combined.sort(key=lambda x: x['date_joined'], reverse=True)
+
+#         total = len(combined)
+#         start = (page - 1) * page_size
+#         paginated = combined[start:start + page_size]
+
+#         return Response({'count': total, 'results': paginated})
+
+#     def post(self, request):
+#         if getattr(request.user, 'user_type', None) not in ['ADMIN']:
+#             return Response({'detail': 'Forbidden'}, status=403)
+
+#         email     = request.data.get('email', '').strip().lower()
+#         name      = request.data.get('name', '').strip()
+#         password  = request.data.get('password', '')
+#         user_type = request.data.get('user_type', 'CUSTOMER')
+
+#         if not email or not password:
+#             return Response({'detail': 'Email and password required.'}, status=400)
+#         if User.objects.filter(email__iexact=email).exists():
+#             return Response({'detail': 'Email already exists.'}, status=400)
+
+#         user = User.objects.create_user(email=email, password=password, name=name)
+#         if hasattr(user, 'user_type'):
+#             user.user_type = user_type
+#             user.save()
+
+#         return Response({
+#             'id':        user.id,
+#             'email':     user.email,
+#             'name':      getattr(user, 'name', ''),
+#             'user_type': getattr(user, 'user_type', 'CUSTOMER'),
+#             'is_active': user.is_active,
+#         }, status=201)
+
+
+# class AdminUserDetailView(APIView):
+#     """PATCH/DELETE /api/auth/admin/users/<id>/"""
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def patch(self, request, pk):
+#         if getattr(request.user, 'user_type', None) not in ['ADMIN']:
+#             return Response({'detail': 'Forbidden'}, status=403)
+
+#         # Wholesale user (id starts with ws_)
+#         pk_str = str(pk)
+#         if pk_str.startswith('ws_'):
+#             try:
+#                 from wholesale.models import WholesaleUser
+#                 ws_id = pk_str[3:]
+#                 u = WholesaleUser.objects.get(pk=ws_id)
+#                 if 'is_active' in request.data:
+#                     u.is_active = request.data['is_active']
+#                 if 'wholesale_status' in request.data:
+#                     u.status = request.data['wholesale_status']
+#                 u.save()
+#                 return Response({'detail': 'Updated.'})
+#             except Exception as e:
+#                 return Response({'detail': str(e)}, status=404)
+
+#         # Normal user
+#         try:
+#             u = User.objects.get(pk=pk)
+#         except User.DoesNotExist:
+#             return Response({'detail': 'Not found.'}, status=404)
+
+#         if 'name' in request.data:
+#             u.name = request.data['name']
+#         if 'is_active' in request.data:
+#             u.is_active = request.data['is_active']
+#         if 'user_type' in request.data:
+#             u.user_type = request.data['user_type']
+#         u.save()
+#         return Response({'detail': 'Updated.'})
+
+#     def delete(self, request, pk):
+#         if getattr(request.user, 'user_type', None) not in ['ADMIN']:
+#             return Response({'detail': 'Forbidden'}, status=403)
+
+#         pk_str = str(pk)
+#         if pk_str.startswith('ws_'):
+#             try:
+#                 from wholesale.models import WholesaleUser
+#                 WholesaleUser.objects.get(pk=pk_str[3:]).delete()
+#                 return Response(status=204)
+#             except Exception as e:
+#                 return Response({'detail': str(e)}, status=404)
+
+#         try:
+#             User.objects.get(pk=pk).delete()
+#             return Response(status=204)
+#         except User.DoesNotExist:
+#             return Response({'detail': 'Not found.'}, status=404)
+
+
+
+
+
+# accounts/views.py — ফাইলের শেষে যোগ করো
+
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
+
+class AdminUserListView(generics.ListAPIView):
+    """GET /api/auth/admin/users/ — admin only"""
+    permission_classes = [permissions.IsAdminUser]
+    filter_backends    = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields      = ['email', 'name', 'first_name', 'last_name']
+    ordering_fields    = ['date_joined', 'name', 'email']
+    ordering           = ['-date_joined']
+
+    def get_queryset(self):
+        qs        = User.objects.select_related('profile').all()
+        user_type = self.request.query_params.get('user_type')
+        if user_type:
+            qs = qs.filter(user_type=user_type)
+        return qs
+
+    def list(self, request, *args, **kwargs):
+        qs        = self.filter_queryset(self.get_queryset())
+        page_size = int(request.query_params.get('page_size', 20))
+        page_num  = int(request.query_params.get('page', 1))
+        start     = (page_num - 1) * page_size
+        end       = start + page_size
+        total     = qs.count()
+        users     = qs[start:end]
 
         data = []
         for u in users:
-            # Wholesale user কিনা check করো
-            is_wholesale = hasattr(u, 'wholesale_profile')
+            # wholesale status check
+            ws_status = None
+            if getattr(u, 'user_type', None) == 'WHOLESALER':
+                try:
+                    ws_status = u.wholesaler_profile.approval_status
+                except Exception:
+                    ws_status = 'PENDING'
+
             data.append({
-                'id':          u.id,
-                'name':        getattr(u, 'name', '') or u.email,
-                'email':       u.email,
-                'user_type':   getattr(u, 'user_type', 'CUSTOMER'),
-                'is_active':   u.is_active,
-                'date_joined': u.date_joined,
-                'phone':       getattr(u.profile, 'phone', '') if hasattr(u, 'profile') else '',
-                'is_wholesale': is_wholesale,
-                # Wholesale specific data
-                'wholesale_status': getattr(
-                    getattr(u, 'wholesale_profile', None), 'status', None
-                ),
-                'business_name': getattr(
-                    getattr(u, 'wholesale_profile', None), 'business_name', None
-                ),
+                'id':               u.id,
+                'name':             getattr(u, 'name', None) or u.get_full_name() or u.email,
+                'email':            u.email,
+                'user_type':        getattr(u, 'user_type', 'CUSTOMER'),
+                'is_active':        u.is_active,
+                'date_joined':      u.date_joined,
+                'business_name':    getattr(getattr(u, 'wholesaler_profile', None), 'business_name', None),
+                'wholesale_status': ws_status,
             })
 
         return Response({
@@ -366,70 +651,130 @@ class AdminUserListView(APIView):
             'results': data,
         })
 
-    def post(self, request):
-        if request.user.user_type not in ['ADMIN']:
-            return Response({'detail': 'Forbidden'}, status=403)
 
-        email     = request.data.get('email', '').strip().lower()
-        name      = request.data.get('name', '').strip()
-        password  = request.data.get('password', '')
-        user_type = request.data.get('user_type', 'CUSTOMER')
+class AdminUserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """GET/PATCH/DELETE /api/auth/admin/users/<id>/"""
+    permission_classes = [permissions.IsAdminUser]
+    queryset           = User.objects.all()
 
-        if not email or not password:
-            return Response({'detail': 'Email and password required.'}, status=400)
-
-        if User.objects.filter(email__iexact=email).exists():
-            return Response({'detail': 'Email already exists.'}, status=400)
-
-        user = User.objects.create_user(
-            email=email,
-            password=password,
-            name=name,
-        )
-        if hasattr(user, 'user_type'):
-            user.user_type = user_type
-            user.save()
-
+    def retrieve(self, request, *args, **kwargs):
+        u = self.get_object()
+        ws_status = None
+        if getattr(u, 'user_type', None) == 'WHOLESALER':
+            try:
+                ws_status = u.wholesaler_profile.approval_status
+            except Exception:
+                ws_status = 'PENDING'
         return Response({
-            'id':        user.id,
-            'email':     user.email,
-            'name':      getattr(user, 'name', ''),
-            'user_type': getattr(user, 'user_type', 'CUSTOMER'),
-            'is_active': user.is_active,
-        }, status=201)
+            'id':               u.id,
+            'name':             getattr(u, 'name', None) or u.get_full_name() or u.email,
+            'email':            u.email,
+            'user_type':        getattr(u, 'user_type', 'CUSTOMER'),
+            'is_active':        u.is_active,
+            'date_joined':      u.date_joined,
+            'wholesale_status': ws_status,
+        })
+
+    def partial_update(self, request, *args, **kwargs):
+        u    = self.get_object()
+        data = request.data
+
+        if 'name' in data:
+            u.name = data['name']
+        if 'user_type' in data:
+            u.user_type = data['user_type']
+        if 'is_active' in data:
+            u.is_active = data['is_active'] in [True, 'true', '1']
+        u.save()
+        return Response({'success': True})
+
+    def destroy(self, request, *args, **kwargs):
+        self.get_object().delete()
+        return Response(status=204)
 
 
-class AdminUserDetailView(APIView):
-    """
-    PATCH  /api/auth/admin/users/<id>/
-    DELETE /api/auth/admin/users/<id>/
-    """
+class AdminUserCreateView(generics.CreateAPIView):
+    """POST /api/auth/admin/users/"""
+    permission_classes = [permissions.IsAdminUser]
+
+    def create(self, request, *args, **kwargs):
+        data  = request.data
+        email = data.get('email', '').strip().lower()
+        name  = data.get('name', '').strip()
+        pwd   = data.get('password', '')
+        utype = data.get('user_type', 'CUSTOMER')
+
+        if not email or not pwd:
+            return Response({'detail': 'Email and password required.'}, status=400)
+        if User.objects.filter(email=email).exists():
+            return Response({'detail': 'User with this email already exists.'}, status=400)
+
+        u = User.objects.create_user(email=email, password=pwd)
+        if hasattr(u, 'name'):
+            u.name = name
+        if hasattr(u, 'user_type'):
+            u.user_type = utype
+        u.save()
+        return Response({'id': u.id, 'email': u.email}, status=201)
+
+from django.db import models as db_models
+from django.db import models as db_models
+
+class AdminDashboardStatsView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def patch(self, request, pk):
-        if request.user.user_type not in ['ADMIN']:
-            return Response({'detail': 'Forbidden'}, status=403)
+    def get(self, request):
+        # Orders
         try:
-            user = User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            return Response({'detail': 'Not found.'}, status=404)
+            from orders.models import Order
+            total_orders   = Order.objects.count()
+            pending_orders = Order.objects.filter(status='pending').count()
+            total_revenue  = Order.objects.aggregate(
+                t=db_models.Sum('total_amount'))['t'] or 0
+        except Exception:
+            total_orders = pending_orders = total_revenue = 0
 
-        if 'name' in request.data:
-            user.name = request.data['name']
-        if 'is_active' in request.data:
-            user.is_active = request.data['is_active']
-        if 'user_type' in request.data:
-            user.user_type = request.data['user_type']
-        user.save()
-
-        return Response({'detail': 'Updated successfully.'})
-
-    def delete(self, request, pk):
-        if request.user.user_type not in ['ADMIN']:
-            return Response({'detail': 'Forbidden'}, status=403)
+        # Products
         try:
-            user = User.objects.get(pk=pk)
-            user.delete()
-            return Response(status=204)
-        except User.DoesNotExist:
-            return Response({'detail': 'Not found.'}, status=404)
+            from products.models import Product
+            total_products = Product.objects.count()
+        except Exception:
+            total_products = 0
+
+        # Normal users
+        total_normal    = User.objects.count()
+        total_customers = User.objects.filter(user_type='CUSTOMER').count()
+        total_sellers   = User.objects.filter(user_type='SELLER').count()
+        total_vendors   = User.objects.filter(user_type='VENDOR').count()
+        total_admins    = User.objects.filter(user_type='ADMIN').count()
+        inactive_users  = User.objects.filter(is_active=False).count()
+
+        # Wholesale users (separate model/table)
+        try:
+            from wholesale.models import WholesaleUser
+            total_wholesale          = WholesaleUser.objects.count()
+            wholesale_pending        = WholesaleUser.objects.filter(status='pending').count()
+            wholesale_approved       = WholesaleUser.objects.filter(status='approved').count()
+        except Exception:
+            total_wholesale = wholesale_pending = wholesale_approved = 0
+
+        return Response({
+            'statistics': {
+                # Top stats
+                'total_users':    total_normal + total_wholesale,
+                'total_products': total_products,
+                'total_orders':   total_orders,
+                'total_revenue':  float(total_revenue),
+                # User breakdown
+                'total_customers':      total_customers,
+                'total_sellers':        total_sellers,
+                'total_vendors':        total_vendors,
+                'total_admins':         total_admins,
+                'inactive_users':       inactive_users,
+                'total_wholesale':      total_wholesale,
+                'wholesale_pending':    wholesale_pending,
+                'wholesale_approved':   wholesale_approved,
+                # Orders
+                'pending_orders': pending_orders,
+            }
+        })

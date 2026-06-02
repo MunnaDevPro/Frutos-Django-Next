@@ -62,7 +62,8 @@ class WholesaleUser(AbstractBaseUser, PermissionsMixin):
         related_query_name='wholesale_user',
         verbose_name='user permissions',
     )
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    serial_number = models.IntegerField( null=True, blank=True)  
     email = models.EmailField(unique=True, db_index=True)
 
     # Business info
@@ -139,6 +140,15 @@ class WholesaleUser(AbstractBaseUser, PermissionsMixin):
     @property
     def display_volume(self):
         return dict(MonthlyVolume.choices).get(self.monthly_volume, self.monthly_volume)
+    
+    def save(self, *args, **kwargs):
+        if self.serial_number is None:
+            last_user = WholesaleUser.objects.order_by('-serial_number').first()
+            if last_user and last_user.serial_number is not None:
+                self.serial_number = last_user.serial_number + 1
+            else:
+                self.serial_number = 1  
+        super().save(*args, **kwargs)
 
 
 class WholesaleDocument(models.Model):

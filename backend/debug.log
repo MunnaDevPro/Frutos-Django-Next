@@ -14381,3 +14381,1327 @@ INFO 2026-06-01 18:07:38,348 basehttp 12860 6600 "PATCH /api/auth/admin/users/2/
 INFO 2026-06-01 18:07:38,368 basehttp 12860 6600 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 884
 INFO 2026-06-01 18:07:55,129 basehttp 12860 13992 - Broken pipe from ('127.0.0.1', 2667)
 INFO 2026-06-01 18:07:55,129 basehttp 12860 5880 - Broken pipe from ('127.0.0.1', 2602)
+INFO 2026-06-02 10:12:56,959 autoreload 14268 18136 Watching for file changes with StatReloader
+INFO 2026-06-02 10:14:57,237 views 14268 17156 ProductViewSet.list called with params: <QueryDict: {}>
+INFO 2026-06-02 10:14:57,239 views 14268 7364 CategoryViewSet.list called with params: <QueryDict: {}>
+INFO 2026-06-02 10:14:57,277 views 14268 7364 Successfully returned 4 categories
+INFO 2026-06-02 10:14:57,279 basehttp 14268 7364 "GET /api/products/categories/ HTTP/1.1" 200 537
+INFO 2026-06-02 10:14:57,306 views 14268 17156 Successfully paginated 1 products
+WARNING 2026-06-02 10:14:57,343 basehttp 14268 7800 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 10:14:57,356 basehttp 14268 14280 "GET /api/homepage/ HTTP/1.1" 404 4787
+WARNING 2026-06-02 10:14:57,390 basehttp 14268 7364 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 10:14:57,428 basehttp 14268 7800 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+INFO 2026-06-02 10:14:57,456 basehttp 14268 17156 "GET /api/products/products/ HTTP/1.1" 200 2137
+WARNING 2026-06-02 10:15:00,688 basehttp 14268 17156 "GET /api/site-config/ HTTP/1.1" 404 4796
+INFO 2026-06-02 10:15:00,690 views 14268 7364 ProductViewSet.list called with params: <QueryDict: {}>
+INFO 2026-06-02 10:15:00,697 views 14268 14280 CategoryViewSet.list called with params: <QueryDict: {}>
+INFO 2026-06-02 10:15:00,733 views 14268 14280 Successfully returned 4 categories
+INFO 2026-06-02 10:15:00,734 views 14268 7364 Successfully paginated 1 products
+INFO 2026-06-02 10:15:00,743 basehttp 14268 14280 "GET /api/products/categories/ HTTP/1.1" 200 537
+INFO 2026-06-02 10:15:00,769 basehttp 14268 7364 "GET /api/products/products/ HTTP/1.1" 200 2137
+WARNING 2026-06-02 10:15:00,822 basehttp 14268 10944 "GET /api/homepage/ HTTP/1.1" 404 4787
+WARNING 2026-06-02 10:15:00,857 basehttp 14268 16960 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 10:15:00,949 basehttp 14268 17156 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 10:15:01,896 basehttp 14268 18660 "GET /api/delivery-charge/ HTTP/1.1" 404 4808
+INFO 2026-06-02 10:15:01,903 views 14268 4952 ProductViewSet.list called with params: <QueryDict: {}>
+INFO 2026-06-02 10:15:02,016 views 14268 4952 Successfully paginated 1 products
+INFO 2026-06-02 10:15:02,072 basehttp 14268 4952 "GET /api/products/products/ HTTP/1.1" 200 2137
+WARNING 2026-06-02 10:15:02,153 basehttp 14268 18660 "GET /api/delivery-charge/ HTTP/1.1" 404 4808
+INFO 2026-06-02 10:15:02,162 views 14268 4952 ProductViewSet.list called with params: <QueryDict: {}>
+INFO 2026-06-02 10:15:02,205 views 14268 4952 Successfully paginated 1 products
+INFO 2026-06-02 10:15:02,244 basehttp 14268 4952 "GET /api/products/products/ HTTP/1.1" 200 2137
+WARNING 2026-06-02 10:15:04,402 basehttp 14268 7364 "POST /api/wholesale/auth/refresh/ HTTP/1.1" 401 45
+WARNING 2026-06-02 10:15:04,571 basehttp 14268 7364 "POST /api/wholesale/auth/refresh/ HTTP/1.1" 401 45
+WARNING 2026-06-02 10:15:04,804 basehttp 14268 7364 "POST /api/wholesale/auth/refresh/ HTTP/1.1" 401 45
+WARNING 2026-06-02 10:15:05,012 basehttp 14268 7364 "POST /api/wholesale/auth/refresh/ HTTP/1.1" 401 45
+WARNING 2026-06-02 10:15:06,964 basehttp 14268 7364 "GET /api/site-config/ HTTP/1.1" 404 4796
+INFO 2026-06-02 10:15:07,655 basehttp 14268 14056 "GET /api/wholesale/content/ HTTP/1.1" 200 82
+WARNING 2026-06-02 10:15:07,751 basehttp 14268 16348 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 10:15:07,770 basehttp 14268 11888 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+INFO 2026-06-02 10:15:07,780 basehttp 14268 1140 "GET /api/wholesale/content/ HTTP/1.1" 200 82
+WARNING 2026-06-02 10:15:07,887 basehttp 14268 7364 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 10:15:07,937 basehttp 14268 14056 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 10:15:07,998 basehttp 14268 16348 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 10:15:09,602 basehttp 14268 4952 "GET /api/delivery-charge/ HTTP/1.1" 404 4808
+INFO 2026-06-02 10:15:09,642 views 14268 4952 ProductViewSet.list called with params: <QueryDict: {}>
+WARNING 2026-06-02 10:15:09,783 basehttp 14268 7364 "GET /api/site-config/ HTTP/1.1" 404 4796
+INFO 2026-06-02 10:15:09,959 views 14268 1140 ProductViewSet.list called with params: <QueryDict: {}>
+INFO 2026-06-02 10:15:09,962 views 14268 11888 CategoryViewSet.list called with params: <QueryDict: {}>
+INFO 2026-06-02 10:15:09,981 views 14268 4952 Successfully paginated 1 products
+INFO 2026-06-02 10:15:10,077 views 14268 1140 Successfully paginated 1 products
+INFO 2026-06-02 10:15:10,086 views 14268 11888 Successfully returned 4 categories
+INFO 2026-06-02 10:15:10,129 basehttp 14268 4952 "GET /api/products/products/ HTTP/1.1" 200 2137
+INFO 2026-06-02 10:15:10,183 basehttp 14268 1140 "GET /api/products/products/ HTTP/1.1" 200 2137
+INFO 2026-06-02 10:15:10,309 basehttp 14268 11888 "GET /api/products/categories/ HTTP/1.1" 200 537
+WARNING 2026-06-02 10:15:10,433 basehttp 14268 7748 "GET /api/homepage/ HTTP/1.1" 404 4787
+WARNING 2026-06-02 10:15:10,502 basehttp 14268 1136 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 10:15:10,599 basehttp 14268 7364 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 10:15:11,167 basehttp 14268 1140 "GET /api/site-config/ HTTP/1.1" 404 4796
+INFO 2026-06-02 10:15:11,223 basehttp 14268 11888 "GET /api/wholesale/content/ HTTP/1.1" 200 82
+WARNING 2026-06-02 10:15:11,342 basehttp 14268 7748 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 10:15:11,545 basehttp 14268 1140 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+INFO 2026-06-02 10:15:15,500 views 14268 18660 ProductViewSet.list called with params: <QueryDict: {}>
+WARNING 2026-06-02 10:15:15,500 basehttp 14268 4952 "GET /api/delivery-charge/ HTTP/1.1" 404 4808
+INFO 2026-06-02 10:15:15,536 views 14268 18660 Successfully paginated 1 products
+INFO 2026-06-02 10:15:15,583 basehttp 14268 18660 "GET /api/products/products/ HTTP/1.1" 200 2137
+WARNING 2026-06-02 10:15:16,210 basehttp 14268 20336 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 10:15:16,250 basehttp 14268 14668 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 10:15:16,307 basehttp 14268 20336 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 10:15:17,886 basehttp 14268 18660 "GET /api/delivery-charge/ HTTP/1.1" 404 4808
+INFO 2026-06-02 10:15:18,132 basehttp 14268 18660 "OPTIONS /api/orders/?ordering=-ordered_at HTTP/1.1" 200 0
+INFO 2026-06-02 10:15:18,137 basehttp 14268 4952 "OPTIONS /api/auth/notifications/unread-count/ HTTP/1.1" 200 0
+WARNING 2026-06-02 10:15:18,208 basehttp 14268 18660 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 401 172
+INFO 2026-06-02 10:15:18,290 basehttp 14268 19284 "OPTIONS /api/auth/dashboard/admin/ HTTP/1.1" 200 0
+INFO 2026-06-02 10:15:18,290 basehttp 14268 4952 "OPTIONS /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 0
+INFO 2026-06-02 10:15:18,300 basehttp 14268 18660 "OPTIONS /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 200 0
+INFO 2026-06-02 10:15:18,340 basehttp 14268 17240 "OPTIONS /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 200 0
+WARNING 2026-06-02 10:15:18,389 basehttp 14268 18660 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:15:18,389 basehttp 14268 4952 "GET /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 401 172
+WARNING 2026-06-02 10:15:18,390 basehttp 14268 12508 "GET /api/auth/notifications/unread-count/ HTTP/1.1" 401 172
+WARNING 2026-06-02 10:15:18,437 basehttp 14268 18660 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:15:18,437 basehttp 14268 17240 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+INFO 2026-06-02 10:15:18,471 basehttp 14268 1496 "OPTIONS /api/auth/token/refresh/ HTTP/1.1" 200 0
+INFO 2026-06-02 10:15:18,617 basehttp 14268 1496 "POST /api/auth/token/refresh/ HTTP/1.1" 200 777
+INFO 2026-06-02 10:15:19,016 views 14268 1496 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 10:15:19,017 views 14268 1496 User authenticated: True
+INFO 2026-06-02 10:15:19,018 views 14268 1496 Query params: <QueryDict: {'ordering': ['-ordered_at']}>
+INFO 2026-06-02 10:15:19,020 views 14268 18660 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 10:15:19,020 views 14268 18660 User authenticated: True
+INFO 2026-06-02 10:15:19,020 views 14268 18660 Query params: <QueryDict: {'page_size': ['50'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 10:15:19,023 basehttp 14268 17240 "GET /api/auth/notifications/unread-count/ HTTP/1.1" 200 17
+INFO 2026-06-02 10:15:19,030 views 14268 1496 Orders queryset count: 2
+INFO 2026-06-02 10:15:19,033 views 14268 18660 Orders queryset count: 2
+INFO 2026-06-02 10:15:19,121 views 14268 1496 Serialized orders count: 2
+INFO 2026-06-02 10:15:19,139 views 14268 18660 Serialized orders count: 2
+INFO 2026-06-02 10:15:19,141 basehttp 14268 1496 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 200 1916
+INFO 2026-06-02 10:15:19,141 basehttp 14268 18660 "GET /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 1916
+WARNING 2026-06-02 10:15:28,565 basehttp 14268 1496 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+INFO 2026-06-02 10:15:34,389 basehttp 14268 1496 "OPTIONS /api/products/products/?page=1&page_size=20 HTTP/1.1" 200 0
+INFO 2026-06-02 10:15:34,390 basehttp 14268 18660 "OPTIONS /api/products/brands/?page_size=200 HTTP/1.1" 200 0
+INFO 2026-06-02 10:15:34,390 basehttp 14268 17240 "OPTIONS /api/products/colors/?page_size=200 HTTP/1.1" 200 0
+INFO 2026-06-02 10:15:34,393 basehttp 14268 4952 "OPTIONS /api/products/sizes/?page_size=200 HTTP/1.1" 200 0
+INFO 2026-06-02 10:15:34,421 basehttp 14268 18660 "OPTIONS /api/shops/shops/?page_size=200 HTTP/1.1" 200 0
+INFO 2026-06-02 10:15:34,424 views 14268 19284 ColorViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 10:15:34,428 basehttp 14268 1496 "GET /api/products/sizes/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 10:15:34,429 views 14268 12508 ProductViewSet.list called with params: <QueryDict: {'page': ['1'], 'page_size': ['20']}>
+INFO 2026-06-02 10:15:34,455 basehttp 14268 4952 "OPTIONS /api/products/categories/?page_size=200 HTTP/1.1" 200 0
+INFO 2026-06-02 10:15:34,464 views 14268 17240 BrandViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 10:15:34,472 views 14268 19284 Successfully returned 4 colors
+INFO 2026-06-02 10:15:34,496 views 14268 1496 ShopViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 10:15:34,512 views 14268 17240 Successfully returned 4 brands
+INFO 2026-06-02 10:15:34,517 views 14268 1496 Successfully paginated 1 shops
+INFO 2026-06-02 10:15:34,518 basehttp 14268 19284 "GET /api/products/colors/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 10:15:34,523 views 14268 4952 CategoryViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 10:15:34,534 basehttp 14268 1496 "GET /api/shops/shops/?page_size=200 HTTP/1.1" 200 746
+INFO 2026-06-02 10:15:34,535 basehttp 14268 17240 "GET /api/products/brands/?page_size=200 HTTP/1.1" 200 249
+INFO 2026-06-02 10:15:34,536 views 14268 12508 Successfully paginated 1 products
+INFO 2026-06-02 10:15:34,556 views 14268 4952 Successfully returned 4 categories
+INFO 2026-06-02 10:15:34,587 basehttp 14268 4952 "GET /api/products/categories/?page_size=200 HTTP/1.1" 200 537
+INFO 2026-06-02 10:15:34,605 basehttp 14268 12508 "GET /api/products/products/?page=1&page_size=20 HTTP/1.1" 200 2170
+INFO 2026-06-02 10:15:36,207 basehttp 14268 12508 "OPTIONS /api/products/categories/?page_size=20&page=1 HTTP/1.1" 200 0
+INFO 2026-06-02 10:15:36,208 basehttp 14268 4952 "OPTIONS /api/products/subcategories/?page_size=20&page=1 HTTP/1.1" 200 0
+INFO 2026-06-02 10:15:36,237 views 14268 12508 SubCategoryViewSet.list called with params: <QueryDict: {'page_size': ['20'], 'page': ['1']}>
+INFO 2026-06-02 10:15:36,237 views 14268 4952 CategoryViewSet.list called with params: <QueryDict: {'page_size': ['20'], 'page': ['1']}>
+INFO 2026-06-02 10:15:36,243 views 14268 12508 Successfully returned 4 subcategories
+INFO 2026-06-02 10:15:36,250 basehttp 14268 12508 "GET /api/products/subcategories/?page_size=20&page=1 HTTP/1.1" 200 271
+INFO 2026-06-02 10:15:36,262 views 14268 4952 Successfully returned 4 categories
+INFO 2026-06-02 10:15:36,265 basehttp 14268 4952 "GET /api/products/categories/?page_size=20&page=1 HTTP/1.1" 200 537
+INFO 2026-06-02 10:15:37,568 views 14268 4952 ProductViewSet.list called with params: <QueryDict: {'page': ['1'], 'page_size': ['20']}>
+INFO 2026-06-02 10:15:37,570 views 14268 1496 ColorViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 10:15:37,602 views 14268 12508 BrandViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 10:15:37,603 views 14268 19284 CategoryViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 10:15:37,604 views 14268 1496 Successfully returned 4 colors
+INFO 2026-06-02 10:15:37,604 views 14268 18660 ShopViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 10:15:37,608 basehttp 14268 17240 "GET /api/products/sizes/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 10:15:37,618 views 14268 12508 Successfully returned 4 brands
+INFO 2026-06-02 10:15:37,621 basehttp 14268 1496 "GET /api/products/colors/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 10:15:37,624 views 14268 18660 Successfully paginated 1 shops
+INFO 2026-06-02 10:15:37,636 basehttp 14268 12508 "GET /api/products/brands/?page_size=200 HTTP/1.1" 200 249
+INFO 2026-06-02 10:15:37,640 views 14268 19284 Successfully returned 4 categories
+INFO 2026-06-02 10:15:37,667 basehttp 14268 18660 "GET /api/shops/shops/?page_size=200 HTTP/1.1" 200 746
+INFO 2026-06-02 10:15:37,672 basehttp 14268 19284 "GET /api/products/categories/?page_size=200 HTTP/1.1" 200 537
+INFO 2026-06-02 10:15:37,684 views 14268 4952 Successfully paginated 1 products
+INFO 2026-06-02 10:15:37,707 basehttp 14268 4952 "GET /api/products/products/?page=1&page_size=20 HTTP/1.1" 200 2170
+INFO 2026-06-02 10:15:38,667 views 14268 4952 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 10:15:38,679 views 14268 4952 User authenticated: True
+INFO 2026-06-02 10:15:38,682 views 14268 4952 Query params: <QueryDict: {'ordering': ['-ordered_at']}>
+INFO 2026-06-02 10:15:38,683 views 14268 4952 Orders queryset count: 2
+INFO 2026-06-02 10:15:38,711 views 14268 4952 Serialized orders count: 2
+INFO 2026-06-02 10:15:38,716 basehttp 14268 4952 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 200 1916
+INFO 2026-06-02 10:15:40,527 basehttp 14268 4952 "OPTIONS /api/orders/?page_size=500&ordering=-ordered_at HTTP/1.1" 200 0
+INFO 2026-06-02 10:15:40,532 basehttp 14268 4952 "OPTIONS /api/products/products/?page_size=10&ordering=-created_at HTTP/1.1" 200 0
+INFO 2026-06-02 10:15:40,550 views 14268 19284 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 10:15:40,568 views 14268 18660 ProductViewSet.list called with params: <QueryDict: {'page_size': ['10'], 'ordering': ['-created_at']}>
+WARNING 2026-06-02 10:15:40,619 basehttp 14268 4952 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+INFO 2026-06-02 10:15:40,620 views 14268 19284 User authenticated: True
+INFO 2026-06-02 10:15:40,666 views 14268 19284 Query params: <QueryDict: {'page_size': ['500'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 10:15:40,671 views 14268 19284 Orders queryset count: 2
+INFO 2026-06-02 10:15:40,705 views 14268 19284 Serialized orders count: 2
+INFO 2026-06-02 10:15:40,711 views 14268 18660 Successfully paginated 1 products
+INFO 2026-06-02 10:15:40,713 basehttp 14268 19284 "GET /api/orders/?page_size=500&ordering=-ordered_at HTTP/1.1" 200 1916
+INFO 2026-06-02 10:15:40,767 basehttp 14268 18660 "GET /api/products/products/?page_size=10&ordering=-created_at HTTP/1.1" 200 2170
+WARNING 2026-06-02 10:15:44,583 basehttp 14268 18660 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+INFO 2026-06-02 10:15:44,731 views 14268 18660 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 10:15:44,734 views 14268 18660 User authenticated: True
+INFO 2026-06-02 10:15:44,734 views 14268 18660 Query params: <QueryDict: {'page_size': ['50'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 10:15:44,738 views 14268 18660 Orders queryset count: 2
+INFO 2026-06-02 10:15:44,762 views 14268 18660 Serialized orders count: 2
+INFO 2026-06-02 10:15:44,763 basehttp 14268 18660 "GET /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 1916
+WARNING 2026-06-02 10:15:48,199 basehttp 14268 18660 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:15:49,761 basehttp 14268 18660 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+WARNING 2026-06-02 10:16:14,859 basehttp 14268 18660 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+WARNING 2026-06-02 10:16:18,200 basehttp 14268 18660 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+INFO 2026-06-02 10:16:43,324 views 14268 1164 ProductViewSet.list called with params: <QueryDict: {}>
+INFO 2026-06-02 10:16:43,326 views 14268 4560 CategoryViewSet.list called with params: <QueryDict: {}>
+WARNING 2026-06-02 10:16:43,345 basehttp 14268 7496 "GET /api/homepage/ HTTP/1.1" 404 4787
+INFO 2026-06-02 10:16:43,365 views 14268 1164 Successfully paginated 1 products
+INFO 2026-06-02 10:16:43,443 views 14268 4560 Successfully returned 4 categories
+INFO 2026-06-02 10:16:43,455 basehttp 14268 4560 "GET /api/products/categories/ HTTP/1.1" 200 537
+INFO 2026-06-02 10:16:43,456 basehttp 14268 1164 "GET /api/products/products/ HTTP/1.1" 200 2137
+WARNING 2026-06-02 10:16:48,261 basehttp 14268 18660 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:16:49,951 basehttp 14268 18660 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+WARNING 2026-06-02 10:17:18,274 basehttp 14268 18660 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:17:48,205 basehttp 14268 18660 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:18:18,201 basehttp 14268 18660 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:18:25,063 basehttp 14268 18660 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+INFO 2026-06-02 10:18:29,658 views 14268 1496 ShopViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 10:18:29,659 views 14268 12508 CategoryViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 10:18:29,663 views 14268 18660 ProductViewSet.list called with params: <QueryDict: {'page': ['1'], 'page_size': ['20']}>
+INFO 2026-06-02 10:18:29,667 views 14268 17240 ColorViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 10:18:29,679 views 14268 1496 Successfully paginated 1 shops
+INFO 2026-06-02 10:18:29,679 basehttp 14268 4952 "GET /api/products/sizes/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 10:18:29,681 views 14268 17240 Successfully returned 4 colors
+INFO 2026-06-02 10:18:29,693 basehttp 14268 1496 "GET /api/shops/shops/?page_size=200 HTTP/1.1" 200 746
+INFO 2026-06-02 10:18:29,698 views 14268 12508 Successfully returned 4 categories
+INFO 2026-06-02 10:18:29,703 basehttp 14268 17240 "GET /api/products/colors/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 10:18:29,705 basehttp 14268 12508 "GET /api/products/categories/?page_size=200 HTTP/1.1" 200 537
+INFO 2026-06-02 10:18:29,709 views 14268 19284 BrandViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 10:18:29,719 views 14268 19284 Successfully returned 4 brands
+INFO 2026-06-02 10:18:29,723 views 14268 18660 Successfully paginated 1 products
+INFO 2026-06-02 10:18:29,723 basehttp 14268 19284 "GET /api/products/brands/?page_size=200 HTTP/1.1" 200 249
+INFO 2026-06-02 10:18:29,745 basehttp 14268 18660 "GET /api/products/products/?page=1&page_size=20 HTTP/1.1" 200 2170
+INFO 2026-06-02 10:18:32,459 views 14268 19284 SubCategoryViewSet.list called with params: <QueryDict: {'page_size': ['20'], 'page': ['1']}>
+INFO 2026-06-02 10:18:32,460 views 14268 18660 CategoryViewSet.list called with params: <QueryDict: {'page_size': ['20'], 'page': ['1']}>
+INFO 2026-06-02 10:18:32,471 views 14268 19284 Successfully returned 4 subcategories
+INFO 2026-06-02 10:18:32,476 views 14268 18660 Successfully returned 4 categories
+INFO 2026-06-02 10:18:32,476 basehttp 14268 19284 "GET /api/products/subcategories/?page_size=20&page=1 HTTP/1.1" 200 271
+INFO 2026-06-02 10:18:32,477 basehttp 14268 18660 "GET /api/products/categories/?page_size=20&page=1 HTTP/1.1" 200 537
+INFO 2026-06-02 10:18:35,898 views 14268 18660 ProductViewSet.list called with params: <QueryDict: {'page': ['1'], 'page_size': ['20']}>
+INFO 2026-06-02 10:18:35,909 views 14268 12508 ColorViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 10:18:35,910 views 14268 19284 BrandViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 10:18:35,915 basehttp 14268 17240 "GET /api/products/sizes/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 10:18:35,944 views 14268 4952 ShopViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 10:18:35,945 views 14268 1496 CategoryViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 10:18:35,952 views 14268 12508 Successfully returned 4 colors
+INFO 2026-06-02 10:18:35,958 basehttp 14268 12508 "GET /api/products/colors/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 10:18:35,959 views 14268 4952 Successfully paginated 1 shops
+INFO 2026-06-02 10:18:35,969 views 14268 1496 Successfully returned 4 categories
+INFO 2026-06-02 10:18:35,971 views 14268 19284 Successfully returned 4 brands
+INFO 2026-06-02 10:18:35,973 basehttp 14268 4952 "GET /api/shops/shops/?page_size=200 HTTP/1.1" 200 746
+INFO 2026-06-02 10:18:35,974 basehttp 14268 1496 "GET /api/products/categories/?page_size=200 HTTP/1.1" 200 537
+INFO 2026-06-02 10:18:35,979 basehttp 14268 19284 "GET /api/products/brands/?page_size=200 HTTP/1.1" 200 249
+INFO 2026-06-02 10:18:35,987 views 14268 18660 Successfully paginated 1 products
+INFO 2026-06-02 10:18:36,004 basehttp 14268 18660 "GET /api/products/products/?page=1&page_size=20 HTTP/1.1" 200 2170
+INFO 2026-06-02 10:18:43,428 views 14268 18660 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 10:18:43,428 views 14268 18660 User authenticated: True
+INFO 2026-06-02 10:18:43,462 views 14268 18660 Query params: <QueryDict: {'ordering': ['-ordered_at']}>
+INFO 2026-06-02 10:18:43,464 views 14268 18660 Orders queryset count: 2
+INFO 2026-06-02 10:18:43,486 views 14268 18660 Serialized orders count: 2
+INFO 2026-06-02 10:18:43,487 basehttp 14268 18660 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 200 1916
+WARNING 2026-06-02 10:18:45,144 basehttp 14268 18660 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+INFO 2026-06-02 10:18:45,161 views 14268 18660 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 10:18:45,164 views 14268 19284 ProductViewSet.list called with params: <QueryDict: {'page_size': ['10'], 'ordering': ['-created_at']}>
+INFO 2026-06-02 10:18:45,170 views 14268 18660 User authenticated: True
+INFO 2026-06-02 10:18:45,176 views 14268 18660 Query params: <QueryDict: {'page_size': ['500'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 10:18:45,179 views 14268 18660 Orders queryset count: 2
+INFO 2026-06-02 10:18:45,196 views 14268 19284 Successfully paginated 1 products
+INFO 2026-06-02 10:18:45,222 views 14268 18660 Serialized orders count: 2
+INFO 2026-06-02 10:18:45,228 basehttp 14268 18660 "GET /api/orders/?page_size=500&ordering=-ordered_at HTTP/1.1" 200 1916
+INFO 2026-06-02 10:18:45,239 basehttp 14268 19284 "GET /api/products/products/?page_size=10&ordering=-created_at HTTP/1.1" 200 2170
+WARNING 2026-06-02 10:18:48,195 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:18:55,185 basehttp 14268 19284 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+WARNING 2026-06-02 10:19:05,277 basehttp 14268 19284 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+WARNING 2026-06-02 10:19:18,267 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:19:48,272 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+INFO 2026-06-02 10:19:56,164 basehttp 14268 12052 "GET /api/wholesale/content/ HTTP/1.1" 200 82
+WARNING 2026-06-02 10:19:56,313 basehttp 14268 19284 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+WARNING 2026-06-02 10:20:16,195 basehttp 14268 19284 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+INFO 2026-06-02 10:20:16,333 views 14268 19284 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 10:20:16,356 views 14268 19284 User authenticated: True
+INFO 2026-06-02 10:20:16,356 views 14268 19284 Query params: <QueryDict: {'page_size': ['50'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 10:20:16,361 views 14268 19284 Orders queryset count: 2
+INFO 2026-06-02 10:20:16,396 views 14268 19284 Serialized orders count: 2
+INFO 2026-06-02 10:20:16,397 basehttp 14268 19284 "GET /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 1916
+WARNING 2026-06-02 10:20:18,216 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:20:26,348 basehttp 14268 19284 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+WARNING 2026-06-02 10:20:48,199 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:20:51,437 basehttp 14268 19284 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+WARNING 2026-06-02 10:21:11,539 basehttp 14268 19284 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+WARNING 2026-06-02 10:21:18,209 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:21:48,303 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:21:57,282 basehttp 14268 19284 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+WARNING 2026-06-02 10:22:18,275 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:22:20,290 basehttp 14268 19284 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+WARNING 2026-06-02 10:23:14,263 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:24:08,278 basehttp 14268 19284 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+WARNING 2026-06-02 10:24:14,291 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:25:14,281 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:26:14,277 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:27:14,280 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:28:14,267 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:29:14,265 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:30:14,264 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:30:16,266 basehttp 14268 19284 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+WARNING 2026-06-02 10:30:54,272 basehttp 14268 19284 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+WARNING 2026-06-02 10:31:14,275 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:32:14,282 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:33:14,283 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:34:14,285 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:35:14,297 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:36:14,286 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:37:14,302 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:38:14,271 basehttp 14268 19284 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:39:14,279 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:40:14,298 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:41:14,286 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:42:14,267 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:43:14,296 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:44:00,295 basehttp 14268 1048 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+WARNING 2026-06-02 10:44:14,274 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:45:14,279 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:45:37,279 basehttp 14268 1048 "GET /api/auth/dashboard/admin/ HTTP/1.1" 404 9735
+WARNING 2026-06-02 10:46:14,285 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:47:14,272 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:48:14,273 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:49:14,285 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:50:14,282 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:51:14,279 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:52:14,285 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:53:14,290 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:53:38,191 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:53:48,270 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:54:18,273 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:55:14,273 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:56:14,281 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:57:14,273 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:57:26,221 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:57:48,291 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:58:18,265 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 10:59:14,265 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+WARNING 2026-06-02 11:00:14,271 basehttp 14268 1048 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+INFO 2026-06-02 11:01:02,516 autoreload 14268 18136 D:\Munna\Munna\icommerce\icommerce\backend\accounts\views.py changed, reloading.
+INFO 2026-06-02 11:01:08,083 autoreload 19828 16688 Watching for file changes with StatReloader
+WARNING 2026-06-02 11:01:14,307 basehttp 19828 756 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 9760
+INFO 2026-06-02 11:01:23,108 autoreload 19828 16688 D:\Munna\Munna\icommerce\icommerce\backend\accounts\urls.py changed, reloading.
+INFO 2026-06-02 11:01:26,427 autoreload 19624 16220 Watching for file changes with StatReloader
+WARNING 2026-06-02 11:01:32,636 basehttp 19624 13376 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:01:34,334 basehttp 19624 18016 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 11:01:34,363 basehttp 19624 3420 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 11:01:34,409 basehttp 19624 18016 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 11:01:35,509 basehttp 19624 13376 "GET /api/delivery-charge/ HTTP/1.1" 404 4808
+INFO 2026-06-02 11:01:35,639 basehttp 19624 13376 "OPTIONS /api/orders/?ordering=-ordered_at HTTP/1.1" 200 0
+INFO 2026-06-02 11:01:35,669 basehttp 19624 13376 "OPTIONS /api/auth/dashboard/admin/ HTTP/1.1" 200 0
+INFO 2026-06-02 11:01:35,697 basehttp 19624 11580 "OPTIONS /api/auth/notifications/unread-count/ HTTP/1.1" 200 0
+INFO 2026-06-02 11:01:35,827 basehttp 19624 15836 "OPTIONS /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 0
+INFO 2026-06-02 11:01:35,842 views 19624 13376 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 11:01:35,860 basehttp 19624 11580 "GET /api/auth/notifications/unread-count/ HTTP/1.1" 200 17
+INFO 2026-06-02 11:01:35,861 views 19624 15836 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 11:01:35,909 views 19624 13376 User authenticated: True
+INFO 2026-06-02 11:01:35,913 views 19624 15836 User authenticated: True
+INFO 2026-06-02 11:01:35,925 views 19624 13376 Query params: <QueryDict: {'ordering': ['-ordered_at']}>
+INFO 2026-06-02 11:01:35,928 views 19624 15836 Query params: <QueryDict: {'page_size': ['50'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 11:01:35,928 basehttp 19624 14260 "OPTIONS /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 200 0
+INFO 2026-06-02 11:01:35,942 basehttp 19624 10180 "GET /api/auth/dashboard/admin/ HTTP/1.1" 200 221
+INFO 2026-06-02 11:01:35,944 views 19624 13376 Orders queryset count: 2
+INFO 2026-06-02 11:01:35,947 views 19624 15836 Orders queryset count: 2
+INFO 2026-06-02 11:01:35,960 basehttp 19624 10620 "OPTIONS /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 200 0
+WARNING 2026-06-02 11:01:35,988 basehttp 19624 14260 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:01:35,989 basehttp 19624 12896 "GET /media/products/thumbnails/mangoage_334.jfif HTTP/1.1" 200 17341
+WARNING 2026-06-02 11:01:36,184 basehttp 19624 10620 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:01:36,205 views 19624 13376 Serialized orders count: 2
+INFO 2026-06-02 11:01:36,210 views 19624 15836 Serialized orders count: 2
+INFO 2026-06-02 11:01:36,222 basehttp 19624 13376 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 200 1916
+INFO 2026-06-02 11:01:36,223 basehttp 19624 15836 "GET /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 1916
+WARNING 2026-06-02 11:02:05,732 basehttp 19624 15836 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:02:35,773 basehttp 19624 15836 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:03:06,311 basehttp 19624 15836 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:03:36,298 basehttp 19624 15836 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:04:06,273 basehttp 19624 15836 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:04:36,287 basehttp 19624 15836 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:05:14,297 basehttp 19624 15836 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:06:14,456 basehttp 19624 15836 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:07:14,287 basehttp 19624 15836 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:08:14,278 basehttp 19624 15836 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:09:14,275 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:09:38,876 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:09:55,900 basehttp 19624 19104 "OPTIONS /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 0
+INFO 2026-06-02 11:09:56,617 basehttp 19624 19104 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 884
+WARNING 2026-06-02 11:10:05,738 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:10:25,563 basehttp 19624 19104 "OPTIONS /api/auth/admin/users/2/ HTTP/1.1" 200 0
+INFO 2026-06-02 11:10:25,632 basehttp 19624 19104 "DELETE /api/auth/admin/users/2/ HTTP/1.1" 204 0
+INFO 2026-06-02 11:10:25,653 basehttp 19624 19104 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 657
+INFO 2026-06-02 11:10:28,663 views 19624 19104 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 11:10:28,664 views 19624 19104 User authenticated: True
+INFO 2026-06-02 11:10:28,665 views 19624 19104 Query params: <QueryDict: {'page_size': ['50'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 11:10:28,769 views 19624 19104 Orders queryset count: 2
+INFO 2026-06-02 11:10:28,894 views 19624 19104 Serialized orders count: 2
+INFO 2026-06-02 11:10:28,901 basehttp 19624 19104 "GET /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 1916
+INFO 2026-06-02 11:10:28,909 basehttp 19624 20388 "GET /api/auth/dashboard/admin/ HTTP/1.1" 200 221
+INFO 2026-06-02 11:10:33,831 basehttp 19624 20388 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 657
+WARNING 2026-06-02 11:10:35,737 basehttp 19624 20388 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:10:46,059 views 19624 19104 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 11:10:46,079 basehttp 19624 20388 "GET /api/auth/dashboard/admin/ HTTP/1.1" 200 221
+INFO 2026-06-02 11:10:46,107 views 19624 19104 User authenticated: True
+INFO 2026-06-02 11:10:46,113 views 19624 19104 Query params: <QueryDict: {'page_size': ['50'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 11:10:46,114 views 19624 19104 Orders queryset count: 2
+INFO 2026-06-02 11:10:46,151 views 19624 19104 Serialized orders count: 2
+INFO 2026-06-02 11:10:46,153 basehttp 19624 19104 "GET /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 1916
+WARNING 2026-06-02 11:11:05,746 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:11:35,747 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:12:05,749 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:12:35,746 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:13:05,753 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:13:35,747 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:14:05,744 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:14:36,279 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:15:14,272 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:16:14,293 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:17:14,292 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:17:56,678 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:18:05,736 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:18:36,281 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:19:06,268 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:19:42,556 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:20:05,740 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:20:36,274 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:21:06,278 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:22:14,280 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:22:36,273 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:23:06,278 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:24:14,333 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:25:14,359 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:26:14,292 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:27:14,297 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:28:14,278 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:29:14,286 basehttp 19624 19104 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:29:31,111 autoreload 19624 16220 D:\Munna\Munna\icommerce\icommerce\backend\accounts\views.py changed, reloading.
+INFO 2026-06-02 11:29:37,414 autoreload 2720 19944 Watching for file changes with StatReloader
+INFO 2026-06-02 11:29:40,899 autoreload 2720 19944 D:\Munna\Munna\icommerce\icommerce\backend\accounts\urls.py changed, reloading.
+INFO 2026-06-02 11:29:45,920 autoreload 9048 18152 Watching for file changes with StatReloader
+WARNING 2026-06-02 11:30:14,469 basehttp 9048 17728 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:30:35,747 basehttp 9048 17728 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:30:48,035 basehttp 9048 9080 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 11:30:48,273 basehttp 9048 1740 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 11:30:48,424 basehttp 9048 9080 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 11:30:48,912 basehttp 9048 16956 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 11:30:48,949 basehttp 9048 9080 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 11:30:48,985 basehttp 9048 13764 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 11:30:49,021 basehttp 9048 4508 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 11:30:49,021 basehttp 9048 1740 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 11:30:49,051 basehttp 9048 9080 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 11:30:50,580 basehttp 9048 17728 "GET /api/delivery-charge/ HTTP/1.1" 404 4808
+INFO 2026-06-02 11:30:50,764 basehttp 9048 16692 "GET /media/products/thumbnails/mangoage_334.jfif HTTP/1.1" 200 17341
+WARNING 2026-06-02 11:30:50,970 basehttp 9048 17728 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 401 172
+WARNING 2026-06-02 11:30:51,031 basehttp 9048 7776 "GET /api/auth/notifications/unread-count/ HTTP/1.1" 401 172
+WARNING 2026-06-02 11:30:51,036 basehttp 9048 17728 "GET /api/auth/dashboard/admin/ HTTP/1.1" 401 172
+WARNING 2026-06-02 11:30:51,110 basehttp 9048 18036 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:30:51,115 basehttp 9048 4844 "GET /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 401 172
+WARNING 2026-06-02 11:30:51,183 basehttp 9048 4844 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:30:51,619 basehttp 9048 4844 "POST /api/auth/token/refresh/ HTTP/1.1" 200 777
+INFO 2026-06-02 11:30:51,665 views 9048 4844 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 11:30:51,667 views 9048 7776 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 11:30:51,667 basehttp 9048 18036 "GET /api/auth/notifications/unread-count/ HTTP/1.1" 200 17
+INFO 2026-06-02 11:30:51,668 views 9048 4844 User authenticated: True
+INFO 2026-06-02 11:30:51,668 views 9048 7776 User authenticated: True
+INFO 2026-06-02 11:30:51,669 views 9048 4844 Query params: <QueryDict: {'ordering': ['-ordered_at']}>
+INFO 2026-06-02 11:30:51,669 views 9048 7776 Query params: <QueryDict: {'page_size': ['50'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 11:30:51,676 views 9048 4844 Orders queryset count: 2
+INFO 2026-06-02 11:30:51,676 views 9048 7776 Orders queryset count: 2
+INFO 2026-06-02 11:30:51,784 basehttp 9048 17728 "GET /api/auth/dashboard/admin/ HTTP/1.1" 200 266
+INFO 2026-06-02 11:30:51,934 views 9048 7776 Serialized orders count: 2
+INFO 2026-06-02 11:30:51,934 views 9048 4844 Serialized orders count: 2
+INFO 2026-06-02 11:30:51,942 basehttp 9048 4844 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 200 1916
+INFO 2026-06-02 11:30:51,943 basehttp 9048 7776 "GET /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 1916
+WARNING 2026-06-02 11:31:20,988 basehttp 9048 7776 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:31:51,270 basehttp 9048 7776 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:32:20,975 basehttp 9048 7776 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:32:45,120 views 9048 7776 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 11:32:45,121 views 9048 7776 User authenticated: True
+INFO 2026-06-02 11:32:45,121 views 9048 7776 Query params: <QueryDict: {'ordering': ['-ordered_at']}>
+INFO 2026-06-02 11:32:45,123 views 9048 7776 Orders queryset count: 2
+INFO 2026-06-02 11:32:45,144 views 9048 7776 Serialized orders count: 2
+INFO 2026-06-02 11:32:45,147 basehttp 9048 7776 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 200 1916
+WARNING 2026-06-02 11:32:50,969 basehttp 9048 7776 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:32:57,634 basehttp 9048 7776 "OPTIONS /api/orders/ORD161408830/ HTTP/1.1" 200 0
+INFO 2026-06-02 11:32:57,698 basehttp 9048 7776 "PATCH /api/orders/ORD161408830/ HTTP/1.1" 200 936
+INFO 2026-06-02 11:32:57,715 views 9048 7776 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 11:32:57,715 views 9048 7776 User authenticated: True
+INFO 2026-06-02 11:32:57,715 views 9048 7776 Query params: <QueryDict: {'ordering': ['-ordered_at']}>
+INFO 2026-06-02 11:32:57,717 views 9048 7776 Orders queryset count: 2
+INFO 2026-06-02 11:32:57,735 views 9048 7776 Serialized orders count: 2
+INFO 2026-06-02 11:32:57,736 basehttp 9048 7776 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 200 1899
+INFO 2026-06-02 11:32:59,784 views 9048 4844 CategoryViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 11:32:59,785 views 9048 7776 ColorViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 11:32:59,798 views 9048 17728 ShopViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 11:32:59,801 views 9048 7776 Successfully returned 4 colors
+INFO 2026-06-02 11:32:59,817 views 9048 18036 ProductViewSet.list called with params: <QueryDict: {'page': ['1'], 'page_size': ['20']}>
+INFO 2026-06-02 11:32:59,817 basehttp 9048 7776 "GET /api/products/colors/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 11:32:59,834 views 9048 4844 Successfully returned 4 categories
+INFO 2026-06-02 11:32:59,846 views 9048 17728 Successfully paginated 1 shops
+INFO 2026-06-02 11:32:59,851 basehttp 9048 4844 "GET /api/products/categories/?page_size=200 HTTP/1.1" 200 537
+INFO 2026-06-02 11:32:59,882 basehttp 9048 17728 "GET /api/shops/shops/?page_size=200 HTTP/1.1" 200 746
+INFO 2026-06-02 11:32:59,883 views 9048 13268 BrandViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 11:32:59,884 views 9048 18036 Successfully paginated 1 products
+INFO 2026-06-02 11:32:59,885 basehttp 9048 13272 "GET /api/products/sizes/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 11:32:59,916 views 9048 13268 Successfully returned 4 brands
+INFO 2026-06-02 11:32:59,930 basehttp 9048 13268 "GET /api/products/brands/?page_size=200 HTTP/1.1" 200 249
+INFO 2026-06-02 11:32:59,932 basehttp 9048 18036 "GET /api/products/products/?page=1&page_size=20 HTTP/1.1" 200 2170
+INFO 2026-06-02 11:33:01,703 views 9048 13268 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 11:33:01,724 basehttp 9048 18036 "GET /api/auth/dashboard/admin/ HTTP/1.1" 200 266
+INFO 2026-06-02 11:33:01,727 views 9048 13268 User authenticated: True
+INFO 2026-06-02 11:33:01,732 views 9048 13268 Query params: <QueryDict: {'page_size': ['50'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 11:33:01,736 views 9048 13268 Orders queryset count: 2
+INFO 2026-06-02 11:33:01,764 views 9048 13268 Serialized orders count: 2
+INFO 2026-06-02 11:33:01,766 basehttp 9048 13268 "GET /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 1899
+WARNING 2026-06-02 11:33:09,172 basehttp 9048 14756 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 11:33:09,191 basehttp 9048 12252 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 11:33:09,218 basehttp 9048 14756 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 11:33:10,009 basehttp 9048 13268 "GET /api/delivery-charge/ HTTP/1.1" 404 4808
+INFO 2026-06-02 11:33:10,102 basehttp 9048 13268 "OPTIONS /api/orders/?ordering=-ordered_at HTTP/1.1" 200 0
+INFO 2026-06-02 11:33:10,106 basehttp 9048 18036 "OPTIONS /api/auth/notifications/unread-count/ HTTP/1.1" 200 0
+INFO 2026-06-02 11:33:10,106 basehttp 9048 17728 "OPTIONS /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 0
+INFO 2026-06-02 11:33:10,106 basehttp 9048 13272 "OPTIONS /api/auth/dashboard/admin/ HTTP/1.1" 200 0
+INFO 2026-06-02 11:33:10,208 basehttp 9048 18036 "OPTIONS /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 200 0
+INFO 2026-06-02 11:33:10,227 basehttp 9048 17728 "OPTIONS /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 200 0
+INFO 2026-06-02 11:33:10,233 views 9048 13272 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 11:33:10,240 views 9048 18036 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 11:33:10,241 basehttp 9048 13268 "GET /api/auth/notifications/unread-count/ HTTP/1.1" 200 17
+INFO 2026-06-02 11:33:10,258 basehttp 9048 4844 "GET /api/auth/dashboard/admin/ HTTP/1.1" 200 266
+INFO 2026-06-02 11:33:10,269 basehttp 9048 16692 "GET /media/products/thumbnails/mangoage_334.jfif HTTP/1.1" 200 17341
+INFO 2026-06-02 11:33:10,275 views 9048 13272 User authenticated: True
+INFO 2026-06-02 11:33:10,288 views 9048 18036 User authenticated: True
+WARNING 2026-06-02 11:33:10,335 basehttp 9048 17728 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:33:10,365 basehttp 9048 7776 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:33:10,373 views 9048 13272 Query params: <QueryDict: {'ordering': ['-ordered_at']}>
+INFO 2026-06-02 11:33:10,373 views 9048 18036 Query params: <QueryDict: {'page_size': ['50'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 11:33:10,386 views 9048 13272 Orders queryset count: 2
+INFO 2026-06-02 11:33:10,391 views 9048 18036 Orders queryset count: 2
+INFO 2026-06-02 11:33:10,422 views 9048 13272 Serialized orders count: 2
+INFO 2026-06-02 11:33:10,447 views 9048 18036 Serialized orders count: 2
+INFO 2026-06-02 11:33:10,447 basehttp 9048 13272 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 200 1899
+INFO 2026-06-02 11:33:10,452 basehttp 9048 18036 "GET /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 1899
+WARNING 2026-06-02 11:33:40,266 basehttp 9048 18036 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:34:10,300 basehttp 9048 18036 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:34:40,283 basehttp 9048 18036 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:35:10,283 basehttp 9048 18036 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:35:40,266 basehttp 9048 18036 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:36:10,275 basehttp 9048 18036 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:36:17,345 basehttp 9048 1048 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 11:36:17,700 basehttp 9048 1048 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 11:36:17,775 basehttp 9048 4600 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 11:36:17,841 basehttp 9048 1048 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 11:36:17,861 basehttp 9048 12536 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 11:36:17,941 basehttp 9048 12408 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+INFO 2026-06-02 11:36:32,195 basehttp 9048 18036 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 657
+WARNING 2026-06-02 11:36:40,292 basehttp 9048 18036 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:36:50,048 basehttp 9048 6628 "POST /api/wholesale/auth/login/ HTTP/1.1" 200 1524
+WARNING 2026-06-02 11:36:57,055 basehttp 9048 11932 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 11:36:57,136 basehttp 9048 18400 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 11:36:57,155 basehttp 9048 11932 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 11:36:57,769 basehttp 9048 18036 "GET /api/delivery-charge/ HTTP/1.1" 404 4808
+INFO 2026-06-02 11:36:57,957 basehttp 9048 13272 "GET /api/auth/notifications/unread-count/ HTTP/1.1" 200 17
+INFO 2026-06-02 11:36:57,958 views 9048 18036 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 11:36:57,966 basehttp 9048 7776 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 657
+INFO 2026-06-02 11:36:58,009 views 9048 18036 User authenticated: True
+WARNING 2026-06-02 11:36:58,029 basehttp 9048 13272 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:36:58,058 views 9048 18036 Query params: <QueryDict: {'ordering': ['-ordered_at']}>
+INFO 2026-06-02 11:36:58,084 views 9048 18036 Orders queryset count: 2
+WARNING 2026-06-02 11:36:58,082 basehttp 9048 13272 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:36:58,119 views 9048 18036 Serialized orders count: 2
+INFO 2026-06-02 11:36:58,126 basehttp 9048 18036 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 200 1899
+INFO 2026-06-02 11:37:01,803 basehttp 9048 18036 "OPTIONS /api/auth/admin/vendors/ HTTP/1.1" 200 0
+WARNING 2026-06-02 11:37:01,834 basehttp 9048 18036 "GET /api/auth/admin/vendors/ HTTP/1.1" 404 10017
+WARNING 2026-06-02 11:37:06,861 basehttp 9048 18036 "GET /api/auth/admin/vendors/ HTTP/1.1" 404 10017
+WARNING 2026-06-02 11:37:28,012 basehttp 9048 18036 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:37:31,598 views 9048 7776 ProductViewSet.list called with params: <QueryDict: {'page_size': ['10'], 'ordering': ['-created_at']}>
+INFO 2026-06-02 11:37:31,600 views 9048 13272 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 11:37:31,618 views 9048 13272 User authenticated: True
+INFO 2026-06-02 11:37:31,626 views 9048 13272 Query params: <QueryDict: {'page_size': ['500'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 11:37:31,631 views 9048 13272 Orders queryset count: 2
+INFO 2026-06-02 11:37:31,632 basehttp 9048 18036 "GET /api/auth/dashboard/admin/ HTTP/1.1" 200 266
+INFO 2026-06-02 11:37:31,670 views 9048 13272 Serialized orders count: 2
+INFO 2026-06-02 11:37:31,673 basehttp 9048 13272 "GET /api/orders/?page_size=500&ordering=-ordered_at HTTP/1.1" 200 1899
+INFO 2026-06-02 11:37:31,674 views 9048 7776 Successfully paginated 1 products
+INFO 2026-06-02 11:37:31,701 basehttp 9048 7776 "GET /api/products/products/?page_size=10&ordering=-created_at HTTP/1.1" 200 2170
+INFO 2026-06-02 11:37:48,715 views 9048 13272 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 11:37:48,717 views 9048 13272 User authenticated: True
+INFO 2026-06-02 11:37:48,719 views 9048 13272 Query params: <QueryDict: {'page_size': ['50'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 11:37:48,721 views 9048 13272 Orders queryset count: 2
+INFO 2026-06-02 11:37:48,733 basehttp 9048 7776 "GET /api/auth/dashboard/admin/ HTTP/1.1" 200 266
+INFO 2026-06-02 11:37:48,752 views 9048 13272 Serialized orders count: 2
+INFO 2026-06-02 11:37:48,753 basehttp 9048 13272 "GET /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 1899
+WARNING 2026-06-02 11:37:58,021 basehttp 9048 13272 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:38:28,275 basehttp 9048 13272 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:38:58,007 basehttp 9048 2436 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:39:28,276 basehttp 9048 2436 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:39:45,036 basehttp 9048 2436 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 657
+WARNING 2026-06-02 11:39:58,278 basehttp 9048 2436 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:40:28,289 basehttp 9048 2436 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:40:58,283 basehttp 9048 2436 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:42:14,281 basehttp 9048 2436 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:43:14,278 basehttp 9048 2436 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:44:14,284 basehttp 9048 2436 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:45:14,278 basehttp 9048 2436 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:46:14,311 basehttp 9048 2436 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:47:14,316 basehttp 9048 2436 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:47:59,861 autoreload 9048 18152 D:\Munna\Munna\icommerce\icommerce\backend\accounts\views.py changed, reloading.
+INFO 2026-06-02 11:48:05,156 autoreload 8240 15880 Watching for file changes with StatReloader
+WARNING 2026-06-02 11:48:14,286 basehttp 8240 9272 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:48:22,164 autoreload 8240 15880 D:\Munna\Munna\icommerce\icommerce\backend\accounts\views.py changed, reloading.
+INFO 2026-06-02 11:48:25,061 autoreload 6204 6400 Watching for file changes with StatReloader
+WARNING 2026-06-02 11:49:14,285 basehttp 6204 7304 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:50:14,280 basehttp 6204 7304 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:51:14,281 basehttp 6204 7304 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:52:14,286 basehttp 6204 7304 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:52:32,237 autoreload 6204 6400 D:\Munna\Munna\icommerce\icommerce\backend\accounts\views.py changed, reloading.
+INFO 2026-06-02 11:52:36,637 autoreload 11216 3208 Watching for file changes with StatReloader
+INFO 2026-06-02 11:52:57,557 autoreload 11216 3208 D:\Munna\Munna\icommerce\icommerce\backend\accounts\views.py changed, reloading.
+INFO 2026-06-02 11:53:01,225 autoreload 2600 14796 Watching for file changes with StatReloader
+INFO 2026-06-02 11:53:22,285 autoreload 2600 14796 D:\Munna\Munna\icommerce\icommerce\backend\accounts\views.py changed, reloading.
+INFO 2026-06-02 11:53:26,327 autoreload 5200 9188 Watching for file changes with StatReloader
+WARNING 2026-06-02 11:53:51,630 basehttp 5200 5456 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:53:52,830 basehttp 5200 15120 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 11:53:52,921 basehttp 5200 14452 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 11:53:52,963 basehttp 5200 15120 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 11:53:53,541 basehttp 5200 14452 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 11:53:53,608 basehttp 5200 19680 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 11:53:53,652 basehttp 5200 14452 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+INFO 2026-06-02 11:53:55,826 views 5200 11768 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 11:53:55,827 views 5200 11768 User authenticated: True
+INFO 2026-06-02 11:53:55,830 views 5200 11768 Query params: <QueryDict: {'page_size': ['50'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 11:53:55,834 views 5200 11768 Orders queryset count: 2
+INFO 2026-06-02 11:53:55,861 basehttp 5200 5456 "GET /api/auth/dashboard/admin/ HTTP/1.1" 200 266
+INFO 2026-06-02 11:53:55,870 views 5200 11768 Serialized orders count: 2
+INFO 2026-06-02 11:53:55,871 basehttp 5200 11768 "GET /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 1899
+WARNING 2026-06-02 11:53:58,000 basehttp 5200 11768 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:54:03,449 basehttp 5200 11768 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 923
+INFO 2026-06-02 11:54:27,785 views 5200 5456 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 11:54:27,808 basehttp 5200 11768 "GET /api/auth/dashboard/admin/ HTTP/1.1" 200 266
+INFO 2026-06-02 11:54:27,829 views 5200 5456 User authenticated: True
+INFO 2026-06-02 11:54:27,909 views 5200 5456 Query params: <QueryDict: {'page_size': ['50'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 11:54:27,962 views 5200 5456 Orders queryset count: 2
+WARNING 2026-06-02 11:54:28,047 basehttp 5200 11768 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 11:54:28,078 views 5200 5456 Serialized orders count: 2
+INFO 2026-06-02 11:54:28,094 basehttp 5200 5456 "GET /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 1899
+INFO 2026-06-02 11:54:38,985 basehttp 5200 5456 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 923
+WARNING 2026-06-02 11:54:58,003 basehttp 5200 5456 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:55:28,018 basehttp 5200 5456 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:55:58,014 basehttp 5200 5456 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:56:28,026 basehttp 5200 5456 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:56:58,012 basehttp 5200 5456 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:57:28,289 basehttp 5200 5456 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:57:58,291 basehttp 5200 5456 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 11:59:14,420 basehttp 5200 5456 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:00:14,277 basehttp 5200 5456 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:01:14,276 basehttp 5200 5456 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:01:16,588 basehttp 5200 12048 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 12:01:16,946 basehttp 5200 12048 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 12:01:17,045 basehttp 5200 20324 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 12:01:17,261 basehttp 5200 12048 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 12:01:17,281 basehttp 5200 7780 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 12:01:17,329 basehttp 5200 19652 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 12:01:28,267 basehttp 5200 5456 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:01:58,273 basehttp 5200 5456 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 12:01:58,846 autoreload 5200 9188 D:\Munna\Munna\icommerce\icommerce\backend\wholesale\models.py changed, reloading.
+INFO 2026-06-02 12:02:02,060 autoreload 17884 10668 Watching for file changes with StatReloader
+INFO 2026-06-02 12:02:06,957 autoreload 17884 10668 D:\Munna\Munna\icommerce\icommerce\backend\wholesale\models.py changed, reloading.
+INFO 2026-06-02 12:02:09,131 autoreload 240 9812 Watching for file changes with StatReloader
+INFO 2026-06-02 12:02:18,903 autoreload 240 9812 D:\Munna\Munna\icommerce\icommerce\backend\wholesale\models.py changed, reloading.
+INFO 2026-06-02 12:02:21,113 autoreload 19756 19344 Watching for file changes with StatReloader
+INFO 2026-06-02 12:29:47,867 autoreload 15356 7404 Watching for file changes with StatReloader
+WARNING 2026-06-02 12:29:49,174 basehttp 15356 9004 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 12:29:49,844 basehttp 15356 9004 "OPTIONS /api/shops/shops/?page_size=200 HTTP/1.1" 200 0
+INFO 2026-06-02 12:29:49,877 views 15356 9004 ShopViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:29:49,880 views 15356 9004 Successfully paginated 1 shops
+INFO 2026-06-02 12:29:49,891 basehttp 15356 9004 "GET /api/shops/shops/?page_size=200 HTTP/1.1" 200 746
+INFO 2026-06-02 12:29:55,172 basehttp 15356 9004 "OPTIONS /api/products/brands/?page_size=200 HTTP/1.1" 200 0
+INFO 2026-06-02 12:29:55,180 views 15356 9004 BrandViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:29:55,184 views 15356 9004 Successfully returned 4 brands
+INFO 2026-06-02 12:29:55,185 basehttp 15356 9004 "GET /api/products/brands/?page_size=200 HTTP/1.1" 200 249
+INFO 2026-06-02 12:29:59,854 basehttp 15356 9004 "OPTIONS /api/products/sizes/?page_size=200 HTTP/1.1" 200 0
+INFO 2026-06-02 12:29:59,892 basehttp 15356 9004 "GET /api/products/sizes/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 12:29:59,957 basehttp 15356 9004 "OPTIONS /api/products/products/?page=1&page_size=20 HTTP/1.1" 200 0
+INFO 2026-06-02 12:29:59,967 views 15356 9004 ProductViewSet.list called with params: <QueryDict: {'page': ['1'], 'page_size': ['20']}>
+INFO 2026-06-02 12:29:59,998 views 15356 9004 Successfully paginated 1 products
+INFO 2026-06-02 12:30:00,022 basehttp 15356 9004 "GET /api/products/products/?page=1&page_size=20 HTTP/1.1" 200 2170
+INFO 2026-06-02 12:30:00,175 basehttp 15356 9004 "OPTIONS /api/products/categories/?page_size=200 HTTP/1.1" 200 0
+INFO 2026-06-02 12:30:00,197 views 15356 9004 CategoryViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:30:00,218 views 15356 9004 Successfully returned 4 categories
+INFO 2026-06-02 12:30:00,222 basehttp 15356 9004 "GET /api/products/categories/?page_size=200 HTTP/1.1" 200 537
+INFO 2026-06-02 12:30:08,505 views 15356 9004 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 12:30:08,506 views 15356 9004 User authenticated: True
+INFO 2026-06-02 12:30:08,506 views 15356 9004 Query params: <QueryDict: {'ordering': ['-ordered_at']}>
+INFO 2026-06-02 12:30:08,507 views 15356 9004 Orders queryset count: 2
+INFO 2026-06-02 12:30:08,520 views 15356 9004 Serialized orders count: 2
+INFO 2026-06-02 12:30:08,521 basehttp 15356 9004 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 200 1899
+WARNING 2026-06-02 12:30:17,465 basehttp 15356 9004 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 12:30:22,504 basehttp 15356 9004 "GET /api/auth/notifications/unread-count/ HTTP/1.1" 200 17
+INFO 2026-06-02 12:30:37,225 basehttp 15356 9004 "OPTIONS /api/products/colors/?page_size=200 HTTP/1.1" 200 0
+INFO 2026-06-02 12:30:37,231 views 15356 9004 ColorViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:30:37,233 views 15356 9004 Successfully returned 4 colors
+INFO 2026-06-02 12:30:37,234 basehttp 15356 9004 "GET /api/products/colors/?page_size=200 HTTP/1.1" 200 52
+WARNING 2026-06-02 12:30:47,463 basehttp 15356 9004 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:31:11,285 basehttp 15356 9004 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 401 172
+INFO 2026-06-02 12:31:11,335 basehttp 15356 9004 "OPTIONS /api/auth/token/refresh/ HTTP/1.1" 200 0
+INFO 2026-06-02 12:31:11,402 basehttp 15356 9004 "POST /api/auth/token/refresh/ HTTP/1.1" 200 777
+INFO 2026-06-02 12:31:11,430 basehttp 15356 9004 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 639
+WARNING 2026-06-02 12:31:17,476 basehttp 15356 9004 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 12:31:19,535 views 15356 1264 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 12:31:19,536 views 15356 1264 User authenticated: True
+INFO 2026-06-02 12:31:19,537 views 15356 1264 Query params: <QueryDict: {'page_size': ['50'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 12:31:19,540 basehttp 15356 9004 "GET /api/auth/dashboard/admin/ HTTP/1.1" 200 266
+INFO 2026-06-02 12:31:19,541 views 15356 1264 Orders queryset count: 2
+INFO 2026-06-02 12:31:19,570 views 15356 1264 Serialized orders count: 2
+INFO 2026-06-02 12:31:19,572 basehttp 15356 1264 "GET /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 1899
+INFO 2026-06-02 12:31:25,702 basehttp 15356 1264 "OPTIONS /api/orders/?page_size=500&ordering=-ordered_at HTTP/1.1" 200 0
+INFO 2026-06-02 12:31:25,702 basehttp 15356 9004 "OPTIONS /api/products/products/?page_size=10&ordering=-created_at HTTP/1.1" 200 0
+INFO 2026-06-02 12:31:25,769 views 15356 1264 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 12:31:25,773 views 15356 10308 ProductViewSet.list called with params: <QueryDict: {'page_size': ['10'], 'ordering': ['-created_at']}>
+INFO 2026-06-02 12:31:25,781 views 15356 1264 User authenticated: True
+INFO 2026-06-02 12:31:25,802 basehttp 15356 9004 "GET /api/auth/dashboard/admin/ HTTP/1.1" 200 266
+INFO 2026-06-02 12:31:25,806 views 15356 1264 Query params: <QueryDict: {'page_size': ['500'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 12:31:25,822 views 15356 10308 Successfully paginated 1 products
+INFO 2026-06-02 12:31:25,824 views 15356 1264 Orders queryset count: 2
+INFO 2026-06-02 12:31:25,898 views 15356 1264 Serialized orders count: 2
+INFO 2026-06-02 12:31:25,902 basehttp 15356 1264 "GET /api/orders/?page_size=500&ordering=-ordered_at HTTP/1.1" 200 1899
+INFO 2026-06-02 12:31:25,904 basehttp 15356 10308 "GET /api/products/products/?page_size=10&ordering=-created_at HTTP/1.1" 200 2170
+WARNING 2026-06-02 12:31:47,451 basehttp 15356 10308 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 12:31:53,598 basehttp 15356 10308 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 639
+WARNING 2026-06-02 12:32:17,476 basehttp 15356 10308 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:32:38,305 basehttp 15356 10308 "GET /api/auth/admin/vendors/ HTTP/1.1" 404 10017
+INFO 2026-06-02 12:32:39,831 views 15356 10308 ProductViewSet.list called with params: <QueryDict: {'page': ['1'], 'page_size': ['20']}>
+INFO 2026-06-02 12:32:39,833 views 15356 1264 BrandViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:32:39,833 views 15356 9004 ColorViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:32:39,851 views 15356 1264 Successfully returned 4 brands
+INFO 2026-06-02 12:32:39,858 views 15356 9004 Successfully returned 4 colors
+INFO 2026-06-02 12:32:39,859 basehttp 15356 1264 "GET /api/products/brands/?page_size=200 HTTP/1.1" 200 249
+INFO 2026-06-02 12:32:39,869 basehttp 15356 9004 "GET /api/products/colors/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 12:32:39,872 views 15356 10336 CategoryViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:32:39,882 views 15356 15176 ShopViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:32:39,900 basehttp 15356 8088 "GET /api/products/sizes/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 12:32:39,905 views 15356 10336 Successfully returned 4 categories
+INFO 2026-06-02 12:32:39,915 views 15356 15176 Successfully paginated 1 shops
+INFO 2026-06-02 12:32:39,921 basehttp 15356 10336 "GET /api/products/categories/?page_size=200 HTTP/1.1" 200 537
+INFO 2026-06-02 12:32:39,923 views 15356 10308 Successfully paginated 1 products
+INFO 2026-06-02 12:32:39,949 basehttp 15356 15176 "GET /api/shops/shops/?page_size=200 HTTP/1.1" 200 746
+INFO 2026-06-02 12:32:39,996 basehttp 15356 10308 "GET /api/products/products/?page=1&page_size=20 HTTP/1.1" 200 2170
+INFO 2026-06-02 12:32:40,410 basehttp 15356 10308 "OPTIONS /api/products/categories/?page_size=20&page=1 HTTP/1.1" 200 0
+INFO 2026-06-02 12:32:40,410 basehttp 15356 15176 "OPTIONS /api/products/subcategories/?page_size=20&page=1 HTTP/1.1" 200 0
+INFO 2026-06-02 12:32:40,428 views 15356 15176 SubCategoryViewSet.list called with params: <QueryDict: {'page_size': ['20'], 'page': ['1']}>
+INFO 2026-06-02 12:32:40,442 views 15356 15176 Successfully returned 4 subcategories
+INFO 2026-06-02 12:32:40,444 views 15356 10308 CategoryViewSet.list called with params: <QueryDict: {'page_size': ['20'], 'page': ['1']}>
+INFO 2026-06-02 12:32:40,453 basehttp 15356 15176 "GET /api/products/subcategories/?page_size=20&page=1 HTTP/1.1" 200 271
+INFO 2026-06-02 12:32:40,472 views 15356 10308 Successfully returned 4 categories
+INFO 2026-06-02 12:32:40,505 basehttp 15356 10308 "GET /api/products/categories/?page_size=20&page=1 HTTP/1.1" 200 537
+INFO 2026-06-02 12:32:41,800 basehttp 15356 10336 "OPTIONS /api/products/sizes/?page_size=20&page=1 HTTP/1.1" 200 0
+INFO 2026-06-02 12:32:41,800 basehttp 15356 15176 "OPTIONS /api/products/colors/?page_size=20&page=1 HTTP/1.1" 200 0
+INFO 2026-06-02 12:32:41,800 basehttp 15356 10308 "OPTIONS /api/products/brands/?page_size=20&page=1 HTTP/1.1" 200 0
+INFO 2026-06-02 12:32:41,824 views 15356 15176 BrandViewSet.list called with params: <QueryDict: {'page_size': ['20'], 'page': ['1']}>
+INFO 2026-06-02 12:32:41,832 basehttp 15356 10336 "GET /api/products/sizes/?page_size=20&page=1 HTTP/1.1" 200 52
+INFO 2026-06-02 12:32:41,853 views 15356 10308 ColorViewSet.list called with params: <QueryDict: {'page_size': ['20'], 'page': ['1']}>
+INFO 2026-06-02 12:32:41,862 views 15356 15176 Successfully returned 4 brands
+INFO 2026-06-02 12:32:41,877 basehttp 15356 15176 "GET /api/products/brands/?page_size=20&page=1 HTTP/1.1" 200 249
+INFO 2026-06-02 12:32:41,880 views 15356 10308 Successfully returned 4 colors
+INFO 2026-06-02 12:32:41,886 basehttp 15356 10308 "GET /api/products/colors/?page_size=20&page=1 HTTP/1.1" 200 52
+INFO 2026-06-02 12:32:41,996 basehttp 15356 9452 "GET /media/brands/paypal.png HTTP/1.1" 200 92736
+INFO 2026-06-02 12:32:45,212 views 15356 15176 BrandViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:32:45,219 views 15356 10308 ProductViewSet.list called with params: <QueryDict: {'page': ['1'], 'page_size': ['20']}>
+INFO 2026-06-02 12:32:45,223 views 15356 15176 Successfully returned 4 brands
+INFO 2026-06-02 12:32:45,237 basehttp 15356 15176 "GET /api/products/brands/?page_size=200 HTTP/1.1" 200 249
+INFO 2026-06-02 12:32:45,238 basehttp 15356 8088 "GET /api/products/sizes/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 12:32:45,239 views 15356 10336 ColorViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:32:45,240 views 15356 1264 ShopViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:32:45,241 views 15356 9004 CategoryViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:32:45,247 views 15356 10336 Successfully returned 4 colors
+INFO 2026-06-02 12:32:45,251 basehttp 15356 10336 "GET /api/products/colors/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 12:32:45,252 views 15356 1264 Successfully paginated 1 shops
+INFO 2026-06-02 12:32:45,266 views 15356 9004 Successfully returned 4 categories
+INFO 2026-06-02 12:32:45,268 basehttp 15356 1264 "GET /api/shops/shops/?page_size=200 HTTP/1.1" 200 746
+INFO 2026-06-02 12:32:45,268 basehttp 15356 9004 "GET /api/products/categories/?page_size=200 HTTP/1.1" 200 537
+INFO 2026-06-02 12:32:45,279 views 15356 10308 Successfully paginated 1 products
+INFO 2026-06-02 12:32:45,296 basehttp 15356 10308 "GET /api/products/products/?page=1&page_size=20 HTTP/1.1" 200 2170
+INFO 2026-06-02 12:32:46,395 views 15356 10308 BrandViewSet.list called with params: <QueryDict: {'page_size': ['20'], 'page': ['1']}>
+INFO 2026-06-02 12:32:46,397 views 15356 1264 ColorViewSet.list called with params: <QueryDict: {'page_size': ['20'], 'page': ['1']}>
+INFO 2026-06-02 12:32:46,397 basehttp 15356 9004 "GET /api/products/sizes/?page_size=20&page=1 HTTP/1.1" 200 52
+INFO 2026-06-02 12:32:46,410 views 15356 10308 Successfully returned 4 brands
+INFO 2026-06-02 12:32:46,413 views 15356 1264 Successfully returned 4 colors
+INFO 2026-06-02 12:32:46,416 basehttp 15356 10308 "GET /api/products/brands/?page_size=20&page=1 HTTP/1.1" 200 249
+INFO 2026-06-02 12:32:46,419 basehttp 15356 1264 "GET /api/products/colors/?page_size=20&page=1 HTTP/1.1" 200 52
+WARNING 2026-06-02 12:32:47,454 basehttp 15356 1264 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 12:32:48,470 views 15356 1264 ProductViewSet.list called with params: <QueryDict: {'page': ['1'], 'page_size': ['20']}>
+INFO 2026-06-02 12:32:48,477 views 15356 9004 ColorViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:32:48,487 views 15356 8088 CategoryViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:32:48,492 views 15356 10308 BrandViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:32:48,497 views 15356 9004 Successfully returned 4 colors
+INFO 2026-06-02 12:32:48,498 views 15356 15176 ShopViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:32:48,507 basehttp 15356 10336 "GET /api/products/sizes/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 12:32:48,524 views 15356 8088 Successfully returned 4 categories
+INFO 2026-06-02 12:32:48,527 views 15356 10308 Successfully returned 4 brands
+INFO 2026-06-02 12:32:48,527 basehttp 15356 9004 "GET /api/products/colors/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 12:32:48,546 views 15356 1264 Successfully paginated 1 products
+INFO 2026-06-02 12:32:48,557 views 15356 15176 Successfully paginated 1 shops
+INFO 2026-06-02 12:32:48,561 basehttp 15356 8088 "GET /api/products/categories/?page_size=200 HTTP/1.1" 200 537
+INFO 2026-06-02 12:32:48,562 basehttp 15356 10308 "GET /api/products/brands/?page_size=200 HTTP/1.1" 200 249
+INFO 2026-06-02 12:32:48,612 basehttp 15356 15176 "GET /api/shops/shops/?page_size=200 HTTP/1.1" 200 746
+INFO 2026-06-02 12:32:48,642 basehttp 15356 1264 "GET /api/products/products/?page=1&page_size=20 HTTP/1.1" 200 2170
+INFO 2026-06-02 12:32:49,299 views 15356 1264 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 12:32:49,305 views 15356 1264 User authenticated: True
+INFO 2026-06-02 12:32:49,328 views 15356 1264 Query params: <QueryDict: {'ordering': ['-ordered_at']}>
+INFO 2026-06-02 12:32:49,332 views 15356 1264 Orders queryset count: 2
+INFO 2026-06-02 12:32:49,362 views 15356 1264 Serialized orders count: 2
+INFO 2026-06-02 12:32:49,364 basehttp 15356 1264 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 200 1899
+INFO 2026-06-02 12:32:56,018 basehttp 15356 1264 "OPTIONS /api/orders/coupons/?page_size=20&page=1 HTTP/1.1" 200 0
+INFO 2026-06-02 12:32:56,018 basehttp 15356 15176 "OPTIONS /api/orders/free-shipping-rules/?page_size=20&page=1 HTTP/1.1" 200 0
+ERROR 2026-06-02 12:32:56,093 views 15356 1264 Error fetching order: No Order matches the given query.
+Traceback (most recent call last):
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\shortcuts.py", line 86, in get_object_or_404
+    return queryset.get(*args, **kwargs)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\query.py", line 649, in get
+    raise self.model.DoesNotExist(
+        "%s matching query does not exist." % self.model._meta.object_name
+    )
+orders.models.Order.DoesNotExist: Order matching query does not exist.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Munna\Munna\icommerce\icommerce\backend\orders\views.py", line 520, in retrieve
+    instance = self.get_object()
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\generics.py", line 100, in get_object
+    obj = get_object_or_404(queryset, **filter_kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\generics.py", line 19, in get_object_or_404
+    return _get_object_or_404(queryset, *filter_args, **filter_kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\shortcuts.py", line 88, in get_object_or_404
+    raise Http404(
+        "No %s matches the given query." % queryset.model._meta.object_name
+    )
+django.http.response.Http404: No Order matches the given query.
+ERROR 2026-06-02 12:32:56,095 views 15356 15176 Error fetching order: No Order matches the given query.
+Traceback (most recent call last):
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\shortcuts.py", line 86, in get_object_or_404
+    return queryset.get(*args, **kwargs)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\query.py", line 649, in get
+    raise self.model.DoesNotExist(
+        "%s matching query does not exist." % self.model._meta.object_name
+    )
+orders.models.Order.DoesNotExist: Order matching query does not exist.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Munna\Munna\icommerce\icommerce\backend\orders\views.py", line 520, in retrieve
+    instance = self.get_object()
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\generics.py", line 100, in get_object
+    obj = get_object_or_404(queryset, **filter_kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\generics.py", line 19, in get_object_or_404
+    return _get_object_or_404(queryset, *filter_args, **filter_kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\shortcuts.py", line 88, in get_object_or_404
+    raise Http404(
+        "No %s matches the given query." % queryset.model._meta.object_name
+    )
+django.http.response.Http404: No Order matches the given query.
+ERROR 2026-06-02 12:32:56,304 log 15356 1264 Internal Server Error: /api/orders/free-shipping-rules/
+ERROR 2026-06-02 12:32:56,312 log 15356 15176 Internal Server Error: /api/orders/coupons/
+ERROR 2026-06-02 12:32:56,314 basehttp 15356 1264 "GET /api/orders/free-shipping-rules/?page_size=20&page=1 HTTP/1.1" 500 146
+ERROR 2026-06-02 12:32:56,315 basehttp 15356 15176 "GET /api/orders/coupons/?page_size=20&page=1 HTTP/1.1" 500 146
+ERROR 2026-06-02 12:32:57,353 views 15356 15176 Error fetching order: No Order matches the given query.
+Traceback (most recent call last):
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\shortcuts.py", line 86, in get_object_or_404
+    return queryset.get(*args, **kwargs)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\query.py", line 649, in get
+    raise self.model.DoesNotExist(
+        "%s matching query does not exist." % self.model._meta.object_name
+    )
+orders.models.Order.DoesNotExist: Order matching query does not exist.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Munna\Munna\icommerce\icommerce\backend\orders\views.py", line 520, in retrieve
+    instance = self.get_object()
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\generics.py", line 100, in get_object
+    obj = get_object_or_404(queryset, **filter_kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\generics.py", line 19, in get_object_or_404
+    return _get_object_or_404(queryset, *filter_args, **filter_kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\shortcuts.py", line 88, in get_object_or_404
+    raise Http404(
+        "No %s matches the given query." % queryset.model._meta.object_name
+    )
+django.http.response.Http404: No Order matches the given query.
+ERROR 2026-06-02 12:32:57,354 views 15356 1264 Error fetching order: No Order matches the given query.
+Traceback (most recent call last):
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\shortcuts.py", line 86, in get_object_or_404
+    return queryset.get(*args, **kwargs)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\query.py", line 649, in get
+    raise self.model.DoesNotExist(
+        "%s matching query does not exist." % self.model._meta.object_name
+    )
+orders.models.Order.DoesNotExist: Order matching query does not exist.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Munna\Munna\icommerce\icommerce\backend\orders\views.py", line 520, in retrieve
+    instance = self.get_object()
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\generics.py", line 100, in get_object
+    obj = get_object_or_404(queryset, **filter_kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\generics.py", line 19, in get_object_or_404
+    return _get_object_or_404(queryset, *filter_args, **filter_kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\shortcuts.py", line 88, in get_object_or_404
+    raise Http404(
+        "No %s matches the given query." % queryset.model._meta.object_name
+    )
+django.http.response.Http404: No Order matches the given query.
+ERROR 2026-06-02 12:32:57,356 log 15356 15176 Internal Server Error: /api/orders/free-shipping-rules/
+ERROR 2026-06-02 12:32:57,364 log 15356 1264 Internal Server Error: /api/orders/coupons/
+ERROR 2026-06-02 12:32:57,365 basehttp 15356 15176 "GET /api/orders/free-shipping-rules/?page_size=20&page=1 HTTP/1.1" 500 146
+ERROR 2026-06-02 12:32:57,365 basehttp 15356 1264 "GET /api/orders/coupons/?page_size=20&page=1 HTTP/1.1" 500 146
+INFO 2026-06-02 12:32:57,687 views 15356 15176 SubCategoryViewSet.list called with params: <QueryDict: {'page_size': ['20'], 'page': ['1']}>
+INFO 2026-06-02 12:32:57,692 views 15356 1264 CategoryViewSet.list called with params: <QueryDict: {'page_size': ['20'], 'page': ['1']}>
+INFO 2026-06-02 12:32:57,699 views 15356 15176 Successfully returned 4 subcategories
+INFO 2026-06-02 12:32:57,703 basehttp 15356 15176 "GET /api/products/subcategories/?page_size=20&page=1 HTTP/1.1" 200 271
+INFO 2026-06-02 12:32:57,709 views 15356 1264 Successfully returned 4 categories
+INFO 2026-06-02 12:32:57,714 basehttp 15356 1264 "GET /api/products/categories/?page_size=20&page=1 HTTP/1.1" 200 537
+INFO 2026-06-02 12:32:59,597 views 15356 15176 BrandViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:32:59,606 views 15356 10308 ColorViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:32:59,613 basehttp 15356 8088 "GET /api/products/sizes/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 12:32:59,616 views 15356 10336 ShopViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:32:59,616 views 15356 1264 ProductViewSet.list called with params: <QueryDict: {'page': ['1'], 'page_size': ['20']}>
+INFO 2026-06-02 12:32:59,618 views 15356 9004 CategoryViewSet.list called with params: <QueryDict: {'page_size': ['200']}>
+INFO 2026-06-02 12:32:59,622 views 15356 10308 Successfully returned 4 colors
+INFO 2026-06-02 12:32:59,627 views 15356 15176 Successfully returned 4 brands
+INFO 2026-06-02 12:32:59,632 views 15356 10336 Successfully paginated 1 shops
+INFO 2026-06-02 12:32:59,670 basehttp 15356 15176 "GET /api/products/brands/?page_size=200 HTTP/1.1" 200 249
+INFO 2026-06-02 12:32:59,675 basehttp 15356 10336 "GET /api/shops/shops/?page_size=200 HTTP/1.1" 200 746
+INFO 2026-06-02 12:32:59,687 basehttp 15356 10308 "GET /api/products/colors/?page_size=200 HTTP/1.1" 200 52
+INFO 2026-06-02 12:32:59,711 views 15356 9004 Successfully returned 4 categories
+INFO 2026-06-02 12:32:59,717 views 15356 1264 Successfully paginated 1 products
+INFO 2026-06-02 12:32:59,733 basehttp 15356 9004 "GET /api/products/categories/?page_size=200 HTTP/1.1" 200 537
+INFO 2026-06-02 12:32:59,769 basehttp 15356 1264 "GET /api/products/products/?page=1&page_size=20 HTTP/1.1" 200 2170
+INFO 2026-06-02 12:33:02,479 basehttp 15356 1264 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 639
+WARNING 2026-06-02 12:33:08,955 basehttp 15356 1772 "POST /api/wholesale/auth/refresh/ HTTP/1.1" 401 45
+WARNING 2026-06-02 12:33:09,033 basehttp 15356 1772 "POST /api/wholesale/auth/refresh/ HTTP/1.1" 401 45
+WARNING 2026-06-02 12:33:09,259 basehttp 15356 1772 "GET /api/site-config/ HTTP/1.1" 404 4796
+INFO 2026-06-02 12:33:09,426 basehttp 15356 1584 "GET /api/wholesale/content/ HTTP/1.1" 200 82
+WARNING 2026-06-02 12:33:09,526 basehttp 15356 13612 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 12:33:09,643 basehttp 15356 1772 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 12:33:09,707 basehttp 15356 1584 "POST /api/wholesale/auth/refresh/ HTTP/1.1" 401 45
+WARNING 2026-06-02 12:33:10,590 basehttp 15356 1264 "GET /api/delivery-charge/ HTTP/1.1" 404 4808
+INFO 2026-06-02 12:33:10,612 views 15356 1264 ProductViewSet.list called with params: <QueryDict: {}>
+WARNING 2026-06-02 12:33:10,654 basehttp 15356 1584 "POST /api/wholesale/auth/refresh/ HTTP/1.1" 401 45
+INFO 2026-06-02 12:33:10,684 views 15356 1264 Successfully paginated 1 products
+INFO 2026-06-02 12:33:10,775 basehttp 15356 1264 "GET /api/products/products/ HTTP/1.1" 200 2137
+WARNING 2026-06-02 12:33:10,864 basehttp 15356 1584 "POST /api/wholesale/auth/refresh/ HTTP/1.1" 401 45
+WARNING 2026-06-02 12:33:11,119 basehttp 15356 1584 "GET /api/site-config/ HTTP/1.1" 404 4796
+INFO 2026-06-02 12:33:11,144 basehttp 15356 13612 "GET /api/wholesale/content/ HTTP/1.1" 200 82
+WARNING 2026-06-02 12:33:11,227 basehttp 15356 8644 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 12:33:11,286 basehttp 15356 1584 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 12:33:11,704 basehttp 15356 13612 "GET /api/site-config/ HTTP/1.1" 404 4796
+INFO 2026-06-02 12:33:11,734 basehttp 15356 8644 "GET /api/wholesale/content/ HTTP/1.1" 200 82
+WARNING 2026-06-02 12:33:11,832 basehttp 15356 9980 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 12:33:11,865 basehttp 15356 13612 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 12:33:12,214 basehttp 15356 8644 "GET /api/site-config/ HTTP/1.1" 404 4796
+INFO 2026-06-02 12:33:12,248 basehttp 15356 9980 "GET /api/wholesale/content/ HTTP/1.1" 200 82
+WARNING 2026-06-02 12:33:12,397 basehttp 15356 3048 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 12:33:12,465 basehttp 15356 8644 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+INFO 2026-06-02 12:33:12,954 views 15356 9004 ProductViewSet.list called with params: <QueryDict: {}>
+WARNING 2026-06-02 12:33:12,964 basehttp 15356 1264 "GET /api/delivery-charge/ HTTP/1.1" 404 4808
+INFO 2026-06-02 12:33:13,007 views 15356 9004 Successfully paginated 1 products
+INFO 2026-06-02 12:33:13,058 basehttp 15356 9004 "GET /api/products/products/ HTTP/1.1" 200 2137
+INFO 2026-06-02 12:33:13,701 views 15356 9004 ProductViewSet.list called with params: <QueryDict: {}>
+WARNING 2026-06-02 12:33:13,724 basehttp 15356 1264 "GET /api/delivery-charge/ HTTP/1.1" 404 4808
+INFO 2026-06-02 12:33:13,743 views 15356 9004 Successfully paginated 1 products
+INFO 2026-06-02 12:33:13,774 basehttp 15356 9004 "GET /api/products/products/ HTTP/1.1" 200 2137
+WARNING 2026-06-02 12:36:00,740 basehttp 15356 14268 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 12:36:00,760 basehttp 15356 6896 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 12:36:00,777 basehttp 15356 14268 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 12:36:01,478 basehttp 15356 9004 "GET /api/delivery-charge/ HTTP/1.1" 404 4808
+INFO 2026-06-02 12:36:01,613 views 15356 9004 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 12:36:01,614 basehttp 15356 1264 "GET /api/auth/notifications/unread-count/ HTTP/1.1" 200 17
+INFO 2026-06-02 12:36:01,621 views 15356 9004 User authenticated: True
+INFO 2026-06-02 12:36:01,627 views 15356 10308 Orders list request from user: elarbol@gmail.com
+WARNING 2026-06-02 12:36:01,679 basehttp 15356 10336 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 12:36:01,681 views 15356 9004 Query params: <QueryDict: {'ordering': ['-ordered_at']}>
+INFO 2026-06-02 12:36:01,716 views 15356 10308 User authenticated: True
+WARNING 2026-06-02 12:36:01,721 basehttp 15356 15176 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 12:36:01,729 basehttp 15356 1264 "GET /api/auth/dashboard/admin/ HTTP/1.1" 200 266
+INFO 2026-06-02 12:36:01,732 views 15356 9004 Orders queryset count: 2
+INFO 2026-06-02 12:36:01,746 views 15356 10308 Query params: <QueryDict: {'page_size': ['50'], 'ordering': ['-ordered_at']}>
+INFO 2026-06-02 12:36:01,829 views 15356 9004 Serialized orders count: 2
+INFO 2026-06-02 12:36:01,878 views 15356 10308 Orders queryset count: 2
+INFO 2026-06-02 12:36:01,879 basehttp 15356 9004 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 200 1899
+INFO 2026-06-02 12:36:01,915 views 15356 10308 Serialized orders count: 2
+INFO 2026-06-02 12:36:01,916 basehttp 15356 10308 "GET /api/orders/?page_size=50&ordering=-ordered_at HTTP/1.1" 200 1899
+WARNING 2026-06-02 12:36:32,273 basehttp 15356 10308 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:37:02,272 basehttp 15356 10308 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:37:32,265 basehttp 15356 10308 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:38:02,278 basehttp 15356 10308 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:38:32,273 basehttp 15356 10308 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:39:02,269 basehttp 15356 2136 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:40:14,298 basehttp 15356 2136 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:41:14,299 basehttp 15356 2136 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:42:14,309 basehttp 15356 2136 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:43:14,274 basehttp 15356 2136 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:44:14,270 basehttp 15356 2136 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:45:14,286 basehttp 15356 2136 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+WARNING 2026-06-02 12:46:14,294 basehttp 15356 2136 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 12:46:26,865 autoreload 15356 7404 D:\Munna\Munna\icommerce\icommerce\backend\accounts\views.py changed, reloading.
+INFO 2026-06-02 12:46:30,801 autoreload 6400 9624 Watching for file changes with StatReloader
+INFO 2026-06-02 12:46:37,086 autoreload 6400 9624 D:\Munna\Munna\icommerce\icommerce\backend\accounts\views.py changed, reloading.
+INFO 2026-06-02 12:46:41,805 autoreload 18336 16212 Watching for file changes with StatReloader
+INFO 2026-06-02 12:46:45,948 autoreload 18336 16212 D:\Munna\Munna\icommerce\icommerce\backend\accounts\views.py changed, reloading.
+INFO 2026-06-02 12:46:49,233 autoreload 7152 1780 Watching for file changes with StatReloader
+INFO 2026-06-02 12:46:53,718 autoreload 7152 1780 D:\Munna\Munna\icommerce\icommerce\backend\accounts\views.py changed, reloading.
+INFO 2026-06-02 12:46:58,383 autoreload 18928 764 Watching for file changes with StatReloader
+WARNING 2026-06-02 12:47:14,304 basehttp 18928 14564 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10048
+INFO 2026-06-02 12:47:48,897 autoreload 18928 764 D:\Munna\Munna\icommerce\icommerce\backend\accounts\urls.py changed, reloading.
+INFO 2026-06-02 12:47:53,690 autoreload 2548 7204 Watching for file changes with StatReloader
+INFO 2026-06-02 12:47:58,278 autoreload 2548 7204 D:\Munna\Munna\icommerce\icommerce\backend\accounts\urls.py changed, reloading.
+INFO 2026-06-02 12:48:01,433 autoreload 15816 13128 Watching for file changes with StatReloader
+WARNING 2026-06-02 12:48:14,301 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 12:48:38,026 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 12:48:42,704 basehttp 15816 18736 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 12:48:42,704 basehttp 15816 13232 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 12:48:42,816 basehttp 15816 18736 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 12:48:43,012 basehttp 15816 20196 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 12:48:43,104 basehttp 15816 13232 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 12:48:43,105 basehttp 15816 18736 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 12:48:43,105 basehttp 15816 5048 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 12:48:43,107 basehttp 15816 20100 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 12:48:43,184 basehttp 15816 20196 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 12:48:43,290 basehttp 15816 11972 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 12:48:43,297 basehttp 15816 5048 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 12:48:43,321 basehttp 15816 20196 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+INFO 2026-06-02 12:48:49,810 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 561
+WARNING 2026-06-02 12:48:53,418 basehttp 15816 11704 "GET /api/site-config/ HTTP/1.1" 404 4796
+WARNING 2026-06-02 12:48:53,460 basehttp 15816 8964 "GET /api/site-config/footer/ HTTP/1.1" 404 4817
+WARNING 2026-06-02 12:48:53,500 basehttp 15816 11704 "GET /api/website/site-config/ HTTP/1.1" 404 23020
+WARNING 2026-06-02 12:48:54,647 basehttp 15816 13416 "GET /api/delivery-charge/ HTTP/1.1" 404 4808
+INFO 2026-06-02 12:48:54,803 basehttp 15816 13416 "OPTIONS /api/orders/?ordering=-ordered_at HTTP/1.1" 200 0
+INFO 2026-06-02 12:48:54,873 basehttp 15816 19680 "OPTIONS /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 0
+INFO 2026-06-02 12:48:54,882 views 15816 13416 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-02 12:48:54,949 views 15816 13416 User authenticated: True
+INFO 2026-06-02 12:48:54,951 basehttp 15816 6788 "OPTIONS /api/auth/notifications/unread-count/ HTTP/1.1" 200 0
+INFO 2026-06-02 12:48:54,960 views 15816 13416 Query params: <QueryDict: {'ordering': ['-ordered_at']}>
+WARNING 2026-06-02 12:48:55,026 basehttp 15816 20392 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+INFO 2026-06-02 12:48:55,027 basehttp 15816 19680 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 561
+INFO 2026-06-02 12:48:55,032 views 15816 13416 Orders queryset count: 2
+INFO 2026-06-02 12:48:55,041 basehttp 15816 19968 "GET /media/products/thumbnails/mangoage_334.jfif HTTP/1.1" 200 17341
+INFO 2026-06-02 12:48:55,086 basehttp 15816 6788 "GET /api/auth/notifications/unread-count/ HTTP/1.1" 200 17
+WARNING 2026-06-02 12:48:55,122 basehttp 15816 19680 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+INFO 2026-06-02 12:48:55,187 views 15816 13416 Serialized orders count: 2
+INFO 2026-06-02 12:48:55,189 basehttp 15816 13416 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 200 1899
+INFO 2026-06-02 12:49:01,306 basehttp 15816 13416 "OPTIONS /api/auth/admin/users/?page=1&page_size=20&user_type=WHOLESALER HTTP/1.1" 200 0
+INFO 2026-06-02 12:49:01,325 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=WHOLESALER HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:02,666 basehttp 15816 13416 "OPTIONS /api/auth/admin/users/?page=1&page_size=20&user_type=VENDOR HTTP/1.1" 200 0
+INFO 2026-06-02 12:49:02,677 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=VENDOR HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:03,793 basehttp 15816 13416 "OPTIONS /api/auth/admin/users/?page=1&page_size=20&user_type=CUSTOMER HTTP/1.1" 200 0
+INFO 2026-06-02 12:49:03,807 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=CUSTOMER HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:04,526 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=WHOLESALER HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:05,332 basehttp 15816 13416 "OPTIONS /api/auth/admin/users/?page=1&page_size=20&user_type=SELLER HTTP/1.1" 200 0
+INFO 2026-06-02 12:49:05,345 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=SELLER HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:05,929 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=VENDOR HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:06,596 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=WHOLESALER HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:07,527 basehttp 15816 13416 "OPTIONS /api/auth/admin/users/?page=1&page_size=20&user_type=AFFILIATE HTTP/1.1" 200 0
+INFO 2026-06-02 12:49:07,543 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=AFFILIATE HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:08,449 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=SELLER HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:08,813 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=VENDOR HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:09,305 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=WHOLESALER HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:14,806 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=CUSTOMER HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:15,824 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 561
+INFO 2026-06-02 12:49:17,156 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=WHOLESALER HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:18,004 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=CUSTOMER HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:20,291 basehttp 15816 13416 "OPTIONS /api/auth/admin/users/?page=1&page_size=20&user_type=ADMIN HTTP/1.1" 200 0
+INFO 2026-06-02 12:49:20,310 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=ADMIN HTTP/1.1" 200 561
+INFO 2026-06-02 12:49:20,735 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=AFFILIATE HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:21,290 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=SELLER HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:21,766 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=VENDOR HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:22,263 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=WHOLESALER HTTP/1.1" 200 24
+INFO 2026-06-02 12:49:22,726 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20&user_type=CUSTOMER HTTP/1.1" 200 24
+WARNING 2026-06-02 12:49:24,928 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+INFO 2026-06-02 12:49:29,335 basehttp 15816 13416 "GET /api/auth/admin/users/?page=1&page_size=20 HTTP/1.1" 200 561
+ERROR 2026-06-02 12:49:48,974 log 15816 15484 Internal Server Error: /api/wholesale/auth/login/
+Traceback (most recent call last):
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\sqlite3\base.py", line 354, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: wholesale_wholesaleuser.serial_number
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\wholesale\views.py", line 71, in post
+    if not serializer.is_valid():
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\serializers.py", line 225, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+                           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\serializers.py", line 447, in run_validation
+    value = self.validate(value)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\wholesale\serializers.py", line 69, in validate
+    user = WholesaleUser.objects.get(email=email)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\query.py", line 645, in get
+    num = len(clone)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\query.py", line 382, in __len__
+    self._fetch_all()
+    ~~~~~~~~~~~~~~~^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+        chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+    )
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1574, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\sqlite3\base.py", line 354, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: no such column: wholesale_wholesaleuser.serial_number
+ERROR 2026-06-02 12:49:49,056 basehttp 15816 15484 "POST /api/wholesale/auth/login/ HTTP/1.1" 500 220917
+WARNING 2026-06-02 12:49:55,283 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 12:50:25,283 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+INFO 2026-06-02 12:50:28,866 basehttp 15816 13416 "OPTIONS /api/wholesale/auth/register/ HTTP/1.1" 200 0
+WARNING 2026-06-02 12:50:29,103 basehttp 15816 13416 "POST /api/wholesale/auth/register/ HTTP/1.1" 400 60
+ERROR 2026-06-02 12:50:53,863 log 15816 13416 Internal Server Error: /api/wholesale/auth/register/
+Traceback (most recent call last):
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\sqlite3\base.py", line 354, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: wholesale_wholesaleuser.serial_number
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\wholesale\views.py", line 56, in post
+    user = serializer.save()
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\wholesale\serializers.py", line 55, in create
+    user.save()
+    ~~~~~~~~~^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\wholesale\models.py", line 146, in save
+    last_user = WholesaleUser.objects.order_by('-serial_number').first()
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\query.py", line 1097, in first
+    for obj in queryset[:1]:
+               ~~~~~~~~^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\query.py", line 400, in __iter__
+    self._fetch_all()
+    ~~~~~~~~~~~~~~~^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+        chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+    )
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1574, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\sqlite3\base.py", line 354, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: no such column: wholesale_wholesaleuser.serial_number
+ERROR 2026-06-02 12:50:53,870 basehttp 15816 13416 "POST /api/wholesale/auth/register/ HTTP/1.1" 500 36411
+WARNING 2026-06-02 12:50:55,275 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+ERROR 2026-06-02 12:51:00,519 log 15816 13416 Internal Server Error: /api/wholesale/auth/register/
+Traceback (most recent call last):
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\sqlite3\base.py", line 354, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such column: wholesale_wholesaleuser.serial_number
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\wholesale\views.py", line 56, in post
+    user = serializer.save()
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\rest_framework\serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\wholesale\serializers.py", line 55, in create
+    user.save()
+    ~~~~~~~~~^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\wholesale\models.py", line 146, in save
+    last_user = WholesaleUser.objects.order_by('-serial_number').first()
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\query.py", line 1097, in first
+    for obj in queryset[:1]:
+               ~~~~~~~~^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\query.py", line 400, in __iter__
+    self._fetch_all()
+    ~~~~~~~~~~~~~~~^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+        chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+    )
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1574, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\Munna\Munna\icommerce\icommerce\backend\venv\Lib\site-packages\django\db\backends\sqlite3\base.py", line 354, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: no such column: wholesale_wholesaleuser.serial_number
+ERROR 2026-06-02 12:51:00,546 basehttp 15816 13416 "POST /api/wholesale/auth/register/ HTTP/1.1" 500 36411
+WARNING 2026-06-02 12:51:25,273 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 12:51:55,268 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 12:53:14,271 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 12:54:14,308 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 12:55:14,281 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 12:56:14,279 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 12:57:14,312 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 12:58:14,296 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 12:58:57,459 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 12:59:25,272 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 12:59:55,267 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 13:01:14,275 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 13:02:14,292 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 13:03:14,290 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 13:04:14,282 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 13:04:25,328 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+WARNING 2026-06-02 13:04:55,290 basehttp 15816 13416 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10335
+INFO 2026-06-02 13:06:06,209 autoreload 16196 17116 Watching for file changes with StatReloader
