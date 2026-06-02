@@ -601,57 +601,101 @@ User = get_user_model()
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 
-class AdminUserListView(generics.ListAPIView):
-    """GET /api/auth/admin/users/ — admin only"""
-    permission_classes = [permissions.IsAdminUser]
-    filter_backends    = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields      = ['email', 'name', 'first_name', 'last_name']
-    ordering_fields    = ['date_joined', 'name', 'email']
-    ordering           = ['-date_joined']
+class AdminUserListView(APIView):
+    """
+    GET  /api/auth/admin/users/  — normal + wholesale users combined
+    POST /api/auth/admin/users/  — create normal user
+    """
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        qs        = User.objects.select_related('profile').all()
-        user_type = self.request.query_params.get('user_type')
-        if user_type:
-            qs = qs.filter(user_type=user_type)
-        return qs
+    def get(self, request):
+        from django.db.models import Q
 
-    def list(self, request, *args, **kwargs):
-        qs        = self.filter_queryset(self.get_queryset())
-        page_size = int(request.query_params.get('page_size', 20))
-        page_num  = int(request.query_params.get('page', 1))
-        start     = (page_num - 1) * page_size
-        end       = start + page_size
-        total     = qs.count()
-        users     = qs[start:end]
+        search    = request.GET.get('search', '').strip()
+        page      = int(request.GET.get('page', 1))
+        page_size = int(request.GET.get('page_size', 20))
 
-        data = []
-        for u in users:
-            # wholesale status check
-            ws_status = None
-            if getattr(u, 'user_type', None) == 'WHOLESALER':
-                try:
-                    ws_status = u.wholesaler_profile.approval_status
-                except Exception:
-                    ws_status = 'PENDING'
+        # ── Normal users ──────────────────────────────────────────
+        qs = User.objects.order_by('-date_joined')
+        if search:
+            qs = qs.filter(Q(email__icontains=search) | Q(name__icontains=search))
 
-            data.append({
+        normal_data = []
+        for u in qs:
+            normal_data.append({
                 'id':               u.id,
-                'name':             getattr(u, 'name', None) or u.get_full_name() or u.email,
+                'name':             getattr(u, 'name', '') or u.email,
                 'email':            u.email,
                 'user_type':        getattr(u, 'user_type', 'CUSTOMER'),
                 'is_active':        u.is_active,
-                'date_joined':      u.date_joined,
-                'business_name':    getattr(getattr(u, 'wholesaler_profile', None), 'business_name', None),
-                'wholesale_status': ws_status,
+                'date_joined':      u.date_joined.isoformat() if u.date_joined else '',
+                'business_name':    None,
+                'wholesale_status': None,
+                'is_wholesale':     False,
             })
 
+        # ── Wholesale users ───────────────────────────────────────
+        ws_data = []
+        try:
+            from wholesale.models import WholesaleUser
+            ws_qs = WholesaleUser.objects.order_by('-applied_at')
+            if search:
+                ws_qs = ws_qs.filter(
+                    Q(email__icontains=search) |
+                    Q(business_name__icontains=search) |
+                    Q(contact_name__icontains=search)
+                )
+            for i, u in enumerate(ws_qs, start=1):
+                ws_data.append({
+                    'id':               f'ws_{i}',
+                    'name':             u.contact_name or u.email,
+                    'email':            u.email,
+                    'user_type':        'WHOLESALE',
+                    'is_active':        u.is_active,
+                    'date_joined':      u.applied_at.isoformat() if u.applied_at else '',
+                    'business_name':    u.business_name,
+                    'wholesale_status': u.status,
+                    'is_wholesale':     True,
+                })
+        except Exception as e:
+            print(f'[AdminUserListView] wholesale fetch error: {e}')
+
+        # ── Merge + sort + paginate ───────────────────────────────
+        combined = normal_data + ws_data
+        combined.sort(key=lambda x: x['date_joined'], reverse=True)
+        total    = len(combined)
+        start    = (page - 1) * page_size
+        paginated = combined[start:start + page_size]
+
+        return Response({'count': total, 'results': paginated})
+
+    def post(self, request):
+        if getattr(request.user, 'user_type', None) not in ['ADMIN']:
+            return Response({'detail': 'Forbidden'}, status=403)
+
+        email     = request.data.get('email', '').strip().lower()
+        name      = request.data.get('name', '').strip()
+        password  = request.data.get('password', '')
+        user_type = request.data.get('user_type', 'CUSTOMER')
+
+        if not email or not password:
+            return Response({'detail': 'Email and password required.'}, status=400)
+        if User.objects.filter(email__iexact=email).exists():
+            return Response({'detail': 'Email already exists.'}, status=400)
+
+        user = User.objects.create_user(email=email, password=password, name=name)
+        if hasattr(user, 'user_type'):
+            user.user_type = user_type
+            user.save()
+
         return Response({
-            'count':   total,
-            'results': data,
-        })
-
-
+            'id':        user.id,
+            'email':     user.email,
+            'name':      getattr(user, 'name', ''),
+            'user_type': getattr(user, 'user_type', 'CUSTOMER'),
+            'is_active': user.is_active,
+        }, status=201)
+    
 class AdminUserDetailView(generics.RetrieveUpdateDestroyAPIView):
     """GET/PATCH/DELETE /api/auth/admin/users/<id>/"""
     permission_classes = [permissions.IsAdminUser]

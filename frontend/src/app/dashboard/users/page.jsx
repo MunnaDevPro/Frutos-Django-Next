@@ -1,233 +1,3 @@
-// "use client";
-
-// import { useState } from "react";
-// import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
-// import Container from "@/app/dashboard/_components/Container";
-// import DataTable from "@/app/dashboard/_components/DataTable";
-// import Modal from "@/app/dashboard/_components/Modal";
-// import FormModal from "@/app/dashboard/_components/FormModal";
-// import ConfirmDialog from "@/app/dashboard/_components/ConfirmDialog";
-// import { useToastContext } from "@/app/dashboard/_components/Toaster";
-// import useSWR from "swr";
-// import { adminUsersApi } from "@/app/dashboard/_lib/auth";
-// import api from "@/app/dashboard/_lib/api";
-
-// const PAGE_SIZE = 20;
-
-// function RoleBadge({ value }) {
-//   const map = {
-//     ADMIN:     "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-//     SELLER:    "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-//     WHOLESALE: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-//     VENDOR:    "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-//     CUSTOMER:  "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
-//   };
-//   return (
-//     <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${map[value] || map.CUSTOMER}`}>
-//       {value || "CUSTOMER"}
-//     </span>
-//   );
-// }
-
-// function WholesaleStatusBadge({ value }) {
-//   if (!value) return <span className="text-gray-400">—</span>;
-//   const map = {
-//     approved:  "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-//     pending:   "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-//     rejected:  "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-//     suspended: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
-//   };
-//   return (
-//     <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${map[value] || map.pending}`}>
-//       {value}
-//     </span>
-//   );
-// }
-
-// const columns = [
-// { key: "id", label: "ID", render: (v, row, index) => (
-//     <span className="text-xs text-gray-400">
-//       {String(v).startsWith('ws_') ? `WS-${index + 1}` : v}
-//     </span>
-// )},  { key: "name",             label: "Name" },
-//   { key: "email",            label: "Email" },
-//   { key: "user_type",        label: "Role",      render: (v) => <RoleBadge value={v} /> },
-//   { key: "business_name",    label: "Business",  render: (v) => v || <span className="text-gray-400">—</span> },
-//   { key: "wholesale_status", label: "WS Status", render: (v) => <WholesaleStatusBadge value={v} /> },
-//   { key: "is_active",        label: "Status",    render: (v) => (
-//     <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${v ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"}`}>
-//       {v ? "Active" : "Inactive"}
-//     </span>
-//   )},
-//   { key: "date_joined", label: "Joined", render: (v) => v ? new Date(v).toLocaleDateString() : "—" },
-// ];
-
-// const editFields = [
-//   { key: "name", label: "Full Name", required: true, placeholder: "John Doe" },
-//   { key: "user_type", label: "Role", type: "select", required: true, options: [
-//     { value: "CUSTOMER",  label: "Customer" },
-//     { value: "SELLER",    label: "Seller" },
-//     { value: "WHOLESALE", label: "Wholesale" },
-//     { value: "VENDOR",    label: "Vendor" },
-//     { value: "ADMIN",     label: "Admin" },
-//   ]},
-//   { key: "is_active", label: "Status", type: "select", required: true, options: [
-//     { value: "true",  label: "Active" },
-//     { value: "false", label: "Inactive" },
-//   ]},
-// ];
-
-// const createFields = [
-//   { key: "email",     label: "Email",     required: true, placeholder: "user@example.com" },
-//   { key: "name",      label: "Full Name", required: true, placeholder: "John Doe" },
-//   { key: "password",  label: "Password",  required: true, placeholder: "Min 8 characters", type: "password" },
-//   { key: "user_type", label: "Role",      type: "select", required: true, options: [
-//     { value: "CUSTOMER", label: "Customer" },
-//     { value: "SELLER",   label: "Seller" },
-//     { value: "VENDOR",   label: "Vendor" },
-//     { value: "ADMIN",    label: "Admin" },
-//   ]},
-// ];
-
-// export default function UsersPage() {
-//   const toast = useToastContext();
-//   const [page, setPage]           = useState(1);
-//   const [search, setSearch]       = useState("");
-//   const [viewItem, setViewItem]   = useState(null);
-//   const [editItem, setEditItem]   = useState(null);
-//   const [createOpen, setCreateOpen] = useState(false);
-//   const [deleteItem, setDeleteItem] = useState(null);
-
-//   const { data: rawData, isLoading, mutate } = useSWR(
-//     ["admin-users", page, search],
-//     () => adminUsersApi.list({ page, page_size: PAGE_SIZE, search: search || undefined }),
-//     { revalidateOnFocus: false, keepPreviousData: true }
-//   );
-
-//   const data       = rawData?.results || rawData?.users || (Array.isArray(rawData) ? rawData : []);
-//   const totalCount = rawData?.count ?? data.length;
-
-//   const handleCreate = async (values) => {
-//     try {
-//       await api.post("/api/auth/admin/users/", values);
-//       toast.success("User created successfully");
-//       setCreateOpen(false);
-//       mutate();
-//     } catch (err) {
-//       toast.error(err?.message || "Failed to create user");
-//     }
-//   };
-
-//   const handleEdit = async (values) => {
-//     try {
-//       await api.patch(`/api/auth/admin/users/${editItem.id}/`, {
-//         ...values,
-//         is_active: values.is_active === "true",
-//       });
-//       toast.success("User updated successfully");
-//       setEditItem(null);
-//       mutate();
-//     } catch (err) {
-//       toast.error(err?.message || "Failed to update user");
-//     }
-//   };
-
-//   const handleDelete = async () => {
-//     try {
-//       await api.delete(`/api/auth/admin/users/${deleteItem.id}/`);
-//       toast.success("User deleted");
-//       setDeleteItem(null);
-//       mutate();
-//     } catch (err) {
-//       toast.error(err?.message || "Failed to delete user");
-//     }
-//   };
-
-//   return (
-//     <Container title="Users" description="Manage user accounts — normal, wholesale, and admin">
-//       <div className="flex justify-end mb-3">
-//         <button
-//           onClick={() => setCreateOpen(true)}
-//           className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-md hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
-//         >
-//           <Plus className="w-4 h-4" /> Add User
-//         </button>
-//       </div>
-
-//       <DataTable
-//         columns={columns}
-//         data={data}
-//         serverSide
-//         totalItems={totalCount}
-//         currentPage={page}
-//         pageSize={PAGE_SIZE}
-//         onSearch={(q) => { setSearch(q); setPage(1); }}
-//         onPageChange={setPage}
-//         loading={isLoading}
-//         searchable
-//         actions={(row) => (
-//           <div className="flex items-center justify-end gap-1">
-//             <button onClick={() => setViewItem(row)} className="p-1.5 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
-//               <Eye className="w-3.5 h-3.5" />
-//             </button>
-//             {/* wholesale user edit limited */}
-//             {!row.is_wholesale && (
-//               <button onClick={() => setEditItem({ ...row, is_active: String(row.is_active) })} className="p-1.5 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
-//                 <Pencil className="w-3.5 h-3.5" />
-//               </button>
-//             )}
-//             <button onClick={() => setDeleteItem(row)} className="p-1.5 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30">
-//               <Trash2 className="w-3.5 h-3.5" />
-//             </button>
-//           </div>
-//         )}
-//       />
-
-//       {/* Create */}
-//       <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Create User">
-//         <FormModal fields={createFields} onSubmit={handleCreate} submitLabel="Create User" />
-//       </Modal>
-
-//       {/* Edit */}
-//       <Modal open={!!editItem} onClose={() => setEditItem(null)} title="Edit User">
-//         {editItem && <FormModal fields={editFields} initialValues={editItem} onSubmit={handleEdit} submitLabel="Save Changes" />}
-//       </Modal>
-
-//       {/* View */}
-//       <Modal open={!!viewItem} onClose={() => setViewItem(null)} title="User Details">
-//         {viewItem && (
-//           <div className="space-y-3">
-//             {[
-//               ["Name",           viewItem.name],
-//               ["Email",          viewItem.email],
-//               ["Role",           viewItem.user_type],
-//               ["Business",       viewItem.business_name || "—"],
-//               ["WS Status",      viewItem.wholesale_status || "—"],
-//               ["Status",         viewItem.is_active ? "Active" : "Inactive"],
-//               ["Joined",         viewItem.date_joined ? new Date(viewItem.date_joined).toLocaleDateString() : "—"],
-//             ].map(([label, val]) => (
-//               <div key={label} className="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800 last:border-0">
-//                 <span className="text-sm text-gray-500">{label}</span>
-//                 <span className="text-sm font-medium text-gray-900 dark:text-white">{String(val)}</span>
-//               </div>
-//             ))}
-//           </div>
-//         )}
-//       </Modal>
-
-//       {/* Delete */}
-//       <ConfirmDialog
-//         open={!!deleteItem}
-//         onClose={() => setDeleteItem(null)}
-//         onConfirm={handleDelete}
-//         title="Delete User"
-//         message={`Delete "${deleteItem?.name || deleteItem?.email}"? This cannot be undone.`}
-//       />
-//     </Container>
-//   );
-// }
-
-
 "use client";
 
 import { useState } from "react";
@@ -244,77 +14,66 @@ import api from "@/app/dashboard/_lib/api";
 
 const PAGE_SIZE = 20;
 
-// ── Role badge config ────────────────────────────────────────────
-const ROLE_CONFIG = {
-  ADMIN:      { label: "Admin",      bg: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400" },
-  WHOLESALER: { label: "Wholesale",  bg: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" },
-  CUSTOMER:   { label: "Customer",   bg: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" },
-  VENDOR:     { label: "Vendor",     bg: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" },
-  SELLER:     { label: "Seller",     bg: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400" },
-  AFFILIATE:  { label: "Affiliate",  bg: "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400" },
-};
-
-const WS_STATUS_CONFIG = {
-  APPROVED: "bg-green-100 text-green-700",
-  PENDING:  "bg-yellow-100 text-yellow-700",
-  REJECTED: "bg-red-100 text-red-700",
-};
-
-// ── Filter tabs ──────────────────────────────────────────────────
-const FILTER_TABS = [
-  { value: "",           label: "All" },
-  { value: "CUSTOMER",   label: "Customers" },
-  { value: "WHOLESALER", label: "Wholesale" },
-  { value: "VENDOR",     label: "Vendors" },
-  { value: "SELLER",     label: "Sellers" },
-  { value: "AFFILIATE",  label: "Affiliates" },
-  { value: "ADMIN",      label: "Admins" },
+const FILTERS = [
+  { label: "All",        value: "" },
+  { label: "Customers",  value: "CUSTOMER" },
+  { label: "Wholesale",  value: "WHOLESALE" },
+  { label: "Sellers",    value: "SELLER" },
+  { label: "Admins",     value: "ADMIN" },
 ];
 
+function RoleBadge({ value }) {
+  const map = {
+    ADMIN:     "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+    SELLER:    "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+    WHOLESALE: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+    VENDOR:    "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+    CUSTOMER:  "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
+  };
+  return (
+    <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${map[value] || map.CUSTOMER}`}>
+      {value || "CUSTOMER"}
+    </span>
+  );
+}
+
+function WholesaleStatusBadge({ value }) {
+  if (!value) return <span className="text-gray-400">—</span>;
+  const map = {
+    approved:  "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+    pending:   "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+    rejected:  "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+    suspended: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
+  };
+  return (
+    <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${map[value] || map.pending}`}>
+      {value}
+    </span>
+  );
+}
+
 const columns = [
-  { key: "id", label: "ID" },
-  { key: "name", label: "Name" },
-  { key: "email", label: "Email" },
-  {
-    key: "user_type", label: "Role",
-    render: (v) => {
-      const cfg = ROLE_CONFIG[v] || { label: v, bg: "bg-gray-100 text-gray-600" };
-      return <span className={`px-2 py-0.5 text-xs rounded-full font-semibold ${cfg.bg}`}>{cfg.label}</span>;
-    }
-  },
-  {
-    key: "business_name", label: "Business",
-    render: (v) => v || "—"
-  },
-  {
-    key: "wholesale_status", label: "Wholesale",
-    render: (v) => v
-      ? <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${WS_STATUS_CONFIG[v] || "bg-gray-100 text-gray-600"}`}>{v}</span>
-      : "—"
-  },
-  {
-    key: "is_active", label: "Status",
-    render: (v) => (
-      <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${v ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"}`}>
-        {v ? "Active" : "Inactive"}
-      </span>
-    )
-  },
-  {
-    key: "date_joined", label: "Joined",
-    render: (v) => v ? new Date(v).toLocaleDateString() : "—"
-  },
+  { key: "id",               label: "ID",        render: (v) => <span className="text-xs text-gray-400">{String(v).startsWith('ws_') ? `WS-${v.replace('ws_','')}` : v}</span> },
+  { key: "name",             label: "Name" },
+  { key: "email",            label: "Email" },
+  { key: "user_type",        label: "Role",      render: (v) => <RoleBadge value={v} /> },
+  { key: "business_name",    label: "Business",  render: (v) => v || <span className="text-gray-400">—</span> },
+  { key: "wholesale_status", label: "WS Status", render: (v) => <WholesaleStatusBadge value={v} /> },
+  { key: "is_active",        label: "Status",    render: (v) => (
+    <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${v ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"}`}>
+      {v ? "Active" : "Inactive"}
+    </span>
+  )},
+  { key: "date_joined", label: "Joined", render: (v) => v ? new Date(v).toLocaleDateString() : "—" },
 ];
 
 const editFields = [
-  { key: "name", label: "Full Name", required: true },
+  { key: "name", label: "Full Name", required: true, placeholder: "John Doe" },
   { key: "user_type", label: "Role", type: "select", required: true, options: [
-    { value: "CUSTOMER",   label: "Customer" },
-    { value: "WHOLESALER", label: "Wholesaler" },
-    { value: "SELLER",     label: "Seller" },
-    { value: "VENDOR",     label: "Vendor" },
-    { value: "AFFILIATE",  label: "Affiliate" },
-    { value: "ADMIN",      label: "Admin" },
+    { value: "CUSTOMER", label: "Customer" },
+    { value: "SELLER",   label: "Seller" },
+    { value: "VENDOR",   label: "Vendor" },
+    { value: "ADMIN",    label: "Admin" },
   ]},
   { key: "is_active", label: "Status", type: "select", required: true, options: [
     { value: "true",  label: "Active" },
@@ -325,44 +84,47 @@ const editFields = [
 const createFields = [
   { key: "email",     label: "Email",     required: true, placeholder: "user@example.com" },
   { key: "name",      label: "Full Name", required: true, placeholder: "John Doe" },
-  { key: "password",  label: "Password",  required: true, type: "password" },
-  { key: "user_type", label: "Role",      type: "select", required: true, options: [
-    { value: "CUSTOMER",   label: "Customer" },
-    { value: "WHOLESALER", label: "Wholesaler" },
-    { value: "SELLER",     label: "Seller" },
-    { value: "VENDOR",     label: "Vendor" },
-    { value: "ADMIN",      label: "Admin" },
+  { key: "password",  label: "Password",  required: true, placeholder: "Min 8 characters", type: "password" },
+  { key: "user_type", label: "Role", type: "select", required: true, options: [
+    { value: "CUSTOMER", label: "Customer" },
+    { value: "SELLER",   label: "Seller" },
+    { value: "VENDOR",   label: "Vendor" },
+    { value: "ADMIN",    label: "Admin" },
   ]},
 ];
 
 export default function UsersPage() {
   const toast = useToastContext();
-  const [page,       setPage]       = useState(1);
-  const [search,     setSearch]     = useState("");
-  const [roleFilter, setRoleFilter] = useState("");
-  const [viewItem,   setViewItem]   = useState(null);
-  const [editItem,   setEditItem]   = useState(null);
+  const [page, setPage]             = useState(1);
+  const [search, setSearch]         = useState("");
+  const [activeFilter, setFilter]   = useState("");
+  const [viewItem, setViewItem]     = useState(null);
+  const [editItem, setEditItem]     = useState(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [deleteItem, setDeleteItem] = useState(null);
 
   const { data: rawData, isLoading, mutate } = useSWR(
-    ["admin-users", page, search, roleFilter],
+    ["admin-users", page, search, activeFilter],
     () => adminUsersApi.list({
       page,
       page_size: PAGE_SIZE,
-      search:    search    || undefined,
-      user_type: roleFilter || undefined,
+      search: search || undefined,
+      user_type: activeFilter || undefined,
     }),
     { revalidateOnFocus: false, keepPreviousData: true }
   );
 
-  const data       = rawData?.results || (Array.isArray(rawData) ? rawData : []);
-  const totalCount = rawData?.count ?? data.length;
+  // Filter client-side too (since API may not support user_type param yet)
+  const rawList = rawData?.results || rawData?.users || (Array.isArray(rawData) ? rawData : []);
+  const data = activeFilter
+    ? rawList.filter(u => u.user_type === activeFilter)
+    : rawList;
+  const totalCount = data.length;
 
   const handleCreate = async (values) => {
     try {
-      await api.post("/api/auth/admin/users/create/", values);
-      toast.success("User created");
+      await api.post("/api/auth/admin/users/", values);
+      toast.success("User created successfully");
       setCreateOpen(false);
       mutate();
     } catch (err) {
@@ -396,20 +158,21 @@ export default function UsersPage() {
   };
 
   return (
-    <Container title="Users" description="Manage user accounts">
-      {/* ── Filter tabs ── */}
-      <div className="flex gap-1 mb-4 flex-wrap">
-        {FILTER_TABS.map(tab => (
+    <Container title="Users" description="Manage user accounts — normal, wholesale, and admin">
+
+      {/* Filter tabs */}
+      <div className="flex items-center gap-2 flex-wrap mb-1">
+        {FILTERS.map(f => (
           <button
-            key={tab.value}
-            onClick={() => { setRoleFilter(tab.value); setPage(1); }}
-            className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-              roleFilter === tab.value
-                ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
+            key={f.value}
+            onClick={() => { setFilter(f.value); setPage(1); }}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              activeFilter === f.value
+                ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
             }`}
           >
-            {tab.label}
+            {f.label}
           </button>
         ))}
         <div className="ml-auto">
@@ -435,9 +198,17 @@ export default function UsersPage() {
         searchable
         actions={(row) => (
           <div className="flex items-center justify-end gap-1">
-            <button onClick={() => setViewItem(row)} className="p-1.5 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"><Eye className="w-3.5 h-3.5" /></button>
-            <button onClick={() => setEditItem({ ...row, is_active: String(row.is_active) })} className="p-1.5 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"><Pencil className="w-3.5 h-3.5" /></button>
-            <button onClick={() => setDeleteItem(row)} className="p-1.5 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"><Trash2 className="w-3.5 h-3.5" /></button>
+            <button onClick={() => setViewItem(row)} className="p-1.5 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+              <Eye className="w-3.5 h-3.5" />
+            </button>
+            {!row.is_wholesale && (
+              <button onClick={() => setEditItem({ ...row, is_active: String(row.is_active) })} className="p-1.5 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
+            )}
+            <button onClick={() => setDeleteItem(row)} className="p-1.5 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30">
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
           </div>
         )}
       />
@@ -458,7 +229,7 @@ export default function UsersPage() {
               ["Email",     viewItem.email],
               ["Role",      viewItem.user_type],
               ["Business",  viewItem.business_name || "—"],
-              ["Wholesale", viewItem.wholesale_status || "—"],
+              ["WS Status", viewItem.wholesale_status || "—"],
               ["Status",    viewItem.is_active ? "Active" : "Inactive"],
               ["Joined",    viewItem.date_joined ? new Date(viewItem.date_joined).toLocaleDateString() : "—"],
             ].map(([label, val]) => (
@@ -476,7 +247,7 @@ export default function UsersPage() {
         onClose={() => setDeleteItem(null)}
         onConfirm={handleDelete}
         title="Delete User"
-        message={`Delete "${deleteItem?.name || deleteItem?.email}"? Cannot undo.`}
+        message={`Delete "${deleteItem?.name || deleteItem?.email}"? This cannot be undone.`}
       />
     </Container>
   );

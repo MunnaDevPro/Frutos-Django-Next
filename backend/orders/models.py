@@ -453,6 +453,15 @@ class Coupon(models.Model):
         CART_TOTAL_DISCOUNT = 'CART_TOTAL_DISCOUNT', 'Cart Total Discount'
         FIRST_TIME_USER = 'FIRST_TIME_USER', 'First Time User'
         USER_SPECIFIC = 'USER_SPECIFIC', 'User Specific'
+
+    class DiscountType(models.TextChoices):
+        PERCENT = 'PERCENT', 'Percentage'
+        FLAT    = 'FLAT',    'Flat Amount'
+
+
+
+    discount_type    = models.CharField(max_length=10, choices=DiscountType.choices, default=DiscountType.PERCENT)
+    discount_amount  = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Flat discount amount (used when discount_type=FLAT)")
     
     code = models.CharField(max_length=50, unique=True, help_text="Unique coupon code", db_index=True)
     type = models.CharField(max_length=25, choices=CouponType.choices, default=CouponType.PRODUCT_DISCOUNT, db_index=True)
