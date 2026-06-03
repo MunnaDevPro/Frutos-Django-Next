@@ -216,12 +216,37 @@ export function CartProvider({ children }) {
   const subtotal   = state.items.reduce((sum, i) => sum + i.price * i.qty, 0)
 
   // ── Promo discount calculation ─────────────────────────────────────────────
-  const promoDiscount = promoState
-    ? state.items.reduce((sum, item) => {
-        if (!promoState.applicable_product_ids.includes(item.id)) return sum
-        const price = item.effectivePrice ?? item.price
-        return sum + price * item.qty * (promoState.discount_percent / 100)
-      }, 0)
+  // applicable_product_ids = [] means coupon applies to ALL products
+  // applicable_product_ids = [id1, id2] means ONLY those products get discount
+  const applicableIds = promoState?.applicable_product_ids || []
+  const hasApplicableRestriction = applicableIds.length > 0
+
+  // Items that qualify for this coupon
+  const qualifyingItems = promoState
+    ? state.items.filter(item =>
+        !hasApplicableRestriction ||
+        applicableIds.includes(String(item.id))
+      )
+    : []
+
+  // min_quantity check: only count qualifying items' qty
+  const qualifyingQty = qualifyingItems.reduce((sum, i) => sum + i.qty, 0)
+  const promoStillValid = promoState
+    ? qualifyingQty >= (promoState.min_quantity_required || 1)
+    : false
+
+  const promoDiscount = (promoState && promoStillValid)
+    ? (() => {
+        if (promoState.discount_type === 'FLAT') {
+          // Flat: fixed amount, but only if qualifying items exist in cart
+          return qualifyingItems.length > 0 ? Number(promoState.flat_discount_amount || 0) : 0
+        }
+        // Percentage: sum discount across qualifying items only
+        return qualifyingItems.reduce((sum, item) => {
+          const price = item.effectivePrice ?? item.price
+          return sum + price * item.qty * (promoState.discount_percent / 100)
+        }, 0)
+      })()
     : 0
 
   const discountedSubtotal = Math.max(0, subtotal - promoDiscount)

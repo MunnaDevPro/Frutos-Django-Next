@@ -1,7 +1,3 @@
-
-
-
-
 // 'use client'
 // // src/app/basket/_components/OrderSummary.jsx
 
@@ -396,23 +392,44 @@ export default function OrderSummary({
     setPromoError('')
     setPromoState(null)
     try {
-      const res = await fetch(`${API_BASE}/products/promo/validate/`, {
+      // Build quantities map for min_quantity validation
+      const quantities = {}
+      items.forEach(i => { quantities[String(i.id)] = i.qty })
+
+      const res = await fetch(`${API_BASE}/orders/coupons/validate/`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ code: trimmed, product_ids: items.map(i => i.id) }),
+        body:    JSON.stringify({
+          code:        trimmed,
+          product_ids: items.map(i => String(i.id)),
+          quantities,
+          cart_total:  subtotal,
+        }),
       })
       const data = await res.json()
       if (data.valid) {
-        const discount = items.reduce((sum, item) => {
-          if (!data.applicable_product_ids.includes(item.id)) return sum
-          const price = item.effectivePrice ?? item.price
-          return sum + price * item.qty * (data.discount_percent / 100)
-        }, 0)
+        const applicableIds = data.applicable_product_ids || items.map(i => String(i.id))
+
+        // Calculate discount client-side (handles both FLAT and PERCENT)
+        let discount
+        if (data.discount_type === 'FLAT') {
+          discount = Number(data.discount_amount)
+        } else {
+          discount = items.reduce((sum, item) => {
+            if (!applicableIds.includes(String(item.id))) return sum
+            const price = item.effectivePrice ?? item.price
+            return sum + price * item.qty * (Number(data.discount_percent) / 100)
+          }, 0)
+        }
+
         setPromoState({
           code:                   trimmed.toUpperCase(),
-          discount_percent:       data.discount_percent,
-          applicable_product_ids: data.applicable_product_ids,
+          discount_percent:       Number(data.discount_percent),
+          discount_type:          data.discount_type,
+          applicable_product_ids: applicableIds,
+          flat_discount_amount:   data.discount_type === 'FLAT' ? Number(data.discount_amount) : 0,
           discount_amount:        discount,
+          min_quantity_required:  data.coupon?.min_quantity_required || 1,
           message:                data.message,
         })
       } else {
@@ -461,13 +478,31 @@ export default function OrderSummary({
             {promoState && promoDiscount > 0 && (
               <div className="flex justify-between text-sm items-center">
                 <span style={{ color: '#00694c' }}>
-                  Promo ({promoState.discount_percent}% off)
+                  Promo ({promoState.discount_type === 'FLAT'
+                    ? `€${Number(promoState.flat_discount_amount || 0).toFixed(2)} off`
+                    : `${promoState.discount_percent}% off`})
                 </span>
                 <span className="font-bold" style={{ color: '#00694c' }}>
                   −€{promoDiscount.toFixed(2)}
                 </span>
               </div>
             )}
+            {/* Promo invalid warning — qty dropped below minimum */}
+            {promoState && promoDiscount === 0 && (() => {
+              const appIds = promoState.applicable_product_ids || []
+              const hasRestriction = appIds.length > 0
+              const qualQty = items.filter(i => !hasRestriction || appIds.includes(String(i.id))).reduce((s, i) => s + i.qty, 0)
+              const need = (promoState.min_quantity_required || 1) - qualQty
+              const msg = need > 0
+                ? `Add ${need} more item(s)${hasRestriction ? ' of the applicable products' : ''} to activate ${promoState.code}`
+                : `${promoState.code} doesn't apply to any items in your cart`
+              return (
+                <div className="flex items-center gap-1 text-xs" style={{ color: '#ba1a1a' }}>
+                  <span className="material-symbols-outlined text-[14px]">warning</span>
+                  <span>{msg}</span>
+                </div>
+              )
+            })()}
 
             {/* ── Delivery row ────────────────────────────────────────────── */}
             <div className="flex justify-between text-sm items-center" style={{ color: '#3d4943' }}>

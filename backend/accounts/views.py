@@ -729,6 +729,15 @@ class AdminUserDetailView(generics.RetrieveUpdateDestroyAPIView):
             u.user_type = data['user_type']
         if 'is_active' in data:
             u.is_active = data['is_active'] in [True, 'true', '1']
+
+        if 'wholesale_status' in data:
+            try:
+                profile = u.wholesaler_profile
+                profile.approval_status = data['wholesale_status']
+                profile.save()
+            except Exception:
+                pass
+
         u.save()
         return Response({'success': True})
 

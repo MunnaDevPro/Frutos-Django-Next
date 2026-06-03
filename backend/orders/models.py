@@ -447,39 +447,32 @@ class FreeShippingRule(models.Model):
 
 class Coupon(models.Model):
     class CouponType(models.TextChoices):
-        PRODUCT_DISCOUNT = 'PRODUCT_DISCOUNT', 'Product Discount'
-        MIN_PRODUCT_QUANTITY = 'MIN_PRODUCT_QUANTITY', 'Minimum Product Quantity'
-        SHIPPING_DISCOUNT = 'SHIPPING_DISCOUNT', 'Shipping Discount'
+        PRODUCT_DISCOUNT    = 'PRODUCT_DISCOUNT',    'Product Discount'
+        MIN_PRODUCT_QUANTITY= 'MIN_PRODUCT_QUANTITY','Minimum Product Quantity'
+        SHIPPING_DISCOUNT   = 'SHIPPING_DISCOUNT',   'Shipping Discount'
         CART_TOTAL_DISCOUNT = 'CART_TOTAL_DISCOUNT', 'Cart Total Discount'
-        FIRST_TIME_USER = 'FIRST_TIME_USER', 'First Time User'
-        USER_SPECIFIC = 'USER_SPECIFIC', 'User Specific'
+        FIRST_TIME_USER     = 'FIRST_TIME_USER',     'First Time User'
+        USER_SPECIFIC       = 'USER_SPECIFIC',       'User Specific'
 
     class DiscountType(models.TextChoices):
         PERCENT = 'PERCENT', 'Percentage'
         FLAT    = 'FLAT',    'Flat Amount'
 
-
-
-    discount_type    = models.CharField(max_length=10, choices=DiscountType.choices, default=DiscountType.PERCENT)
-    discount_amount  = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Flat discount amount (used when discount_type=FLAT)")
-    
-    code = models.CharField(max_length=50, unique=True, help_text="Unique coupon code", db_index=True)
-    type = models.CharField(max_length=25, choices=CouponType.choices, default=CouponType.PRODUCT_DISCOUNT, db_index=True)
-    discount_percent = models.DecimalField(max_digits=5, decimal_places=2, help_text="Discount percentage (0-100)")
-    min_quantity_required = models.PositiveIntegerField(default=1, help_text="Minimum quantity required to apply coupon")
-    min_cart_total = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Minimum cart total required for CART_TOTAL_DISCOUNT")
-    usage_limit = models.PositiveIntegerField(null=True, blank=True, help_text="Maximum number of times this coupon can be used. Leave blank for unlimited.")
-    used_count = models.PositiveIntegerField(default=0, help_text="Number of times this coupon has been used")
-    applicable_products = models.ManyToManyField(
-        'products.Product',  # ← string reference
-        blank=True,
-        related_name='coupons',
-    )
-    eligible_users = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='specific_coupons', help_text="Users eligible for USER_SPECIFIC coupons")
-    active = models.BooleanField(default=True, db_index=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    valid_from = models.DateTimeField(default=timezone.now, help_text="Coupon becomes valid from this date and time", db_index=True)
-    expires_at = models.DateTimeField(help_text="Coupon expiration date and time", db_index=True)
+    code                  = models.CharField(max_length=50, unique=True, db_index=True)
+    type                  = models.CharField(max_length=25, choices=CouponType.choices, default=CouponType.PRODUCT_DISCOUNT, db_index=True)
+    discount_type         = models.CharField(max_length=10, choices=DiscountType.choices, default=DiscountType.PERCENT)  # ← NEW
+    discount_percent      = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    discount_amount       = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # ← NEW (flat)
+    min_quantity_required = models.PositiveIntegerField(default=1)
+    min_cart_total        = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    usage_limit           = models.PositiveIntegerField(null=True, blank=True)
+    used_count            = models.PositiveIntegerField(default=0)
+    applicable_products   = models.ManyToManyField('products.Product', blank=True, related_name='coupons')
+    eligible_users        = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='specific_coupons')
+    active                = models.BooleanField(default=True, db_index=True)
+    created_at            = models.DateTimeField(auto_now_add=True)
+    valid_from            = models.DateTimeField(default=timezone.now, db_index=True)
+    expires_at            = models.DateTimeField(db_index=True)
 
     class Meta:
         ordering = ['-created_at']

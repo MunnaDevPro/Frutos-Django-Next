@@ -3,13 +3,8 @@
 <div class="sidebar-area" id="sidebar-area">
     <div class="logo position-relative d-flex align-items-center justify-content-between" style="padding: 1rem; min-height: 60px;">
         <a href="{% url 'dashboard:home' %}" class="d-block text-decoration-none position-relative" style="max-width: 150px; width: 100%;">
-            <img src="{% static 'assets/images/logo_light.svg' %}" 
-                 alt="iCommerce Logo" 
-                 width="150" 
-                 height="50" 
-                 decoding="async"
-                 style="width: 100%; height: auto; max-width: 150px; display: block;">
-        </a> 
+            <img src="{% static 'assets/images/logo_light.svg' %}" alt="iCommerce Logo" width="150" height="50" decoding="async" style="width: 100%; height: auto; max-width: 150px; display: block;">
+        </a>
         <button class="sidebar-burger-menu-close bg-transparent py-3 border-0 opacity-0 z-n1 position-absolute top-50 end-0 translate-middle-y" id="sidebar-burger-menu-close">
             <span class="border-1 d-block for-dark-burger" style="border-bottom: 1px solid #475569; height: 1px; width: 25px; transform: rotate(45deg);"></span>
             <span class="border-1 d-block for-dark-burger" style="border-bottom: 1px solid #475569; height: 1px; width: 25px; transform: rotate(-45deg);"></span>
@@ -27,26 +22,16 @@
             <li class="menu-title small text-uppercase">
                 <span class="menu-title-text">MAIN</span>
             </li>
-            
+
             <li class="menu-item {% if request.resolver_match.url_name == 'home' %}open{% endif %}">
-                <a href="{% url 'dashboard:home' %}" 
-                   class="menu-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
-                   hx-get="{% url 'dashboard:home' %}"
-                   hx-target="#dashboard-content"
-                   hx-swap="innerHTML"
-                   hx-push-url="true">
+                <a href="{% url 'dashboard:home' %}" class="menu-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" hx-get="{% url 'dashboard:home' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
                     <span class="material-symbols-outlined menu-icon">dashboard</span>
                     <span class="title">Dashboard</span>
                 </a>
             </li>
-            
+
             <li class="menu-item {% if request.resolver_match.url_name == 'analytics' %}open{% endif %}">
-                <a href="{% url 'dashboard:analytics' %}" 
-                   class="menu-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}"
-                   hx-get="{% url 'dashboard:analytics' %}"
-                   hx-target="#dashboard-content"
-                   hx-swap="innerHTML"
-                   hx-push-url="true">
+                <a href="{% url 'dashboard:analytics' %}" class="menu-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}" hx-get="{% url 'dashboard:analytics' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
                     <span class="material-symbols-outlined menu-icon">analytics</span>
                     <span class="title">Analytics</span>
                 </a>
@@ -56,7 +41,7 @@
             <li class="menu-title small text-uppercase mt-3">
                 <span class="menu-title-text">CATALOG</span>
             </li>
-            
+
             <li class="menu-item">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <span class="material-symbols-outlined menu-icon">inventory_2</span>
@@ -64,112 +49,61 @@
                 </a>
                 <ul class="menu-sub">
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='Product' %}\" 
-                           class="menu-link"
-                           hx-get="{% url 'dashboard:model_list' app_label='products' model_name='Product' %}"
-                           hx-target="#dashboard-content"
-                           hx-swap="innerHTML"
-                           hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='Product' %}\" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='products' model_name='Product' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
                             All Products
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='Category' %}" 
-                           class="menu-link"
-                           hx-get="{% url 'dashboard:model_list' app_label='products' model_name='Category' %}"
-                           hx-target="#dashboard-content"
-                           hx-swap="innerHTML"
-                           hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='Category' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='products' model_name='Category' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
                             Categories
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='SubCategory' %}" 
-                           class="menu-link"
-                           hx-get="{% url 'dashboard:model_list' app_label='products' model_name='SubCategory' %}"
-                           hx-target="#dashboard-content"
-                           hx-swap="innerHTML"
-                           hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='SubCategory' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='products' model_name='SubCategory' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
                             Subcategories
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='Brand' %}" 
-                           class="menu-link"
-                           hx-get="{% url 'dashboard:model_list' app_label='products' model_name='Brand' %}"
-                           hx-target="#dashboard-content"
-                           hx-swap="innerHTML"
-                           hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='Brand' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='products' model_name='Brand' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
                             Brands
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='Color' %}" 
-                           class="menu-link"
-                           hx-get="{% url 'dashboard:model_list' app_label='products' model_name='Color' %}"
-                           hx-target="#dashboard-content"
-                           hx-swap="innerHTML"
-                           hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='Color' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='products' model_name='Color' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
                             Colors
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='Size' %}" 
-                           class="menu-link"
-                           hx-get="{% url 'dashboard:model_list' app_label='products' model_name='Size' %}"
-                           hx-target="#dashboard-content"
-                           hx-swap="innerHTML"
-                           hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='Size' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='products' model_name='Size' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
                             Sizes
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='ProductAdditionalImage' %}" 
-                           class="menu-link"
-                           hx-get="{% url 'dashboard:model_list' app_label='products' model_name='ProductAdditionalImage' %}"
-                           hx-target="#dashboard-content"
-                           hx-swap="innerHTML"
-                           hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='ProductAdditionalImage' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='products' model_name='ProductAdditionalImage' %}" hx-target="#dashboard-content" hx-swap="innerHTML"
+                            hx-push-url="true">
                             Product Images
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='ProductAdditionalDescription' %}" 
-                           class="menu-link"
-                           hx-get="{% url 'dashboard:model_list' app_label='products' model_name='ProductAdditionalDescription' %}"
-                           hx-target="#dashboard-content"
-                           hx-swap="innerHTML"
-                           hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='ProductAdditionalDescription' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='products' model_name='ProductAdditionalDescription' %}" hx-target="#dashboard-content"
+                            hx-swap="innerHTML" hx-push-url="true">
                             Product Descriptions
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='ProductSpecification' %}" 
-                           class="menu-link"
-                           hx-get="{% url 'dashboard:model_list' app_label='products' model_name='ProductSpecification' %}"
-                           hx-target="#dashboard-content"
-                           hx-swap="innerHTML"
-                           hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='ProductSpecification' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='products' model_name='ProductSpecification' %}" hx-target="#dashboard-content" hx-swap="innerHTML"
+                            hx-push-url="true">
                             Product Specs
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='Review' %}" 
-                           class="menu-link"
-                           hx-get="{% url 'dashboard:model_list' app_label='products' model_name='Review' %}"
-                           hx-target="#dashboard-content"
-                           hx-swap="innerHTML"
-                           hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='Review' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='products' model_name='Review' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
                             Reviews
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='CategoryMinimumOrderQuantity' %}" 
-                           class="menu-link"
-                           hx-get="{% url 'dashboard:model_list' app_label='products' model_name='CategoryMinimumOrderQuantity' %}"
-                           hx-target="#dashboard-content"
-                           hx-swap="innerHTML"
-                           hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='CategoryMinimumOrderQuantity' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='products' model_name='CategoryMinimumOrderQuantity' %}" hx-target="#dashboard-content"
+                            hx-swap="innerHTML" hx-push-url="true">
                             Min Order Quantities
                         </a>
                     </li>
@@ -180,7 +114,7 @@
             <li class="menu-title small text-uppercase mt-3">
                 <span class="menu-title-text">SALES</span>
             </li>
-            
+
             <li class="menu-item">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <span class="material-symbols-outlined menu-icon">shopping_cart</span>
@@ -188,52 +122,27 @@
                 </a>
                 <ul class="menu-sub">
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='orders' model_name='Order' %}" 
-                           class="menu-link"
-                           hx-get="{% url 'dashboard:model_list' app_label='orders' model_name='Order' %}"
-                           hx-target="#dashboard-content"
-                           hx-swap="innerHTML"
-                           hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='orders' model_name='Order' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='orders' model_name='Order' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
                             All Orders
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='orders' model_name='OrderItem' %}" 
-                           class="menu-link"
-                           hx-get="{% url 'dashboard:model_list' app_label='orders' model_name='OrderItem' %}"
-                           hx-target="#dashboard-content"
-                           hx-swap="innerHTML"
-                           hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='orders' model_name='OrderItem' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='orders' model_name='OrderItem' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
                             Order Items
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='orders' model_name='OrderUpdate' %}" 
-                           class="menu-link"
-                           hx-get="{% url 'dashboard:model_list' app_label='orders' model_name='OrderUpdate' %}"
-                           hx-target="#dashboard-content"
-                           hx-swap="innerHTML"
-                           hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='orders' model_name='OrderUpdate' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='orders' model_name='OrderUpdate' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
                             Order Updates
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='orders' model_name='OrderPayment' %}" 
-                           class="menu-link"
-                           hx-get="{% url 'dashboard:model_list' app_label='orders' model_name='OrderPayment' %}"
-                           hx-target="#dashboard-content"
-                           hx-swap="innerHTML"
-                           hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='orders' model_name='OrderPayment' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='orders' model_name='OrderPayment' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
                             Payments
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='orders' model_name='Coupon' %}" 
-                           class="menu-link"
-                           hx-get="{% url 'dashboard:model_list' app_label='orders' model_name='Coupon' %}"
-                           hx-target="#dashboard-content"
-                           hx-swap="innerHTML"
-                           hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='orders' model_name='Coupon' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='orders' model_name='Coupon' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
                             Coupons
                         </a>
                     </li>
@@ -248,7 +157,8 @@
                 </a>
                 <ul class="menu-sub">
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='ShippingCategory' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='products' model_name='ShippingCategory' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='products' model_name='ShippingCategory' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='products' model_name='ShippingCategory' %}" hx-target="#dashboard-content" hx-swap="innerHTML"
+                            hx-push-url="true">
                             Shipping Categories
                         </a>
                     </li>
@@ -263,7 +173,8 @@
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='orders' model_name='FreeShippingRule' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='orders' model_name='FreeShippingRule' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='orders' model_name='FreeShippingRule' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='orders' model_name='FreeShippingRule' %}" hx-target="#dashboard-content" hx-swap="innerHTML"
+                            hx-push-url="true">
                             Free Shipping Rules
                         </a>
                     </li>
@@ -274,7 +185,7 @@
             <li class="menu-title small text-uppercase mt-3">
                 <span class="menu-title-text">CUSTOMER MANAGEMENT</span>
             </li>
-            
+
             <li class="menu-item">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <span class="material-symbols-outlined menu-icon">people</span>
@@ -292,7 +203,8 @@
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='users' model_name='WholesalerProfile' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='users' model_name='WholesalerProfile' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='users' model_name='WholesalerProfile' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='users' model_name='WholesalerProfile' %}" hx-target="#dashboard-content" hx-swap="innerHTML"
+                            hx-push-url="true">
                             Wholesalers
                         </a>
                     </li>
@@ -340,7 +252,7 @@
             <li class="menu-title small text-uppercase mt-3">
                 <span class="menu-title-text">WEBSITE</span>
             </li>
-            
+
             <li class="menu-item">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                     <span class="material-symbols-outlined menu-icon">web</span>
@@ -368,7 +280,8 @@
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='website' model_name='HorizontalPromoBanner' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='website' model_name='HorizontalPromoBanner' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='website' model_name='HorizontalPromoBanner' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='website' model_name='HorizontalPromoBanner' %}" hx-target="#dashboard-content" hx-swap="innerHTML"
+                            hx-push-url="true">
                             Promo Banners
                         </a>
                     </li>
@@ -388,7 +301,8 @@
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'dashboard:model_list' app_label='website' model_name='SocialMediaLink' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='website' model_name='SocialMediaLink' %}" hx-target="#dashboard-content" hx-swap="innerHTML" hx-push-url="true">
+                        <a href="{% url 'dashboard:model_list' app_label='website' model_name='SocialMediaLink' %}" class="menu-link" hx-get="{% url 'dashboard:model_list' app_label='website' model_name='SocialMediaLink' %}" hx-target="#dashboard-content" hx-swap="innerHTML"
+                            hx-push-url="true">
                             Social Links
                         </a>
                     </li>
@@ -425,7 +339,7 @@
                 </ul>
             </li>
 
-<!-- SETTINGS & TOOLS -->
+            <!-- SETTINGS & TOOLS -->
             <li class="menu-title small text-uppercase mt-3">
                 <span class="menu-title-text">SYSTEM</span>
             </li>
@@ -447,4 +361,3 @@
     </aside>
 </div>
 <!-- End Sidebar Area -->
-

@@ -1,4 +1,3 @@
-
 # orders/views.py
 import logging
 import traceback
@@ -1133,90 +1132,148 @@ class ShippingMethodListAPIView(generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
 
 class CouponViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for coupon management.
-    Admin can create/edit/delete. Public can only view active coupons.
-    """
-    serializer_class = CouponSerializer
-    permission_classes = [ReadOnlyOrIsAdmin]
-    pagination_class = StandardResultsSetPagination
-    filter_backends = [DjangoFilterBackend, SearchFilter]
-    search_fields = ['code', 'type']
-    
+    serializer_class   = CouponSerializer
+    def get_permissions(self):
+        if self.action == "validate_coupon":
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
+    pagination_class   = StandardResultsSetPagination
+    filter_backends    = [DjangoFilterBackend, SearchFilter]
+    search_fields      = ['code', 'type']
+
     def get_queryset(self):
-        """Admin sees all coupons, public sees only active ones."""
-        if (self.request.user and self.request.user.is_authenticated and
-            (self.request.user.is_staff or getattr(self.request.user, 'user_type', '') == 'ADMIN')):
+        user = self.request.user
+        is_admin = (
+            user.is_staff or
+            user.is_superuser or
+            getattr(user, 'user_type', '') in ['ADMIN', 'SELLER']
+        )
+        if user.is_authenticated and is_admin:
             return Coupon.objects.all().order_by('-created_at')
         return Coupon.objects.filter(active=True)
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        is_admin = (
+            user.is_staff or
+            user.is_superuser or
+            getattr(user, 'user_type', '') in ['ADMIN', 'SELLER']
+        )
+        if not is_admin:
+            return Response({'detail': 'Forbidden'}, status=403)
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        user = request.user
+        is_admin = (
+            user.is_staff or
+            user.is_superuser or
+            getattr(user, 'user_type', '') in ['ADMIN', 'SELLER']
+        )
+        if not is_admin:
+            return Response({'detail': 'Forbidden'}, status=403)
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        user = request.user
+        is_admin = (
+            user.is_staff or
+            user.is_superuser or
+            getattr(user, 'user_type', '') in ['ADMIN', 'SELLER']
+        )
+        if not is_admin:
+            return Response({'detail': 'Forbidden'}, status=403)
+        return super().destroy(request, *args, **kwargs)
     
     @action(detail=False, methods=['post'], url_path='validate')
     def validate_coupon(self, request):
         """
-        Validate a coupon against cart items
-        POST /api/coupons/validate/
-        Body: {
-            "coupon_code": "SAVE10",
-            "cart_items": [
-                {"quantity": 2, "product": "Product 1"},
-                {"quantity": 1, "product": "Product 2"}
-            ],
-            "cart_total": 75.50,  // Optional, required for CART_TOTAL_DISCOUNT
-            "user_id": 123        // Optional, required for FIRST_TIME_USER and USER_SPECIFIC
-        }
+        Validate a coupon against cart items.
+        Accepts both old format (coupon_code + cart_items) and
+        new frontend format (code + product_ids + cart_total + quantities).
+        POST /api/orders/coupons/validate/
         """
-        serializer = CouponValidationSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-        coupon_code = serializer.validated_data['coupon_code']
-        cart_items = serializer.validated_data['cart_items']
-        cart_total = serializer.validated_data.get('cart_total')
-        user_id = serializer.validated_data.get('user_id')
-        
-        # Get user if user_id is provided
+        data = request.data
+
+        # ── Normalise request: support both legacy and frontend format ─────────
+        # Frontend sends: { code, product_ids: [uuid, ...], cart_total, quantities: {uuid: qty} }
+        # Legacy sends:   { coupon_code, cart_items: [{quantity, product}], cart_total }
+        coupon_code = data.get('coupon_code') or data.get('code', '')
+        cart_total  = data.get('cart_total')
+        user_id     = data.get('user_id')
+
+        # Build cart_items list
+        if 'cart_items' in data:
+            cart_items = data['cart_items']
+        else:
+            # Frontend format: reconstruct from product_ids + quantities
+            product_ids = data.get('product_ids', [])
+            quantities  = data.get('quantities', {})  # {product_id: qty}
+            cart_items  = [
+                {'product': str(pid), 'quantity': quantities.get(str(pid), 1)}
+                for pid in product_ids
+            ]
+
+        if not coupon_code:
+            return Response({'valid': False, 'message': 'Coupon code is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # ── Fetch user ──────────────────────────────────────────────────────────
         user = None
         if user_id:
             try:
                 from django.contrib.auth import get_user_model
                 User = get_user_model()
                 user = User.objects.get(id=user_id)
-            except User.DoesNotExist:
-                return Response({
-                    'valid': False,
-                    'message': 'User not found.'
-                }, status=status.HTTP_400_BAD_REQUEST)
-        
+            except Exception:
+                return Response({'valid': False, 'message': 'User not found.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # ── Fetch coupon ────────────────────────────────────────────────────────
         try:
-            coupon = Coupon.objects.get(code=coupon_code, active=True)
+            coupon = Coupon.objects.prefetch_related('applicable_products').get(
+                code__iexact=coupon_code, active=True
+            )
         except Coupon.DoesNotExist:
-            return Response({
-                'valid': False,
-                'message': 'Coupon not found or inactive.'
-            }, status=status.HTTP_404_NOT_FOUND)
-        
-        # Validate coupon with enhanced parameters
-        is_valid, message = coupon.is_valid_for_cart(cart_items, user=user, cart_total=cart_total)
-        
-        response_data = {
-            'valid': is_valid,
-            'message': message,
-            'coupon': CouponSerializer(coupon).data if is_valid else None
-        }
-        
-        # If valid, calculate discount amounts
-        if is_valid and cart_total is not None:
-            # Calculate discount with cart total and default shipping cost
-            discount_breakdown = coupon.calculate_discount(cart_total, shipping_cost=0)
-            total_discount = discount_breakdown['product_discount'] + discount_breakdown['shipping_discount']
-            
-            response_data.update({
-                'discount_amount': total_discount,
-                'discount_breakdown': discount_breakdown,
-                'discount_type': coupon.get_type_display()
-            })
-        
-        return Response(response_data, status=status.HTTP_200_OK)
+            return Response({'valid': False, 'message': 'Invalid promo code.'}, status=status.HTTP_200_OK)
+
+        # ── Validate ────────────────────────────────────────────────────────────
+        cart_total_val = float(cart_total) if cart_total is not None else None
+        is_valid, message = coupon.is_valid_for_cart(cart_items, user=user, cart_total=cart_total_val)
+
+        if not is_valid:
+            return Response({'valid': False, 'message': message}, status=status.HTTP_200_OK)
+
+        # ── Build applicable_product_ids list ──────────────────────────────────
+        # Empty list = applies to ALL products; non-empty = specific products only
+        applicable_qs = coupon.applicable_products.all()
+        if applicable_qs.exists():
+            applicable_product_ids = [str(i) for i in applicable_qs.values_list('id', flat=True)]
+        else:
+            applicable_product_ids = []  # empty = all products (frontend convention)
+
+        # ── Calculate discount on qualifying items only ────────────────────────
+        has_restriction = len(applicable_product_ids) > 0
+        qualifying_items = [
+            item for item in cart_items
+            if not has_restriction or str(item.get('product', '')) in applicable_product_ids
+        ]
+
+        if coupon.discount_type == 'FLAT':
+            discount_amount = float(coupon.discount_amount) if qualifying_items else 0.0
+        else:
+            effective_cart_total = cart_total_val or 0
+            discount_amount = effective_cart_total * float(coupon.discount_percent) / 100
+
+        discount_amount = round(discount_amount, 2)
+
+        return Response({
+            'valid':                  True,
+            'message':                message,
+            'discount_percent':       float(coupon.discount_percent),
+            'discount_amount':        discount_amount,
+            'discount_type':          coupon.discount_type,   # 'PERCENT' | 'FLAT'
+            'applicable_product_ids': applicable_product_ids,
+            'coupon':                 CouponSerializer(coupon).data,
+        }, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=['post'], url_path='calculate-discount')
     def calculate_discount(self, request, pk=None):
@@ -1307,23 +1364,41 @@ class ShippingCategoryViewSet(viewsets.ModelViewSet):
         return ShippingCategorySerializer
 
 class FreeShippingRuleViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for free shipping rules management.
-    Admin can create/edit/delete. Public can only view active rules.
-    """
-    permission_classes = [ReadOnlyOrIsAdmin]
-    pagination_class = StandardResultsSetPagination
-    
+    serializer_class   = FreeShippingRuleSerializer
+    permission_classes = [permissions.IsAuthenticated]  # ← change
+    pagination_class   = StandardResultsSetPagination
+
+    def _is_admin(self, user):
+        return (
+            user.is_staff or
+            user.is_superuser or
+            getattr(user, 'user_type', '') in ['ADMIN', 'SELLER']
+        )
+
     def get_serializer_class(self):
         if self.request.method in ('POST', 'PUT', 'PATCH'):
             return FreeShippingRuleWriteSerializer
         return FreeShippingRuleSerializer
-    
+
     def get_queryset(self):
-        if (self.request.user and self.request.user.is_authenticated and
-            (self.request.user.is_staff or getattr(self.request.user, 'user_type', '') == 'ADMIN')):
-            return FreeShippingRule.objects.all().order_by('-threshold_amount')
+        if self.request.user.is_authenticated and self._is_admin(self.request.user):
+            return FreeShippingRule.objects.all()
         return FreeShippingRule.objects.filter(active=True)
+
+    def create(self, request, *args, **kwargs):
+        if not self._is_admin(request.user):
+            return Response({'detail': 'Forbidden'}, status=403)
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        if not self._is_admin(request.user):
+            return Response({'detail': 'Forbidden'}, status=403)
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        if not self._is_admin(request.user):
+            return Response({'detail': 'Forbidden'}, status=403)
+        return super().destroy(request, *args, **kwargs)
     
     @action(detail=False, methods=['get'], url_path='check-eligibility')
     def check_eligibility(self, request):

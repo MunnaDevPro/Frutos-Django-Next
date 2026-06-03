@@ -71,6 +71,7 @@ const editFields = [
   { key: "name", label: "Full Name", required: true, placeholder: "John Doe" },
   { key: "user_type", label: "Role", type: "select", required: true, options: [
     { value: "CUSTOMER", label: "Customer" },
+    { value: "WHOLESALE", label: "Wholesaler" },
     { value: "SELLER",   label: "Seller" },
     { value: "VENDOR",   label: "Vendor" },
     { value: "ADMIN",    label: "Admin" },
@@ -80,6 +81,15 @@ const editFields = [
     { value: "false", label: "Inactive" },
   ]},
 ];
+
+const wholesaleEditFields = [
+  ...editFields,
+  { key: "wholesale_status", label: "Wholesale Status", type: "select", options: [
+    { value: "PENDING",  label: "Pending" },
+    { value: "APPROVED", label: "Approved" },
+    { value: "REJECTED", label: "Rejected" },
+  ]},
+]
 
 const createFields = [
   { key: "email",     label: "Email",     required: true, placeholder: "user@example.com" },
@@ -92,6 +102,18 @@ const createFields = [
     { value: "ADMIN",    label: "Admin" },
   ]},
 ];
+
+const handleApproveWholesale = async (row) => {
+  try {
+    await api.patch(`/api/auth/admin/users/${row.id}/`, {
+      wholesale_status: 'APPROVED',
+    })
+    toast.success(`${row.name} approved as wholesaler`)
+    mutate()
+  } catch (err) {
+    toast.error(err?.message || 'Failed to approve wholesaler')
+  }
+}
 
 export default function UsersPage() {
   const toast = useToastContext();
@@ -133,18 +155,19 @@ export default function UsersPage() {
   };
 
   const handleEdit = async (values) => {
-    try {
-      await api.patch(`/api/auth/admin/users/${editItem.id}/`, {
-        ...values,
-        is_active: values.is_active === "true",
-      });
-      toast.success("User updated");
-      setEditItem(null);
-      mutate();
-    } catch (err) {
-      toast.error(err?.message || "Failed to update user");
+  try {
+    const payload = {
+      ...values,
+      is_active: values.is_active === "true",
     }
-  };
+    await api.patch(`/api/auth/admin/users/${editItem.id}/`, payload)
+    toast.success("User updated")
+    setEditItem(null)
+    mutate()
+  } catch (err) {
+    toast.error(err?.message || "Failed to update user")
+  }
+}
 
   const handleDelete = async () => {
     try {
@@ -197,20 +220,23 @@ export default function UsersPage() {
         loading={isLoading}
         searchable
         actions={(row) => (
-          <div className="flex items-center justify-end gap-1">
-            <button onClick={() => setViewItem(row)} className="p-1.5 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
-              <Eye className="w-3.5 h-3.5" />
+        <div className="flex items-center justify-end gap-1">
+          <button onClick={() => setViewItem(row)} className="p-1.5 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"><Eye className="w-3.5 h-3.5" /></button>
+          
+          <button onClick={() => setEditItem({ ...row, is_active: String(row.is_active),wholesale_status: row.wholesale_status || 'PENDING',})} className="p-1.5 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"><Pencil className="w-3.5 h-3.5" /></button>
+          
+          {row.user_type === 'WHOLESALER' && row.wholesale_status === 'PENDING' && (
+            <button
+              onClick={() => handleApproveWholesale(row)}
+              className="px-2 py-1 text-xs font-medium rounded bg-green-600 text-white hover:bg-green-700"
+            >
+              Approve
             </button>
-            {!row.is_wholesale && (
-              <button onClick={() => setEditItem({ ...row, is_active: String(row.is_active) })} className="p-1.5 rounded text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
-                <Pencil className="w-3.5 h-3.5" />
-              </button>
-            )}
-            <button onClick={() => setDeleteItem(row)} className="p-1.5 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30">
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        )}
+          )}
+          
+          <button onClick={() => setDeleteItem(row)} className="p-1.5 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"><Trash2 className="w-3.5 h-3.5" /></button>
+        </div>
+      )}
       />
 
       <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Create User">
@@ -218,8 +244,15 @@ export default function UsersPage() {
       </Modal>
 
       <Modal open={!!editItem} onClose={() => setEditItem(null)} title="Edit User">
-        {editItem && <FormModal fields={editFields} initialValues={editItem} onSubmit={handleEdit} submitLabel="Save Changes" />}
-      </Modal>
+  {editItem && (
+    <FormModal
+      fields={editItem.user_type === 'WHOLESALER' ? wholesaleEditFields : editFields}
+      initialValues={editItem}
+      onSubmit={handleEdit}
+      submitLabel="Save Changes"
+    />
+  )}
+</Modal>
 
       <Modal open={!!viewItem} onClose={() => setViewItem(null)} title="User Details">
         {viewItem && (

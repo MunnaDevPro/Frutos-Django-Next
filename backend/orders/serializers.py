@@ -409,18 +409,38 @@ class FreeShippingRuleWriteSerializer(serializers.ModelSerializer):
 # ══════════════════════════════════════════════════════════════════
 #  COUPON SERIALIZERS
 # ══════════════════════════════════════════════════════════════════
-
 class CouponSerializer(serializers.ModelSerializer):
-    is_expired = serializers.SerializerMethodField()
-    type_display = serializers.CharField(source='get_type_display', read_only=True)
+    type_display             = serializers.CharField(source='get_type_display', read_only=True)
+    is_expired               = serializers.SerializerMethodField()
+    is_valid_period          = serializers.SerializerMethodField()
+    eligible_users_count     = serializers.SerializerMethodField()
     applicable_products_data = serializers.SerializerMethodField()
 
     class Meta:
         model  = Coupon
-        fields = '__all__'
+        fields = [
+            'id', 'code', 'type', 'type_display',
+            'discount_type', 'discount_percent', 'discount_amount',
+            'min_quantity_required', 'min_cart_total',
+            'usage_limit', 'used_count',
+            'applicable_products', 'applicable_products_data',
+            'active', 'is_expired', 'is_valid_period',
+            'eligible_users_count', 'created_at', 'valid_from', 'expires_at',
+        ]
+        read_only_fields = ['created_at', 'used_count']
 
     def get_is_expired(self, obj):
-        return obj.is_expired()
+        try: return obj.is_expired()
+        except: return False
+
+    def get_is_valid_period(self, obj):
+        try: return obj.is_valid_period()
+        except: return True
+
+    def get_eligible_users_count(self, obj):
+        if obj.type == 'USER_SPECIFIC':
+            return obj.eligible_users.count()
+        return None
 
     def get_applicable_products_data(self, obj):
         return [{'id': p.id, 'name': p.name} for p in obj.applicable_products.all()]

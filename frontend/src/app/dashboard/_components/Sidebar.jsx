@@ -27,6 +27,7 @@ import {
   Ticket,
   MessageSquare,
 } from "lucide-react";
+import Image from "next/image";
 
 const navGroups = [
   {
@@ -117,7 +118,7 @@ export default function Sidebar({ collapsed, onToggle }) {
   const NavContent = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="h-14 flex items-center px-4 border-b border-gray-200 dark:border-gray-800 shrink-0">
+      {/* <div className="h-14 flex items-center px-4 border-b border-gray-200 dark:border-gray-800 shrink-0">
         {!collapsed && (
           <span className="text-base font-semibold text-gray-900 dark:text-white">
             iCommerce
@@ -129,7 +130,33 @@ export default function Sidebar({ collapsed, onToggle }) {
         >
           <ChevronLeft className={`w-4 h-4 transition-transform ${collapsed ? "rotate-180" : ""}`} />
         </button>
-      </div>
+      </div> */}
+      {/* Logo */}
+    <div className="h-14 flex items-center px-4 border-b border-gray-200 dark:border-gray-800 shrink-0">
+      {!collapsed && (
+        <div className="flex items-center gap-2">
+          <div className="relative h-8 w-8 shrink-0">
+            <Image 
+              src="/favicon_orrange.jpeg" 
+              alt="El-Arbol Logo" 
+              fill 
+              priority 
+              className="object-contain" 
+            />
+          </div>
+          <span className="text-base font-bold text-gray-900 dark:text-white whitespace-nowrap">
+            El-Arbol
+          </span>
+        </div>
+      )}
+      
+      <button
+        onClick={onToggle}
+        className="ml-auto p-1.5 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hidden md:flex"
+      >
+        <ChevronLeft className={`w-4 h-4 transition-transform ${collapsed ? "rotate-180" : ""}`} />
+      </button>
+    </div>
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-5">
