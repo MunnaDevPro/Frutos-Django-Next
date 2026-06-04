@@ -49,7 +49,8 @@ urlpatterns = [
     path('api/wholesale/', include('wholesale.urls')),
     path('api/website/', include('website.urls')),
     path('api/sections/', include('sections.urls')),  # New sections API
-    path('api/stores/', include('stores.urls')),  # Stores API
+    # path('api/stores/', include('stores.urls')),  # Stores API
+    path('api/fulfillment/', include('stores.urls')),
 ]
 
 
