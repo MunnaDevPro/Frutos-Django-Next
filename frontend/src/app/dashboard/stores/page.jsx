@@ -7,39 +7,7 @@ import {
   ChevronUp, Package, Loader2, AlertCircle, Eye, EyeOff,
   Star, Leaf, Truck, ShoppingCart, ArrowUpDown, GripVertical,
 } from 'lucide-react'
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api'
-
-// ─── API helpers ─────────────────────────────────────────────────────────────
-
-async function apiFetch(path, options = {}) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
-    cache: 'no-store',
-    ...options,
-  })
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(err.detail || `API error ${res.status}`)
-  }
-  if (res.status === 204) return null
-  return res.json()
-}
-
-async function apiMultipart(path, formData, method = 'POST', token) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-    body: formData,
-    cache: 'no-store',
-  })
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(err.detail || JSON.stringify(err) || `API error ${res.status}`)
-  }
-  if (res.status === 204) return null
-  return res.json()
-}
+import { adminFetch } from '@/app/dashboard/_lib/api'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -305,6 +273,7 @@ function StoreFormModal({ store, onClose, onSave }) {
   const [form, setForm] = useState({
     ...EMPTY_STORE,
     ...(store || {}),
+    // Explicit overrides to handle camelCase/snake_case and integer booleans from backend
     features: store?.features || [],
     availability: store?.availability || [],
     leftover_packs: store?.leftover_packs || [],
@@ -313,6 +282,10 @@ function StoreFormModal({ store, onClose, onSave }) {
     map_link: store?.mapLink || store?.map_link || '',
     short_name: store?.shortName || store?.short_name || '',
     full_address: store?.fullAddress || store?.full_address || '',
+    // Force boolean — backend may send 0/1 or "true"/"false"
+    is_active: store
+      ? Boolean(store.is_active === true || store.is_active === 1 || store.is_active === 'true')
+      : true,
   })
   const [image, setImage] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -327,6 +300,7 @@ function StoreFormModal({ store, onClose, onSave }) {
     setError('')
 
     try {
+      // ── 1. Save main store (multipart for image upload) ──
       const fd = new FormData()
       const fields = ['name', 'short_name', 'address', 'city', 'full_address',
         'phone', 'open_time', 'close_time', 'map_link', 'provenance', 'order']
@@ -334,22 +308,32 @@ function StoreFormModal({ store, onClose, onSave }) {
       fd.append('is_active', form.is_active ? 'true' : 'false')
       if (image) fd.append('image', image)
 
-      const path = isEdit ? `/fulfillment/stores/${store.id}/` : '/fulfillment/stores/'
+      const path = isEdit ? `/api/fulfillment/stores/${store.id}/` : '/api/fulfillment/stores/admin/'
       const method = isEdit ? 'PATCH' : 'POST'
-      const saved = await apiMultipart(path, fd, method)
 
-      // Save features
-      if (saved) {
-        await apiFetch(`/fulfillment/stores/${saved.id}/features/`, {
-          method: 'PUT',
-          body: JSON.stringify({ features: form.features }),
-        }).catch(() => {})
+      // adminFetch handles auth token automatically from localStorage
+      const saved = await adminFetch(path, { method, body: fd })
+      console.log('Store saved:', saved)
 
-        await apiFetch(`/fulfillment/stores/${saved.id}/availability/`, {
+      // ── 2. Save features ──
+      if (saved?.id) {
+        await adminFetch(`/api/fulfillment/stores/${saved.id}/features/`, {
           method: 'PUT',
-          body: JSON.stringify({ availability: form.availability }),
-        }).catch(() => {})
+          body: { features: form.features },
+        }).catch(err => console.warn('features save failed:', err.message))
+
+        await adminFetch(`/api/fulfillment/stores/${saved.id}/availability/`, {
+          method: 'PUT',
+          body: { availability: form.availability },
+        }).catch(err => console.warn('availability save failed:', err.message))
       }
+
+      // ── 3. Bust Next.js cache so /stores page updates instantly ──
+      await fetch('/api/revalidate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tag: 'stores', secret: process.env.NEXT_PUBLIC_REVALIDATE_SECRET }),
+      }).catch(() => {})
 
       onSave()
     } catch (err) {
@@ -626,6 +610,7 @@ function StoreRow({ store, onEdit, onDelete, onToggle }) {
 export default function StoresPage() {
   const [stores, setStores] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [filterActive, setFilterActive] = useState('all')
   const [editStore, setEditStore] = useState(null)
@@ -635,11 +620,13 @@ export default function StoresPage() {
 
   const load = async () => {
     setLoading(true)
+    setError('')
     try {
-      const data = await apiFetch('/fulfillment/stores/')
+      const data = await adminFetch('/api/fulfillment/stores/admin/')
       setStores(Array.isArray(data) ? data : (data.results || []))
     } catch (e) {
-      console.error(e)
+      console.error('Load stores error:', e)
+      setError(e.message || 'Failed to load stores')
     } finally {
       setLoading(false)
     }
@@ -657,27 +644,37 @@ export default function StoresPage() {
     return matchSearch && matchStatus
   })
 
-  const handleEdit = (store) => { setEditStore(store); setShowForm(true) }
-  const handleAdd  = () => { setEditStore(null); setShowForm(true) }
+  const handleEdit  = (store) => { setEditStore(store); setShowForm(true) }
+  const handleAdd   = () => { setEditStore(null); setShowForm(true) }
   const handleClose = () => { setShowForm(false); setEditStore(null) }
   const handleSaved = () => { handleClose(); load() }
 
   const handleToggle = async (store) => {
+    // Optimistic update — flip immediately in UI
+    setStores(prev => prev.map(s =>
+      s.id === store.id ? { ...s, is_active: !s.is_active } : s
+    ))
     try {
       const fd = new FormData()
       fd.append('is_active', store.is_active ? 'false' : 'true')
-      await apiMultipart(`/fulfillment/stores/${store.id}/`, fd, 'PATCH')
-      load()
-    } catch (e) { console.error(e) }
+      await adminFetch(`/api/fulfillment/stores/${store.id}/`, { method: 'PATCH', body: fd })
+      load() // sync with server
+    } catch (e) {
+      console.error('Toggle error:', e)
+      // Revert on failure
+      setStores(prev => prev.map(s =>
+        s.id === store.id ? { ...s, is_active: store.is_active } : s
+      ))
+    }
   }
 
   const handleDelete = async () => {
     setDeleting(true)
     try {
-      await apiFetch(`/fulfillment/stores/${deleteStore.id}/`, { method: 'DELETE' })
+      await adminFetch(`/api/fulfillment/stores/${deleteStore.id}/`, { method: 'DELETE' })
       setDeleteStore(null)
       load()
-    } catch (e) { console.error(e) }
+    } catch (e) { console.error('Delete error:', e) }
     finally { setDeleting(false) }
   }
 
@@ -704,9 +701,9 @@ export default function StoresPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         {[
-          { label: 'Total Stores',    value: stores.length,  color: 'text-white' },
-          { label: 'Active',          value: activeCount,    color: 'text-emerald-400' },
-          { label: 'Inactive',        value: inactiveCount,  color: 'text-zinc-500' },
+          { label: 'Total Stores', value: stores.length,  color: 'text-white' },
+          { label: 'Active',       value: activeCount,    color: 'text-emerald-400' },
+          { label: 'Inactive',     value: inactiveCount,  color: 'text-zinc-500' },
         ].map(({ label, value, color }) => (
           <div key={label} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
             <p className="text-xs text-zinc-500 mb-1">{label}</p>
@@ -742,6 +739,14 @@ export default function StoresPage() {
         {loading ? (
           <div className="flex items-center justify-center py-16 gap-3 text-zinc-500">
             <Loader2 size={18} className="animate-spin" /> Loading stores…
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <AlertCircle size={24} className="text-red-400" />
+            <p className="text-sm font-semibold text-red-400">{error}</p>
+            <button onClick={load} className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-sm rounded-xl">
+              Retry
+            </button>
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 gap-3">

@@ -1,7 +1,7 @@
 """
-stores/urls.py — Updated with Admin CRUD routes
+stores/urls.py  — FINAL VERSION
 
-Mount in root urls.py:
+root urls.py তে:
     path('api/fulfillment/', include('stores.urls')),
 """
 from django.urls import path
@@ -12,13 +12,13 @@ from .views import (
 )
 
 urlpatterns = [
-    # ── Public ───────────────────────────────────────────────
-    path('stores/',              StoreListView.as_view(),   name='store-list'),
-    path('stores/<slug:slug>/',  StoreDetailView.as_view(), name='store-detail'),
+    # Public
+    path('stores/',                        StoreListView.as_view(),              name='store-list'),
+    path('stores/slug/<slug:slug>/',       StoreDetailView.as_view(),            name='store-detail'),
 
-    # ── Admin CRUD ────────────────────────────────────────────
-    path('stores/admin/',                              AdminStoreListCreateView.as_view(), name='admin-store-list'),
-    path('stores/<int:pk>/',                           AdminStoreDetailView.as_view(),     name='admin-store-detail'),
-    path('stores/<int:pk>/features/',                  AdminStoreFeaturesView.as_view(),   name='admin-store-features'),
-    path('stores/<int:pk>/availability/',              AdminStoreAvailabilityView.as_view(), name='admin-store-availability'),
+    # Admin CRUD
+    path('stores/admin/',                  AdminStoreListCreateView.as_view(),   name='admin-store-list'),
+    path('stores/<int:pk>/',               AdminStoreDetailView.as_view(),       name='admin-store-detail'),
+    path('stores/<int:pk>/features/',      AdminStoreFeaturesView.as_view(),     name='admin-store-features'),
+    path('stores/<int:pk>/availability/',  AdminStoreAvailabilityView.as_view(), name='admin-store-availability'),
 ]

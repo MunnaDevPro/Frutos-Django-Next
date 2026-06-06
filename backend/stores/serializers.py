@@ -51,7 +51,7 @@ class StoreListSerializer(serializers.ModelSerializer):
             'openTime', 'closeTime', 'hours',
             'mapLink', 'lat', 'lng',
             'features', 'availability', 'provenance',
-            'image', 'leftoverPacks',
+            'image', 'leftoverPacks', 'is_active',
         ]
 
     def get_image(self, obj):
