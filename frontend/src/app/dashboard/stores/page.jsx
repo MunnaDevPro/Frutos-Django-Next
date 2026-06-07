@@ -7,6 +7,7 @@ import {
   ChevronUp, Package, Loader2, AlertCircle, Eye, EyeOff,
   Star, Leaf, Truck, ShoppingCart, ArrowUpDown, GripVertical,
 } from 'lucide-react'
+import * as LucideIcons from 'lucide-react'
 import { adminFetch } from '@/app/dashboard/_lib/api'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -138,6 +139,15 @@ function FeaturesPicker({ selected, onChange }) {
 
 // ─── Availability Manager ─────────────────────────────────────────────────────
 
+function toPascalCase(name = '') {
+  return name.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join('')
+}
+
+function DynamicIcon({ name, size = 15 }) {
+  const Icon = LucideIcons[toPascalCase(name)] || LucideIcons.ShoppingBasket
+  return <Icon size={size} />
+}
+
 function AvailabilityManager({ items, onChange }) {
   const [cat, setCat] = useState('')
   const [icon, setIcon] = useState('shopping-basket')
@@ -153,8 +163,8 @@ function AvailabilityManager({ items, onChange }) {
   const remove = (idx) => onChange(items.filter((_, i) => i !== idx))
 
   return (
-    <div className="space-y-3">
-      <div className="flex gap-2">
+    <div className="space-y-4 mt-2">
+      <div className="flex gap-2 items-center">
         <input
           value={cat}
           onChange={e => setCat(e.target.value)}
@@ -162,35 +172,58 @@ function AvailabilityManager({ items, onChange }) {
           placeholder="e.g. Fruits, Bread, Veg…"
           className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500"
         />
-        <select
-          value={icon}
-          onChange={e => setIcon(e.target.value)}
-          className="bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-        >
-          {AVAILABILITY_ICONS.map(ic => (
-            <option key={ic} value={ic}>{ic}</option>
-          ))}
-        </select>
+        <div className="relative">
+          <input
+            value={icon}
+            onChange={e => setIcon(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), add())}
+            placeholder="Icon (e.g. apple, leaf)"
+            className="w-36 bg-zinc-800 border border-zinc-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500"
+          />
+          <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-emerald-400">
+            <DynamicIcon name={icon} size={16} />
+          </div>
+        </div>
         <button
           type="button" onClick={add}
-          className="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors"
+          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors flex items-center gap-1.5 font-semibold text-sm"
         >
-          <Plus size={16} />
+          <Plus size={15} /> Add
         </button>
       </div>
-      {items.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {items.map((item, i) => (
-            <span key={i}
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-800 border border-zinc-700 rounded-full text-xs text-zinc-300">
-              <ShoppingBasket size={11} className="text-emerald-400" />
-              {item.category}
-              <span className="text-zinc-500 ml-0.5">{item.icon}</span>
-              <button type="button" onClick={() => remove(i)} className="text-zinc-500 hover:text-red-400 ml-1">
-                <X size={11} />
-              </button>
-            </span>
-          ))}
+      
+      {items.length > 0 ? (
+        <div className="bg-zinc-800/50 border border-zinc-700 rounded-xl overflow-hidden mt-4">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-zinc-700/50 bg-zinc-800">
+                <th className="px-4 py-3 font-semibold text-zinc-400 w-20 text-center">Icon</th>
+                <th className="px-4 py-3 font-semibold text-zinc-400">Category</th>
+                <th className="px-4 py-3 font-semibold text-zinc-400 w-16 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-700/50">
+              {items.map((item, i) => (
+                <tr key={i} className="hover:bg-zinc-800/30 transition-colors">
+                  <td className="px-4 py-2 flex justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400" title={item.icon}>
+                      <DynamicIcon name={item.icon} size={15} />
+                    </div>
+                  </td>
+                  <td className="px-4 py-2 text-white font-medium">{item.category}</td>
+                  <td className="px-4 py-2 text-center">
+                    <button type="button" onClick={() => remove(i)} className="p-1.5 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors inline-flex">
+                      <Trash2 size={15} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="py-8 text-center text-zinc-500 text-sm border border-dashed border-zinc-700 rounded-xl">
+          No availability categories added yet.
         </div>
       )}
     </div>
@@ -344,10 +377,10 @@ function StoreFormModal({ store, onClose, onSave }) {
   }
 
   const TABS = [
-    { id: 'basic',    label: 'Basic Info',  icon: Store    },
-    { id: 'hours',    label: 'Hours & Map', icon: Clock    },
-    { id: 'features', label: 'Features',    icon: Tag      },
-    { id: 'packs',    label: 'Leftover Packs', icon: Package },
+    { id: 'basic',        label: 'Basic Info',          icon: Store    },
+    { id: 'hours',        label: 'Hours & Map',         icon: Clock    },
+    { id: 'features',     label: 'Features',            icon: Tag      },
+    { id: 'availability', label: "Today's Availability",icon: ShoppingBasket },
   ]
 
   return (
@@ -472,17 +505,13 @@ function StoreFormModal({ store, onClose, onSave }) {
                   <SectionHeader icon={Tag} title="Store Features" subtitle="Select what this store offers" />
                   <FeaturesPicker selected={form.features} onChange={val => set('features', val)} />
                 </div>
-                <div className="border-t border-zinc-800 pt-5">
-                  <SectionHeader icon={ShoppingBasket} title="Product Availability" subtitle="Add categories available at this store" />
-                  <AvailabilityManager items={form.availability} onChange={val => set('availability', val)} />
-                </div>
               </>
             )}
 
-            {section === 'packs' && (
+            {section === 'availability' && (
               <>
-                <SectionHeader icon={Package} title="Leftover Packs" subtitle="Surprise packs available at this store" />
-                <LeftoverPacksManager packs={form.leftover_packs} onChange={val => set('leftover_packs', val)} />
+                <SectionHeader icon={ShoppingBasket} title="Today's Availability" subtitle="Manage available categories at this store" />
+                <AvailabilityManager items={form.availability} onChange={val => set('availability', val)} />
               </>
             )}
           </div>

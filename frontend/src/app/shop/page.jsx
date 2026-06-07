@@ -2,6 +2,8 @@
 import { getProducts, getCategories } from '@/lib/api_product'
 import ProductListingClient from './ProductListingClient'
 
+import { Suspense } from 'react'
+
 export const dynamic = 'force-dynamic'
 export const revalidate = 0  // always fresh on every request
 
@@ -17,9 +19,11 @@ export default async function MarketPage() {
   ])
 
   return (
-    <ProductListingClient
-      initialProducts={products}
-      categories={categories}
-    />
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading Market...</div>}>
+      <ProductListingClient
+        initialProducts={products}
+        categories={categories}
+      />
+    </Suspense>
   )
 }

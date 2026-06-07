@@ -4,6 +4,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import ProductCard from '@/app/components/ProductCard'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 const SORT_OPTIONS = ['Promotional first', 'Price: Low to High', 'Price: High to Low', 'Newest arrivals']
 
@@ -87,10 +88,15 @@ export default function ProductListingClient({ initialProducts = [], categories 
     return () => clearInterval(interval)
   }, [fetchFresh])
 
+  const searchParams = useSearchParams()
+  const initialCatParam = searchParams.get('category')
+
   // Build CATEGORY_PILLS from API categories (same logic as before)
   const CATEGORY_PILLS = ['All Produce', ...categories.filter(c => c !== 'All' && c !== 'On Sale')]
 
-  const [activeCategory, setActiveCategory]   = useState('All Produce')
+  const initCat = initialCatParam && CATEGORY_PILLS.includes(initialCatParam) ? initialCatParam : 'All Produce'
+
+  const [activeCategory, setActiveCategory]   = useState(initCat)
   const [sortBy, setSortBy]                   = useState('Promotional first')
   const [inStockOnly, setInStockOnly]         = useState(false)
   const maxProductPrice = useMemo(
@@ -109,6 +115,9 @@ export default function ProductListingClient({ initialProducts = [], categories 
   const filtered = useMemo(() => {
     let list = [...products]
 
+    const storeParam = searchParams.get('store')
+    if (storeParam)             list = list.filter(p => p.store?.slug === storeParam || p.shop?.slug === storeParam)
+
     if (dataCat !== 'All')      list = list.filter(p => p.category === dataCat)
     if (dataCat === 'On Sale')  list = list.filter(p => p.onSale)
     if (inStockOnly)            list = list.filter(p => p.inStock)
@@ -123,7 +132,7 @@ export default function ProductListingClient({ initialProducts = [], categories 
     if (sortBy === 'Promotional first')  list.sort((a, b) => (b.onSale ? 1 : 0) - (a.onSale ? 1 : 0))
 
     return list
-  },  [products, dataCat, inStockOnly, priceMax, sortBy, searchQuery])
+  },  [products, dataCat, inStockOnly, priceMax, sortBy, searchQuery, searchParams])
 
   const visibleProducts = filtered.slice(0, visibleCount)
 
@@ -136,9 +145,13 @@ export default function ProductListingClient({ initialProducts = [], categories 
   }
 
   function catCount(cat) {
-    if (cat === 'All Produce') return products.length 
-    return products.filter(p => p.category === cat).length 
-}
+    let list = products
+    const storeParam = searchParams.get('store')
+    if (storeParam) list = list.filter(p => p.store?.slug === storeParam || p.shop?.slug === storeParam)
+
+    if (cat === 'All Produce') return list.length 
+    return list.filter(p => p.category === cat).length 
+  }
   // ── Sidebar ───────────────────────────────────────────────────────────────
   const Sidebar = () => (
     <aside className="space-y-8">

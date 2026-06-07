@@ -367,7 +367,7 @@ function PackQuickViewModal({ pack, onClose, onReserve }) {
       <div className="bg-white w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl overflow-hidden flex flex-col shadow-2xl transform transition-all translate-y-0" onClick={e => e.stopPropagation()}>
         <div className="relative h-64 w-full bg-gray-100 flex-shrink-0">
           <img src={pack.image} alt={pack.name} className="w-full h-full object-cover" />
-          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-white/80 rounded-full text-gray-800 hover:bg-white transition-colors shadow-sm">
+          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-white/80 rounded-full text-gray-800 hover:bg-white transition-colors shadow-sm cursor-pointer">
             <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
         </div>
@@ -400,7 +400,7 @@ function PackQuickViewModal({ pack, onClose, onReserve }) {
           <button 
             onClick={() => onReserve(pack)}
             disabled={pack.stock <= 0}
-            className="w-full py-4 rounded-xl font-bold text-white text-[15px] shadow-lg active:scale-[0.98] transition-all disabled:opacity-50 disabled:active:scale-100"
+            className="w-full py-4 rounded-xl font-bold text-white text-[15px] shadow-lg active:scale-[0.98] transition-all disabled:opacity-50 disabled:active:scale-100 cursor-pointer"
             style={{ background: pack.stock > 0 ? 'linear-gradient(135deg, #00694c 0%, #008560 100%)' : '#94a3b8' }}>
             {pack.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
           </button>
@@ -536,7 +536,10 @@ export default function StoreDetailClient({ store }) {
                 </div>
                 <div className="space-y-4">
                   {leftoverPacks.map((pack) => (
-                    <div key={pack.id} className="flex overflow-hidden rounded-xl relative group transition-all" style={{ background: '#fff', boxShadow: '0 2px 12px rgba(0,33,21,0.06)' }}>
+                    <div key={pack.id} 
+                         onClick={() => setSelectedPack(pack)}
+                         className="flex overflow-hidden rounded-xl relative group transition-all cursor-pointer hover:ring-2 hover:ring-[#00694c]/20" 
+                         style={{ background: '#fff', boxShadow: '0 2px 12px rgba(0,33,21,0.06)' }}>
                       <div className="w-28 h-28 flex-shrink-0 relative overflow-hidden">
                         <img src={pack.image} alt={pack.name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
                         {pack.discount_percentage > 0 && (
@@ -565,7 +568,6 @@ export default function StoreDetailClient({ store }) {
                               <span className="font-bold text-sm leading-none" style={{ color: '#855000' }}>€{Number(pack.price).toFixed(2)}</span>
                           </div>
                           <button 
-                            onClick={() => setSelectedPack(pack)}
                             className="text-xs font-bold px-3 py-1.5 rounded-full transition-colors active:scale-95 disabled:opacity-50 disabled:active:scale-100" 
                             disabled={pack.stock <= 0}
                             style={{ background: pack.stock > 0 ? 'rgba(0,105,76,0.09)' : '#f1f5f9', color: pack.stock > 0 ? '#00694c' : '#94a3b8', border: 'none' }}>
@@ -662,7 +664,10 @@ export default function StoreDetailClient({ store }) {
                   </div>
                   <div className="space-y-4">
                     {leftoverPacks.map((pack) => (
-                      <div key={pack.id} className="flex overflow-hidden rounded-xl relative group transition-all" style={{ background: '#fff', boxShadow: '0 2px 12px rgba(0,33,21,0.06)' }}>
+                      <div key={pack.id} 
+                           onClick={() => setSelectedPack(pack)}
+                           className="flex overflow-hidden rounded-xl relative group transition-all cursor-pointer hover:ring-2 hover:ring-[#00694c]/20 hover:shadow-lg" 
+                           style={{ background: '#fff', boxShadow: '0 2px 12px rgba(0,33,21,0.06)' }}>
                         <div className="w-36 h-36 flex-shrink-0 relative overflow-hidden">
                           <img src={pack.image} alt={pack.name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
                           {pack.discount_percentage > 0 && (
@@ -692,8 +697,7 @@ export default function StoreDetailClient({ store }) {
                                 <span className="font-bold text-lg leading-none" style={{ color: '#855000' }}>€{Number(pack.price).toFixed(2)}</span>
                             </div>
                             <button 
-                              onClick={() => setSelectedPack(pack)}
-                              className="text-sm font-bold px-5 py-2 rounded-full transition-colors active:scale-95 disabled:opacity-50 disabled:active:scale-100" 
+                              className="text-xs font-bold px-4 py-2 rounded-full transition-colors active:scale-95 disabled:opacity-50 disabled:active:scale-100" 
                               disabled={pack.stock <= 0}
                               style={{ background: pack.stock > 0 ? 'rgba(0,105,76,0.09)' : '#f1f5f9', color: pack.stock > 0 ? '#00694c' : '#94a3b8' }}>
                               {pack.stock > 0 ? 'Reserve Now' : 'Sold Out'}
