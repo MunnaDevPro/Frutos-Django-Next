@@ -238,13 +238,13 @@
 // src/app/dashboard/page.jsx
 "use client";
 
-import { DollarSign, ShoppingCart, Users, Package, Loader2, Store, MapPin, ToggleLeft, ToggleRight } from "lucide-react";
+import { DollarSign, ShoppingCart, Users, Package, Loader2, Store, MapPin, ToggleLeft, ToggleRight, Archive } from "lucide-react";
 import useSWR from "swr";
 import { AreaChart, Area, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import Container from "@/app/dashboard/_components/Container";
 import StatCard from "@/app/dashboard/_components/StatCard";
 import { fetchAdminDashboardStats } from "@/app/dashboard/_lib/auth";
-import { ordersService, storesService } from "@/app/dashboard/_lib/services";
+import { ordersService, storesService, leftoverPacksService } from "@/app/dashboard/_lib/services";
 
 const STATUS_COLORS = {
   pending:    { bg: "bg-amber-50 dark:bg-amber-950/30",    text: "text-amber-700 dark:text-amber-400" },
@@ -323,6 +323,23 @@ export default function DashboardHomePage() {
   const allOrders    = Array.isArray(ordersRaw) ? ordersRaw : (ordersRaw?.results || []);
   const recentOrders = allOrders.slice(0, 6);
 
+  const { data: leftoverPacksData } = useSWR(
+    "dash-leftover-packs",
+    () => leftoverPacksService.list(),
+    { revalidateOnFocus: false }
+  );
+  const leftoverPacks = Array.isArray(leftoverPacksData) ? leftoverPacksData : (leftoverPacksData?.results || []);
+
+  let availableLeftoverPacks = 0;
+  leftoverPacks.forEach(p => { availableLeftoverPacks += Number(p.stock || 0); });
+
+  let soldLeftoverPacks = 0;
+  allOrders.forEach(o => {
+     (o.items || []).forEach(item => {
+        if (item.leftover_pack) soldLeftoverPacks += Number(item.quantity || 1);
+     });
+  });
+
   const dailyTrend = (() => {
     const map = {};
     const now = new Date();
@@ -351,15 +368,16 @@ export default function DashboardHomePage() {
   return (
     <Container title="Dashboard" description="Overview of your store performance">
 
-      {/* Top 4 stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Top 5 stat cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {statsLoading
-          ? Array.from({ length: 4 }).map((_, i) => (
+          ? Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg p-4 h-24 animate-pulse" />
             ))
           : <>
               <StatCard label="Total Users"    value={Number(stats?.total_users    || 0).toLocaleString()} icon={Users} />
               <StatCard label="Total Products" value={Number(stats?.total_products || 0).toLocaleString()} icon={Package} />
+              <StatCard label="Leftover Packs" value={leftoverPacks.length.toLocaleString()} icon={Archive} />
               <StatCard label="Total Orders"   value={Number(stats?.total_orders   || 0).toLocaleString()} icon={ShoppingCart} />
               <StatCard label="Revenue"        value={`৳${Number(stats?.total_revenue || 0).toLocaleString()}`} icon={DollarSign} />
             </>
@@ -369,17 +387,39 @@ export default function DashboardHomePage() {
       {/* User breakdown — no emoji, no vendors */}
       <UserSegmentGrid stats={stats} loading={statsLoading} />
 
-      {/* Pending Orders — inside breakdown already via WS Pending; show as single stat */}
-      {!statsLoading && (
-        <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 border-l-4 border-l-amber-400 rounded-lg px-4 py-3 flex items-center gap-3 w-fit">
-          <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Pending Orders</p>
-            <p className="text-xl font-bold text-gray-900 dark:text-white">
-              {Number(stats?.pending_orders || 0).toLocaleString()}
-            </p>
+      {/* Secondary Metrics Row */}
+      <div className="flex flex-wrap gap-4">
+        {/* Pending Orders */}
+        {!statsLoading && (
+          <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 border-l-4 border-l-amber-400 rounded-lg px-5 py-3 flex items-center gap-4 w-fit shadow-sm">
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 font-semibold">Pending Orders</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white leading-none">
+                {Number(stats?.pending_orders || 0).toLocaleString()}
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Leftover Packs Quick Stats */}
+        {!statsLoading && (
+          <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 border-l-4 border-l-emerald-400 rounded-lg px-5 py-3 flex items-center gap-6 w-fit shadow-sm">
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 font-semibold">Available Packs</p>
+              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 leading-none">
+                {availableLeftoverPacks.toLocaleString()}
+              </p>
+            </div>
+            <div className="w-px h-10 bg-gray-200 dark:bg-gray-800"></div>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 font-semibold">Packs Sold</p>
+              <p className="text-2xl font-bold text-amber-600 dark:text-amber-400 leading-none">
+                {soldLeftoverPacks.toLocaleString()}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
