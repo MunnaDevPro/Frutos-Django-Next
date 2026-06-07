@@ -203,18 +203,28 @@ class OrderCreateSerializer(serializers.Serializer):
                     size = Size.objects.filter(id=item['size_id']).first()
 
                 if item.get('item_type') == 'product':
+                    product = item['product']
+                    if product.stock is not None and product.stock > 0:
+                        product.stock = max(0, product.stock - item['quantity'])
+                        product.save(update_fields=['stock'])
+
                     OrderItem.objects.create(
                         order      = order,
-                        product    = item['product'],
+                        product    = product,
                         quantity   = item['quantity'],
                         unit_price = item['unit_price'],
                         color      = color,
                         size       = size,
                     )
                 else:
+                    pack = item['leftover_pack']
+                    if pack.stock is not None and pack.stock > 0:
+                        pack.stock = max(0, pack.stock - item['quantity'])
+                        pack.save(update_fields=['stock'])
+
                     OrderItem.objects.create(
                         order         = order,
-                        leftover_pack = item['leftover_pack'],
+                        leftover_pack = pack,
                         quantity      = item['quantity'],
                         unit_price    = item['unit_price'],
                         color         = color,

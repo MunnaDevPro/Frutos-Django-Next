@@ -39280,3 +39280,70 @@ WARNING 2026-06-07 15:36:19,433 basehttp 9340 11008 "GET /api/auth/vendor/ticket
 WARNING 2026-06-07 15:37:06,236 basehttp 9340 12620 "GET /api/fulfillment/stores/slug/freshdrop/ HTTP/1.1" 404 46
 INFO 2026-06-07 15:37:07,129 basehttp 9340 12620 - Broken pipe from ('127.0.0.1', 14131)
 WARNING 2026-06-07 15:37:11,472 basehttp 9340 11008 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10340
+INFO 2026-06-07 15:37:33,600 basehttp 9340 6636 "GET /api/fulfillment/stores/slug/dhaka-dhanmondi/ HTTP/1.1" 200 976
+INFO 2026-06-07 15:37:34,273 basehttp 9340 6636 - Broken pipe from ('127.0.0.1', 14137)
+WARNING 2026-06-07 15:38:11,451 basehttp 9340 11008 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10340
+WARNING 2026-06-07 15:39:08,532 basehttp 9340 13808 "GET /api/site-config/ HTTP/1.1" 404 4801
+WARNING 2026-06-07 15:39:08,616 basehttp 9340 7900 "GET /api/site-config/footer/ HTTP/1.1" 404 4822
+WARNING 2026-06-07 15:39:08,742 basehttp 9340 13808 "GET /api/site-config/ HTTP/1.1" 404 4801
+WARNING 2026-06-07 15:39:08,795 basehttp 9340 7900 "GET /api/site-config/footer/ HTTP/1.1" 404 4822
+WARNING 2026-06-07 15:39:09,466 basehttp 9340 11008 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10340
+INFO 2026-06-07 15:39:09,942 basehttp 9340 12676 "GET /api/fulfillment/stores/ HTTP/1.1" 200 978
+WARNING 2026-06-07 15:39:59,051 basehttp 9340 11800 "GET /api/site-config/ HTTP/1.1" 404 4801
+INFO 2026-06-07 15:39:59,069 basehttp 9340 9024 "GET /api/fulfillment/stores/slug/dhaka-dhanmondi/ HTTP/1.1" 200 976
+WARNING 2026-06-07 15:39:59,084 basehttp 9340 18388 "GET /api/site-config/footer/ HTTP/1.1" 404 4822
+INFO 2026-06-07 15:39:59,429 basehttp 9340 11800 "GET /api/website/site-config/ HTTP/1.1" 200 326
+INFO 2026-06-07 15:39:59,749 basehttp 9340 18960 "GET /media/stores/banners/freshdrop.avif HTTP/1.1" 200 103090
+INFO 2026-06-07 15:39:59,763 basehttp 9340 11336 "GET /media/stores/leftover-packs/frutis_package.jpg HTTP/1.1" 200 193694
+WARNING 2026-06-07 15:40:00,875 basehttp 9340 11008 "GET /api/delivery-charge/ HTTP/1.1" 404 4813
+INFO 2026-06-07 15:40:00,951 views 9340 11008 ProductViewSet.list called with params: <QueryDict: {}>
+INFO 2026-06-07 15:40:01,019 basehttp 9340 18960 "GET /media/products/thumbnails/mango_2.jfif HTTP/1.1" 200 8386
+INFO 2026-06-07 15:40:01,023 basehttp 9340 11336 "GET /media/products/thumbnails/lychess.jpg HTTP/1.1" 200 92793
+INFO 2026-06-07 15:40:01,048 views 9340 11008 Successfully paginated 3 products
+INFO 2026-06-07 15:40:01,217 basehttp 9340 19440 "GET /api/fulfillment/stores/ HTTP/1.1" 200 978
+INFO 2026-06-07 15:40:01,250 basehttp 9340 11008 "GET /api/products/products/ HTTP/1.1" 200 8402
+WARNING 2026-06-07 15:40:11,458 basehttp 9340 11008 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10340
+WARNING 2026-06-07 15:40:33,724 basehttp 9340 3468 "GET /api/delivery-charge/?subtotal=0 HTTP/1.1" 404 4824
+WARNING 2026-06-07 15:40:33,725 basehttp 9340 20452 "GET /api/fulfillment/stores/nearest/ HTTP/1.1" 404 8939
+WARNING 2026-06-07 15:40:34,130 basehttp 9340 11008 "GET /api/products/907ce95b-6ad4-473e-944b-b1220f0e52f6/ HTTP/1.1" 404 16531
+WARNING 2026-06-07 15:40:34,183 basehttp 9340 8932 "GET /api/products/907ce95b-6ad4-473e-944b-b1220f0e52f6/ HTTP/1.1" 404 16531
+WARNING 2026-06-07 15:40:34,184 basehttp 9340 14788 "GET /api/products/2c65dc51-3260-4f31-a085-4e50ef6b53b2/ HTTP/1.1" 404 16531
+WARNING 2026-06-07 15:40:34,217 basehttp 9340 11212 "GET /api/products/1/ HTTP/1.1" 404 16426
+WARNING 2026-06-07 15:40:34,237 basehttp 9340 972 "GET /api/products/1/ HTTP/1.1" 404 16426
+WARNING 2026-06-07 15:40:34,238 basehttp 9340 16080 "GET /api/products/2c65dc51-3260-4f31-a085-4e50ef6b53b2/ HTTP/1.1" 404 16531
+WARNING 2026-06-07 15:40:35,797 basehttp 9340 972 "GET /api/products/1/ HTTP/1.1" 404 16426
+WARNING 2026-06-07 15:40:35,797 basehttp 9340 16080 "GET /api/products/2c65dc51-3260-4f31-a085-4e50ef6b53b2/ HTTP/1.1" 404 16531
+WARNING 2026-06-07 15:40:36,874 basehttp 9340 972 "GET /api/products/1/ HTTP/1.1" 404 16426
+INFO 2026-06-07 15:40:39,074 views 9340 10048 ProductViewSet.list called with params: <QueryDict: {}>
+WARNING 2026-06-07 15:40:39,092 basehttp 9340 11688 "GET /api/delivery/windows/ HTTP/1.1" 404 4816
+WARNING 2026-06-07 15:40:39,107 basehttp 9340 13608 "GET /api/delivery-charge/?subtotal=0 HTTP/1.1" 404 4824
+INFO 2026-06-07 15:40:39,267 views 9340 10048 Successfully paginated 3 products
+INFO 2026-06-07 15:40:39,298 basehttp 9340 10048 "GET /api/products/products/ HTTP/1.1" 200 8402
+INFO 2026-06-07 15:40:48,364 basehttp 9340 972 "OPTIONS /api/orders/submit/ HTTP/1.1" 200 0
+INFO 2026-06-07 15:40:48,399 views 9340 972 Order created: ORD154048958
+INFO 2026-06-07 15:40:48,419 basehttp 9340 972 "POST /api/orders/submit/ HTTP/1.1" 201 60
+INFO 2026-06-07 15:40:50,050 basehttp 9340 9088 "GET /api/orders/ORD154048958/ HTTP/1.1" 200 994
+WARNING 2026-06-07 15:40:51,839 basehttp 9340 972 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10340
+WARNING 2026-06-07 15:40:53,550 basehttp 9340 972 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 401 172
+INFO 2026-06-07 15:40:53,570 basehttp 9340 972 "OPTIONS /api/auth/token/refresh/ HTTP/1.1" 200 0
+INFO 2026-06-07 15:40:53,620 basehttp 9340 972 "POST /api/auth/token/refresh/ HTTP/1.1" 200 777
+INFO 2026-06-07 15:40:53,636 views 9340 972 Orders list request from user: elarbol@gmail.com
+INFO 2026-06-07 15:40:53,638 views 9340 972 User authenticated: True
+INFO 2026-06-07 15:40:53,640 views 9340 972 Query params: <QueryDict: {'ordering': ['-ordered_at']}>
+INFO 2026-06-07 15:40:53,646 views 9340 972 Orders queryset count: 5
+INFO 2026-06-07 15:40:53,679 views 9340 972 Serialized orders count: 5
+INFO 2026-06-07 15:40:53,681 basehttp 9340 972 "GET /api/orders/?ordering=-ordered_at HTTP/1.1" 200 4794
+INFO 2026-06-07 15:40:59,004 basehttp 9340 8200 "GET /api/fulfillment/stores/ HTTP/1.1" 200 978
+INFO 2026-06-07 15:41:01,482 basehttp 9340 8200 "GET /api/fulfillment/stores/slug/dhaka-dhanmondi/ HTTP/1.1" 200 976
+INFO 2026-06-07 15:41:01,544 basehttp 9340 11336 "GET /media/stores/leftover-packs/frutis_package.jpg HTTP/1.1" 304 0
+WARNING 2026-06-07 15:41:19,423 basehttp 9340 972 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10340
+WARNING 2026-06-07 15:41:49,417 basehttp 9340 972 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10340
+WARNING 2026-06-07 15:43:11,460 basehttp 9340 972 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10340
+WARNING 2026-06-07 15:44:11,455 basehttp 9340 972 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10340
+WARNING 2026-06-07 15:45:11,435 basehttp 9340 972 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10340
+WARNING 2026-06-07 15:46:11,428 basehttp 9340 972 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10340
+WARNING 2026-06-07 15:47:11,490 basehttp 9340 972 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10340
+WARNING 2026-06-07 15:48:11,436 basehttp 9340 972 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10340
+WARNING 2026-06-07 15:49:11,471 basehttp 9340 14700 "GET /api/auth/vendor/tickets/?status=OPEN&page_size=1 HTTP/1.1" 404 10340
+INFO 2026-06-07 15:50:07,028 autoreload 9340 13564 D:\Munna\Munna\icommerce\icommerce\backend\orders\serializers.py changed, reloading.
+INFO 2026-06-07 15:50:10,285 autoreload 11500 14444 Watching for file changes with StatReloader
