@@ -363,7 +363,7 @@ import Container from "@/app/dashboard/_components/Container";
 import { TrendingUp, ShoppingCart, DollarSign, Users, Package, CheckCircle, Clock, XCircle, Loader2, BarChart2, Store, MapPin } from "lucide-react";
 import useSWR from "swr";
 import { fetchAdminDashboardStats } from "@/app/dashboard/_lib/auth";
-import { ordersService, productsService, storesService } from "@/app/dashboard/_lib/services";
+import { ordersService, productsService, storesService, leftoverPacksService } from "@/app/dashboard/_lib/services";
 
 // Chart color palette
 const PALETTE = ["#18181b", "#4f46e5", "#0ea5e9", "#10b981", "#f59e0b", "#ef4444"];
@@ -444,6 +444,13 @@ export default function AnalyticsPage() {
   const activeStores   = allStores.filter(s => s.is_active);
   const inactiveStores = allStores.filter(s => !s.is_active);
 
+  const { data: leftoverPacksData } = useSWR(
+    "analytics-leftover-packs",
+    () => leftoverPacksService.list(),
+    { revalidateOnFocus: false }
+  );
+  const leftoverPacks = Array.isArray(leftoverPacksData) ? leftoverPacksData : (leftoverPacksData?.results || []);
+
   // Feature breakdown across all stores
   const featureMap = {};
   allStores.forEach(s => (s.features || []).forEach(f => {
@@ -507,6 +514,49 @@ export default function AnalyticsPage() {
   });
   const statusBreakdown = Object.entries(statusMap).map(([name, value]) => ({ name, value }));
   const paymentBreakdown = Object.entries(paymentMap).map(([name, value]) => ({ name, value }));
+
+  // ─── Leftover Packs Metrics ──────────────────────────────────────────────────
+  const totalLeftoverPacks = leftoverPacks.length;
+  let totalLeftoverPacksAvailable = 0;
+  let totalLeftoverPacksSold = 0;
+  let leftoverPackOrdersCount = 0;
+  let leftoverPackRevenue = 0;
+
+  leftoverPacks.forEach(pack => {
+     totalLeftoverPacksAvailable += Number(pack.stock || 0);
+  });
+
+  const packsByStoreMap = {};
+  const packIdToStore = {};
+  leftoverPacks.forEach(pack => {
+     const storeName = pack.store?.name || pack.store || 'Unknown Store';
+     packIdToStore[pack.id] = storeName;
+     if (!packsByStoreMap[storeName]) {
+        packsByStoreMap[storeName] = { store: storeName, available: 0, sold: 0 };
+     }
+     packsByStoreMap[storeName].available += Number(pack.stock || 0);
+  });
+
+  orders.forEach(o => {
+    let hasLeftoverPack = false;
+    (o.items || []).forEach(item => {
+      if (item.leftover_pack) {
+        const qty = Number(item.quantity || 1);
+        totalLeftoverPacksSold += qty;
+        leftoverPackRevenue += Number(item.unit_price || 0) * qty;
+        hasLeftoverPack = true;
+        
+        const packId = typeof item.leftover_pack === 'object' ? item.leftover_pack.id : item.leftover_pack;
+        const storeName = packIdToStore[packId];
+        if (storeName && packsByStoreMap[storeName]) {
+           packsByStoreMap[storeName].sold += qty;
+        }
+      }
+    });
+    if (hasLeftoverPack) leftoverPackOrdersCount++;
+  });
+
+  const leftoverPacksByStore = Object.values(packsByStoreMap);
 
   if (statsLoading) {
     return (
@@ -733,6 +783,76 @@ export default function AnalyticsPage() {
                 ))}
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Leftover Packs Analytics */}
+      <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg mt-4 mb-4">
+        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-800 flex items-center gap-2">
+          <Package className="w-4 h-4 text-emerald-500" />
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Leftover Packs Analytics</h3>
+        </div>
+        
+        <div className="p-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Metrics summary */}
+          <div className="lg:col-span-1 space-y-3">
+             <div className="grid grid-cols-2 gap-3">
+               <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 rounded-lg p-3">
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Total Packs</p>
+                  <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300 mt-1">{totalLeftoverPacks}</p>
+               </div>
+               <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/50 rounded-lg p-3">
+                  <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">Pack Revenue</p>
+                  <p className="text-2xl font-bold text-blue-700 dark:text-blue-300 mt-1">৳{leftoverPackRevenue.toLocaleString()}</p>
+               </div>
+             </div>
+             
+             <div className="bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-lg p-3">
+                <div className="flex justify-between items-center mb-2">
+                   <p className="text-xs text-gray-500 dark:text-gray-400">Available vs Sold</p>
+                   <p className="text-xs font-medium text-gray-700 dark:text-gray-300">{totalLeftoverPacksAvailable + totalLeftoverPacksSold} Total Units</p>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2 flex overflow-hidden">
+                   <div style={{ width: `${Math.max((totalLeftoverPacksAvailable / (totalLeftoverPacksAvailable + totalLeftoverPacksSold || 1)) * 100, 0)}%` }} className="bg-emerald-400"></div>
+                   <div style={{ width: `${Math.max((totalLeftoverPacksSold / (totalLeftoverPacksAvailable + totalLeftoverPacksSold || 1)) * 100, 0)}%` }} className="bg-amber-400"></div>
+                </div>
+                <div className="flex justify-between text-[11px]">
+                   <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400"></span> Available ({totalLeftoverPacksAvailable})
+                   </span>
+                   <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium">
+                      <span className="w-2 h-2 rounded-full bg-amber-400"></span> Sold ({totalLeftoverPacksSold})
+                   </span>
+                </div>
+             </div>
+
+             <div className="bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-lg p-3">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Orders with Packs</p>
+                  <p className="text-xl font-bold text-gray-900 dark:text-white">{leftoverPackOrdersCount}</p>
+             </div>
+          </div>
+          
+          {/* Chart by Store */}
+          <div className="lg:col-span-2">
+             <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Pack Units by Store</h4>
+             <div className="h-48 w-full">
+               {leftoverPacksByStore.length > 0 ? (
+                 <ResponsiveContainer width="100%" height="100%">
+                   <BarChart data={leftoverPacksByStore} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                     <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                     <XAxis dataKey="store" tick={{ fontSize: 10 }} stroke="#9ca3af" axisLine={false} tickLine={false} />
+                     <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" allowDecimals={false} axisLine={false} tickLine={false} />
+                     <Tooltip content={<CustomTooltip />} cursor={{fill: 'transparent'}} />
+                     <Legend wrapperStyle={{ fontSize: '11px', marginTop: '10px' }} />
+                     <Bar dataKey="available" name="Available" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} />
+                     <Bar dataKey="sold" name="Sold" stackId="a" fill="#fbbf24" radius={[4, 4, 0, 0]} />
+                   </BarChart>
+                 </ResponsiveContainer>
+               ) : (
+                 <div className="flex items-center justify-center h-full text-sm text-gray-400">No leftover packs data found</div>
+               )}
+             </div>
           </div>
         </div>
       </div>

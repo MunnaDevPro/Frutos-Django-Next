@@ -607,6 +607,10 @@ export const analyticsService = {
     adminDashboard: () => api.get("/api/auth/dashboard/admin/"),
 };
 // Stores (fulfillment)
+export const leftoverPacksService = {
+    list: (params = {}) => api.get("/api/fulfillment/dashboard/leftover-packs/", params),
+};
+
 export const storesService = {
     /** All stores including inactive — admin only */
     list: () => api.get("/api/fulfillment/stores/admin/"),
