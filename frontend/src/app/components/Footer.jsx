@@ -288,9 +288,9 @@ export default function Footer({ config }) {
           </p>
           <div className="flex gap-6 order-1 md:order-3">
             {['Privacy Policy', 'Terms of Service', 'Cookies'].map((item) => (
-              <a key={item} href="#" className="text-xs text-gray-400 hover:text-white transition-colors duration-200">
+              <Link key={item} href="#" className="text-xs text-gray-400 hover:text-white transition-colors duration-200">
                 {item}
-              </a>
+              </Link>
             ))}
           </div>
         </div>

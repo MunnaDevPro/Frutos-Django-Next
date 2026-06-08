@@ -124,6 +124,7 @@
 
 // src/app/checkout/page.jsx — SERVER COMPONENT
 import { cookies }          from 'next/headers'
+import Link                 from 'next/link'
 import { auth }             from '@/auth'
 import { getDeliveryWindows, getDeliveryOption } from '@/lib/api'
 import { getProducts }      from '@/lib/api_product'
@@ -238,9 +239,9 @@ export default async function CheckoutPage() {
             ))}
           </div>
           <div className="mt-8 text-center">
-            <a href="/shop" className="text-[13px] font-bold text-[#151E13] border-b-2 border-[#00694C] pb-1 hover:text-[#00694C] transition-colors">
+            <Link href="/shop" className="text-[13px] font-bold text-[#151E13] border-b-2 border-[#00694C] pb-1 hover:text-[#00694C] transition-colors">
               VIEW ALL PRODUCE
-            </a>
+            </Link>
           </div>
         </div>
       </section>

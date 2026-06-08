@@ -255,7 +255,6 @@ export function CartProvider({ children }) {
 
   function addItem(product, effectivePrice = null, qty = 1) {
     dispatch({ type: 'ADD_ITEM', product, effectivePrice, qty })
-    setSidebarOpen(true)
   }
 
   function removeItem(id, item_type = 'product') { dispatch({ type: 'REMOVE_ITEM', id, item_type }) }

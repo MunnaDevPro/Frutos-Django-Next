@@ -9,6 +9,7 @@ import { WishlistProvider } from '@/app/context/WishlistContext'
 import NavbarWrapper from '@/app/components/NavbarWrapper'
 import FooterWrapper from '@/app/components/FooterWrapper'
 import CartSidebar          from '@/app/components/CartSidebar'
+import FloatingCart         from '@/app/components/FloatingCart'
 import Providers            from '@/app/providers'
 import SessionGuard         from '@/app/components/SessionGuard'
 import { getSiteConfig }    from '@/lib/api_site_config'
@@ -78,6 +79,7 @@ export default async function RootLayout({ children }) {
                 <main style={{ background: '#ffffff', minHeight: '100vh' }} className="md:pb-0">
                   {children}
                 </main>
+                <FloatingCart />
                 <CartSidebar />
               </CartProvider>
               <FooterWrapper config={siteConfig} />

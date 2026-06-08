@@ -106,6 +106,7 @@ export default function ProductCard({ product, notified, onNotify }) {
 
   const displayPrice     = isApprovedWholesale && wholesalePrice ? wholesalePrice : price
   const isWholesalePrice = isApprovedWholesale && wholesalePrice
+  const cleanOrigin      = origin?.replace(/^from\s+/i, '')
 
   return (
     <>
@@ -165,12 +166,12 @@ export default function ProductCard({ product, notified, onNotify }) {
               <h3 className="font-sans font-bold text-gray-900 text-[13px] md:text-[15px] leading-snug flex-1 min-w-0 group-hover:text-[#00694C] transition-colors line-clamp-2">
                 {name}
               </h3>
-              {origin && (
+              {cleanOrigin && (
                 <div className="flex-shrink-0 text-right" style={{ maxWidth: '72px' }}>
                   <span className="font-serif italic text-[10px] md:text-[11px] text-gray-400 leading-tight block">from</span>
                   <span className="font-serif italic text-[10px] md:text-[11px] text-gray-400 leading-tight block"
                     style={{ overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
-                    {origin}
+                    {cleanOrigin}
                   </span>
                 </div>
               )}

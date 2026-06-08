@@ -28,7 +28,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3001",
     "http://127.0.0.1:3001",
     "http://192.168.1.6:3000",
-    "http://10.17.90.39:3000",
+    "http://10.17.90.71:3000",
     "https://icommerce-beta.vercel.app",
     "https://icommerce.passmcq.com",
     "https://icommerce.com.bd",

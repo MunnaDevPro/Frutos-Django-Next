@@ -63,6 +63,65 @@ function Toggle({ checked, onChange }) {
   )
 }
 
+// ─── Pagination Component ───────────────────────────────────────────────────────
+function Pagination({ currentPage, totalPages, onPageChange }) {
+  if (totalPages <= 1) return null
+
+  const getVisiblePages = () => {
+    let pages = []
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+        pages.push(i)
+      } else if (pages[pages.length - 1] !== '...') {
+        pages.push('...')
+      }
+    }
+    return pages
+  }
+
+  return (
+    <div className="flex items-center justify-center gap-2 mt-12">
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="w-10 h-10 flex items-center justify-center rounded-lg border border-[#BCCAC1]/40 text-[#151E13] disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:bg-white cursor-pointer"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+      </button>
+
+      {getVisiblePages().map((page, idx) => (
+        page === '...' ? (
+          <span key={`dots-${idx}`} className="text-[#6D7A73]">...</span>
+        ) : (
+          <button
+            key={page}
+            onClick={() => onPageChange(page)}
+            className={`w-10 h-10 flex items-center justify-center rounded-lg font-bold transition-colors cursor-pointer ${
+              currentPage === page 
+                ? 'bg-[#00694C] text-white' 
+                : 'border border-[#BCCAC1]/40 text-[#151E13] hover:bg-white'
+            }`}
+          >
+            {page}
+          </button>
+        )
+      ))}
+
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="w-10 h-10 flex items-center justify-center rounded-lg border border-[#BCCAC1]/40 text-[#151E13] disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:bg-white cursor-pointer"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M9 18l6-6-6-6" />
+        </svg>
+      </button>
+    </div>
+  )
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 // Props:
 //   initialProducts — array of products fetched server-side from the API
@@ -105,7 +164,8 @@ export default function ProductListingClient({ initialProducts = [], categories 
 )
   const [priceMax, setPriceMax] = useState(maxProductPrice)
   const [showMobileFilter, setShowMobileFilter] = useState(false)
-  const [visibleCount, setVisibleCount]       = useState(6)
+  const [currentPage, setCurrentPage]         = useState(1)
+  const itemsPerPage = 6
   const [notified, setNotified]               = useState({})
   const [searchQuery, setSearchQuery]         = useState('')
 
@@ -134,7 +194,12 @@ export default function ProductListingClient({ initialProducts = [], categories 
     return list
   },  [products, dataCat, inStockOnly, priceMax, sortBy, searchQuery, searchParams])
 
-  const visibleProducts = filtered.slice(0, visibleCount)
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [dataCat, inStockOnly, priceMax, sortBy, searchQuery, searchParams])
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage)
+  const visibleProducts = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
   function clearFilters() {
     setActiveCategory('All Produce')
@@ -321,28 +386,7 @@ export default function ProductListingClient({ initialProducts = [], categories 
 
             {/* Content */}
             <div className="flex-1 min-w-0">
-              {/* Category pills */}
-              <div className="flex gap-3 overflow-x-auto pb-2 mb-4" style={{ scrollbarWidth: 'none' }}>
-                {CATEGORY_PILLS.map((pill, index) => {
-                  const isActive = activeCategory === pill
-                  return (
-                    <button
-                      key={`desktop-pill-${pill}-${index}`}
 
-                      onClick={() => setActiveCategory(pill)}
-                      className="shrink-0 px-6 py-2 rounded-full text-sm font-bold whitespace-nowrap"
-                      style={{
-                        background: isActive ? '#00694c' : '#fff',
-                        color: isActive ? '#fff' : '#3d4943',
-                        border: 'none', cursor: 'pointer',
-                        boxShadow: isActive ? '0 4px 14px rgba(0,105,76,0.25)' : '0 1px 4px rgba(0,0,0,0.06)',
-                      }}
-                    >
-                      {pill}
-                    </button>
-                  )
-                })}
-              </div>
 
               {/* Product grid */}
               {visibleProducts.length === 0 ? (
@@ -365,19 +409,12 @@ export default function ProductListingClient({ initialProducts = [], categories 
                 </div>
               )}
 
-              {/* Load more */}
-              {visibleCount < filtered.length && (
-                <div className="flex justify-center mt-16">
-                  <button
-                    onClick={() => setVisibleCount(v => v + 6)}
-                    className="flex items-center gap-2 px-10 py-4 rounded-lg font-bold text-sm text-white"
-                    style={{ background: 'linear-gradient(135deg, #00694c 0%, #008560 100%)', border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,105,76,0.25)' }}
-                  >
-                    Load more products
-                    <ChevronDown />
-                  </button>
-                </div>
-              )}
+              {/* Pagination */}
+              <Pagination 
+                currentPage={currentPage} 
+                totalPages={totalPages} 
+                onPageChange={setCurrentPage} 
+              />
             </div>
           </div>
         </div>
@@ -412,27 +449,7 @@ export default function ProductListingClient({ initialProducts = [], categories 
             </button>
           </div>
 
-          {/* Mobile category pills */}
-          <div className="flex gap-2 overflow-x-auto pb-4" style={{ scrollbarWidth: 'none' }}>
-            {CATEGORY_PILLS.map((cat, index) => {
-              const isActive = activeCategory === cat
-              return (
-                <button
-                  key={`mobile-pill-${cat}-${index}`}
 
-                  onClick={() => setActiveCategory(cat)}
-                  className="shrink-0 px-5 py-2 rounded-full text-[11px] font-bold uppercase tracking-wider whitespace-nowrap"
-                  style={{
-                    background: isActive ? '#adedd8' : '#fff',
-                    color: isActive ? '#2f6d5d' : 'rgba(21,30,19,0.5)',
-                    border: '1px solid rgba(188,202,193,0.15)',
-                  }}
-                >
-                  {cat}
-                </button>
-              )
-            })}
-          </div>
         </div>
 
         {/* Mobile filter drawer */}
@@ -492,17 +509,14 @@ export default function ProductListingClient({ initialProducts = [], categories 
             </div>
           )}
 
-          {visibleCount < filtered.length && (
-            <div className="flex justify-center mt-10">
-              <button
-                onClick={() => setVisibleCount(v => v + 6)}
-                className="px-8 py-3.5 rounded-xl font-bold text-sm text-white"
-                style={{ background: 'linear-gradient(135deg, #00694c 0%, #008560 100%)', border: 'none' }}
-              >
-                Load more
-              </button>
-            </div>
-          )}
+          {/* Pagination */}
+          <div className="pb-8">
+            <Pagination 
+              currentPage={currentPage} 
+              totalPages={totalPages} 
+              onPageChange={setCurrentPage} 
+            />
+          </div>
         </div>
       </div>
     </div>

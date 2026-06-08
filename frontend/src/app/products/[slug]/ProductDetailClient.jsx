@@ -231,6 +231,7 @@ function ReviewForm({ product, session, localToken }) {
 function TabSection({ product, session, localToken }) {
   const [tab, setTab] = useState('Description')
   const tabs = ['Description', 'Nutritional Info', 'Origin', 'Reviews']
+  const cleanOrigin = product.origin?.replace(/^from\s+/i, '')
 
   return (
     <section className="border-t border-[#BCCAC1]/30">
@@ -312,7 +313,7 @@ function TabSection({ product, session, localToken }) {
           <div>
             <h3 style={{ fontFamily: '"Newsreader", Georgia, serif',
                          fontSize: '1.4rem', fontWeight: 700, color: '#151E13', marginBottom: '14px' }}>
-              From {product.origin}
+              From {cleanOrigin}
             </h3>
             <RichContent html={product.description}
               style={{ fontSize: '15px', color: '#3D4943', lineHeight: 1.75 }} />
@@ -393,6 +394,7 @@ export default function ProductDetailClient({ product: initialProduct, related }
 
   const [product, setProduct] = useState(initialProduct)
   const [localToken, setLocalToken] = useState(null)
+  const cleanOrigin = product.origin?.replace(/^from\s+/i, '')
 
   useEffect(() => {
     const token = getAccess()
@@ -442,7 +444,6 @@ export default function ProductDetailClient({ product: initialProduct, related }
       displayPrice,
       qty,
     )
-    setSidebarOpen(true)
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
   }
@@ -524,7 +525,7 @@ export default function ProductDetailClient({ product: initialProduct, related }
         <div className="flex items-center gap-3 mb-2">
           <span className="italic text-lg text-[#855000]"
             style={{ fontFamily: '"Newsreader", Georgia, serif' }}>
-            from {product.origin}
+            from {cleanOrigin}
           </span>
           <div className="flex-1 h-px bg-[#BCCAC1]/30" />
         </div>
@@ -696,7 +697,7 @@ export default function ProductDetailClient({ product: initialProduct, related }
                 </h1>
                 <p className="italic text-lg text-[#00694C] mb-3"
                   style={{ fontFamily: '"Newsreader", Georgia, serif' }}>
-                  Class A — Fresh from {product.origin}
+                  Class A — Fresh from {cleanOrigin}
                 </p>
                 <StarRating rating={product.rating} reviews={product.reviews} size={16} />
               </div>

@@ -440,20 +440,7 @@ useEffect(() => {
               )}
             </button>
 
-            {/* Cart */}
-            <button onClick={() => setSidebarOpen(true)}
-              className="w-9 h-9 cursor-pointer flex items-center justify-center rounded-full hover:bg-[#BCCAC1]/25 transition-colors relative">
-              <svg width="19" height="19" fill="none" stroke="#3D4943" strokeWidth="1.75" viewBox="0 0 24 24">
-                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-              </svg>
-              {totalItems > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-[17px] h-[17px] bg-[#00694C] text-white rounded-full flex items-center justify-center"
-                  style={{ fontSize: '10px', fontWeight: 700, lineHeight: 1 }}>
-                  {totalItems}
-                </span>
-              )}
-            </button>
+
 
             {/* Auth */}
             {isAuthenticated ? (
@@ -509,19 +496,7 @@ useEffect(() => {
               )}
             </button>
 
-            {/* Cart */}
-            <button onClick={() => setSidebarOpen(true)} className="w-9 h-9 flex items-center justify-center relative">
-              <svg width="19" height="19" fill="none" stroke="#151E13" strokeWidth="1.75" viewBox="0 0 24 24">
-                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-              </svg>
-              {totalItems > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-[15px] h-[15px] bg-[#00694C] text-white rounded-full flex items-center justify-center"
-                  style={{ fontSize: '9px', fontWeight: 700, lineHeight: 1 }}>
-                  {totalItems}
-                </span>
-              )}
-            </button>
+
 
             {isAuthenticated ? (
                 <div className="flex items-center">

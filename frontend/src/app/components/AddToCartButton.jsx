@@ -29,7 +29,6 @@ export default function AddToCartButton({
 
     addItem(product, effectivePrice, qty)
     setAdded(true)
-    setSidebarOpen(true)
     setTimeout(() => setAdded(false), 1500)
   }
 
