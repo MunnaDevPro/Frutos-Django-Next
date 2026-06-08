@@ -120,6 +120,11 @@ export function useWishlist() {
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 function normalizeProduct(p) {
+  // If this is a Wishlist object wrapper, extract the inner product
+  if (p && p.product && p.product.id) {
+    p = p.product;
+  }
+  
   return {
     id:             p.id,
     name:           p.name           || p.product_name || '',

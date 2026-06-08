@@ -63,8 +63,18 @@ const statusFields = [
   { key: "tracking_number", label: "Tracking Number", placeholder: "Enter tracking number" },
 ];
 
+const FILTERS = [
+  { label: "All", value: "" },
+  { label: "Pending", value: "PENDING" },
+  { label: "Processing", value: "PROCESSING" },
+  { label: "Shipped", value: "SHIPPED" },
+  { label: "Delivered", value: "DELIVERED" },
+  { label: "Cancelled", value: "CANCELLED" },
+];
+
 export default function OrdersPage() {
   const toast = useToastContext();
+  const [activeFilter, setFilter] = useState("");
   const [viewItem, setViewItem] = useState(null);
   const [editItem, setEditItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
@@ -76,7 +86,10 @@ export default function OrdersPage() {
     { revalidateOnFocus: false, keepPreviousData: true, shouldRetryOnError: false }
   );
 
-  const data = rawData?.results || (Array.isArray(rawData) ? rawData : []);
+  const rawList = rawData?.results || (Array.isArray(rawData) ? rawData : []);
+  const data = activeFilter 
+    ? rawList.filter(o => o.status === activeFilter) 
+    : rawList;
   const totalCount = rawData?.count ?? data.length;
 
   const handleStatusUpdate = async (values) => {
@@ -114,8 +127,24 @@ export default function OrdersPage() {
         ) : null
       }
     >
+      <div className="flex items-center gap-2 flex-wrap mb-2">
+        {FILTERS.map(f => (
+          <button
+            key={f.value}
+            onClick={() => setFilter(f.value)}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              activeFilter === f.value
+                ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
       {error && (
-        <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg px-4 py-3">
+        <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg px-4 py-3 mb-4">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>
             {error?.message?.includes("credentials") || error?.status === 401

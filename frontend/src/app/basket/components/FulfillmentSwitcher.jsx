@@ -6,6 +6,8 @@
 // import { useState, useEffect } from 'react'
 // import { getDeliveryOption, getNearestStore } from '@/lib/api'
 
+import { isStoreOpen } from '@/lib/stores-api'
+
 const MODES = [
   { id: 'delivery', label: 'Home Delivery'   },
   { id: 'collect',  label: 'Click & Collect' },
@@ -94,6 +96,8 @@ function CollectPanel({ data, error }) {
     ? `≈ ${readyMins / 60} hour${readyMins / 60 !== 1 ? 's' : ''}`
     : `≈ ${readyMins} min`
 
+  const isOpen = data ? isStoreOpen(data) : false
+
   return (
     <div
       className="mt-4 rounded-xl overflow-hidden"
@@ -125,18 +129,19 @@ function CollectPanel({ data, error }) {
           <span
             className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
             style={
-              data.is_open_now
+              isOpen
                 ? { background: '#d4ede5', color: '#095041' }
                 : { background: '#fde8e8', color: '#9b1c1c' }
             }
           >
-            {data.is_open_now ? 'OPEN' : 'CLOSED'}
+            {isOpen ? 'OPEN' : 'CLOSED'}
           </span>
         )}
       </div>
 
       {/* Hours — uses the single `hours` display string from stores.Store */}
       {data?.hours && (
+
         <div
           className="px-4 py-3 flex items-center gap-2"
           style={{ borderBottom: '1px solid #d4ede5' }}

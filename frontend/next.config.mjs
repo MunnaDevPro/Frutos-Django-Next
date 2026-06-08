@@ -3,9 +3,8 @@ const nextConfig = {
     experimental: {
         staleTimes: {
             dynamic: 0,
-            static: 30, // must be >= 30 in Next.js 16
+            static: 30,
         },
-        // Network IP ebong domain gulo ekhane allow kore deya holo
         allowedDevOrigins: [
             '10.17.90.71',
             '10.17.90.71:3000',
@@ -15,8 +14,16 @@ const nextConfig = {
     },
 
     images: {
-        unoptimized: true,
-        remotePatterns: [{
+        unoptimized: true, // Jetuku proyojon, optimized line change kore unoptimized use korte paren debug er jonno
+        remotePatterns: [
+            // 1. Eiti hocche apnar network IP pattern jeti onno device theke image load korbe
+            {
+                protocol: 'http',
+                hostname: '10.17.90.71',
+                port: '8000',
+                pathname: '/media/**',
+            },
+            {
                 protocol: 'http',
                 hostname: 'localhost',
                 port: '8000',

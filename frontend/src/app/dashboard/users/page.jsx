@@ -54,6 +54,15 @@ function WholesaleStatusBadge({ value }) {
 
 const columns = [
   { key: "id",               label: "ID",        render: (v) => <span className="text-xs text-gray-400">{String(v).startsWith('ws_') ? `WS-${v.replace('ws_','')}` : v}</span> },
+  { key: "avatar",           label: "Photo",     render: (v, row) => (
+    <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-200 shrink-0">
+      {v ? (
+        <img src={v} alt={row.name || "User"} className="w-full h-full object-cover" />
+      ) : (
+        <span className="text-xs font-semibold text-gray-500">{(row.name || row.email || "U").charAt(0).toUpperCase()}</span>
+      )}
+    </div>
+  )},
   { key: "name",             label: "Name" },
   { key: "email",            label: "Email" },
   { key: "user_type",        label: "Role",      render: (v) => <RoleBadge value={v} /> },
@@ -256,21 +265,32 @@ export default function UsersPage() {
 
       <Modal open={!!viewItem} onClose={() => setViewItem(null)} title="User Details">
         {viewItem && (
-          <div className="space-y-3">
-            {[
-              ["Name",      viewItem.name],
-              ["Email",     viewItem.email],
-              ["Role",      viewItem.user_type],
-              ["Business",  viewItem.business_name || "—"],
-              ["WS Status", viewItem.wholesale_status || "—"],
-              ["Status",    viewItem.is_active ? "Active" : "Inactive"],
-              ["Joined",    viewItem.date_joined ? new Date(viewItem.date_joined).toLocaleDateString() : "—"],
-            ].map(([label, val]) => (
-              <div key={label} className="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800 last:border-0">
-                <span className="text-sm text-gray-500">{label}</span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">{String(val)}</span>
+          <div className="space-y-4">
+            <div className="flex justify-center mb-4">
+              <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-200">
+                {viewItem.avatar ? (
+                  <img src={viewItem.avatar} alt={viewItem.name || "User"} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-2xl font-semibold text-gray-500">{(viewItem.name || viewItem.email || "U").charAt(0).toUpperCase()}</span>
+                )}
               </div>
-            ))}
+            </div>
+            <div className="space-y-3">
+              {[
+                ["Name",      viewItem.name],
+                ["Email",     viewItem.email],
+                ["Role",      viewItem.user_type],
+                ["Business",  viewItem.business_name || "—"],
+                ["WS Status", viewItem.wholesale_status || "—"],
+                ["Status",    viewItem.is_active ? "Active" : "Inactive"],
+                ["Joined",    viewItem.date_joined ? new Date(viewItem.date_joined).toLocaleDateString() : "—"],
+              ].map(([label, val]) => (
+                <div key={label} className="flex justify-between py-1.5 border-b border-gray-100 dark:border-gray-800 last:border-0">
+                  <span className="text-sm text-gray-500">{label}</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{String(val)}</span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </Modal>

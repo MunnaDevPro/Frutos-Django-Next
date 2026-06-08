@@ -434,10 +434,9 @@ class WishlistItemDeleteView(generics.DestroyAPIView):
     queryset = Wishlist.objects.all()
 
     def get_object(self):
-        obj = super().get_object()
-        if obj.user != self.request.user and not self.request.user.is_staff:
-            from rest_framework.exceptions import PermissionDenied
-            raise PermissionDenied()
+        product_id = self.kwargs.get('product_id')
+        from django.shortcuts import get_object_or_404
+        obj = get_object_or_404(Wishlist, user=self.request.user, product_id=product_id)
         return obj
 
 

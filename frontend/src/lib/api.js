@@ -154,14 +154,15 @@ export async function getDeliveryOption(subtotal = 0) {
 
 
 export async function getNearestStore(lat = null, lng = null) {
-    const params = lat != null && lng != null ? `?lat=${lat}&lng=${lng}` : ''
     try {
-        const res = await fetch(`${API_BASE}/fulfillment/stores/nearest/${params}`, {
+        // Fetching all stores since nearest endpoint is not available
+        const res = await fetch(`${API_BASE}/fulfillment/stores/`, {
             headers: { 'Content-Type': 'application/json' },
-            next: { tags: ['collect-stores'] }, // ← এখন server component-এ কাজ করবে
+            next: { tags: ['collect-stores'] }, 
         })
         if (!res.ok) throw new Error(`API error ${res.status}`)
-        return res.json()
+        const data = await res.json()
+        return Array.isArray(data) && data.length > 0 ? data[0] : null
     } catch (err) {
         console.warn('[api] getNearestStore fallback:', err.message)
         return null
