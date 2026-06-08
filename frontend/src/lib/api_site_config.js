@@ -22,8 +22,6 @@ const FALLBACK_CONFIG = {
 
 export async function getSiteConfig() {
     const candidates = [
-        `${API_BASE}/site-config/`,
-        `${API_BASE}/site-config/footer/`,
         `${API_BASE}/website/site-config/`,
     ]
 

@@ -590,8 +590,9 @@ export default function ProductDetailClient({ product: initialProduct, related }
                 <Minus size={16} />
               </button>
               <span className="font-bold text-lg text-[#151E13]">{qty}</span>
-              <button onClick={() => setQty((q) => q + 1)}
-                className="p-2 cursor-pointer hover:bg-[#ddf0d0] rounded-lg text-[#00694C] transition-colors">
+              <button onClick={() => setQty((q) => (product.stock ? Math.min(product.stock, q + 1) : q + 1))}
+                disabled={product.stock && qty >= product.stock}
+                className={`p-2 rounded-lg transition-colors ${product.stock && qty >= product.stock ? 'text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:bg-[#ddf0d0] text-[#00694C]'}`}>
                 <Plus size={16} />
               </button>
             </div>
@@ -777,9 +778,9 @@ export default function ProductDetailClient({ product: initialProduct, related }
                         <Minus size={16} />
                       </button>
                       <span className="font-bold text-lg text-[#151E13]">{qty}</span>
-                      <button onClick={() => setQty((q) => q + 1)}
-                        className="p-2 cursor-pointer hover:bg-[#E7F1DF] rounded-lg
-                                   text-[#00694C] transition-colors">
+                      <button onClick={() => setQty((q) => (product.stock ? Math.min(product.stock, q + 1) : q + 1))}
+                        disabled={product.stock && qty >= product.stock}
+                        className={`p-2 rounded-lg transition-colors ${product.stock && qty >= product.stock ? 'text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:bg-[#E7F1DF] text-[#00694C]'}`}>
                         <Plus size={16} />
                       </button>
                     </div>

@@ -97,9 +97,10 @@ export default function BasketItemList({ items, updateQty, removeItem, isApprove
                   </span>
 
                   <button
-                    onClick={() => updateQty(item.id, item.qty + 1, item.item_type || 'product')}
-                    className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded transition-colors cursor-pointer hover:bg-[#e2e8e2]"
-                    style={{ color: '#3d4943' }}
+                    onClick={() => updateQty(item.id, item.stock ? Math.min(item.stock, item.qty + 1) : item.qty + 1, item.item_type || 'product')}
+                    disabled={item.stock && item.qty >= item.stock}
+                    className={`w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded transition-colors ${item.stock && item.qty >= item.stock ? 'text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:bg-[#e2e8e2]'}`}
+                    style={{ color: item.stock && item.qty >= item.stock ? undefined : '#3d4943' }}
                     aria-label="Increase quantity"
                   >
                     <span className="material-symbols-outlined text-[14px] md:text-[16px]">add</span>

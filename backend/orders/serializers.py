@@ -114,6 +114,9 @@ class OrderCreateSerializer(serializers.Serializer):
                     except Product.DoesNotExist:
                         raise serializers.ValidationError(f"Product '{item_data['product']}' not found.")
                     
+                    if product.stock is not None and product.stock < qty:
+                        raise serializers.ValidationError(f"Not enough stock for '{product.name}'. Available: {product.stock}, Requested: {qty}")
+                    
                     unit_price = product.discount_price if product.discount_price else product.price
                     subtotal   = unit_price * qty
                     cart_subtotal += subtotal
@@ -131,6 +134,9 @@ class OrderCreateSerializer(serializers.Serializer):
                         pack = LeftoverPack.objects.get(id=item_data['leftover_pack'])
                     except LeftoverPack.DoesNotExist:
                         raise serializers.ValidationError(f"Pack '{item_data['leftover_pack']}' not found.")
+                    
+                    if pack.stock is not None and pack.stock < qty:
+                        raise serializers.ValidationError(f"Not enough stock for '{pack.name}'. Available: {pack.stock}, Requested: {qty}")
                     
                     unit_price = pack.price
                     subtotal   = unit_price * qty

@@ -334,7 +334,9 @@ export default function CartSidebar() {
                         <span className="material-symbols-outlined text-[16px]">remove</span>
                       </button>
                       <span className="w-7 text-center font-bold text-sm">{item.qty}</span>
-                      <button onClick={() => updateQty(item.id, item.qty + 1, item.item_type || 'product')} className="w-7 cursor-pointer h-7 flex items-center justify-center hover:bg-[#e2e8e2] rounded transition-colors">
+                      <button onClick={() => updateQty(item.id, item.stock ? Math.min(item.stock, item.qty + 1) : item.qty + 1, item.item_type || 'product')} 
+                        disabled={item.stock && item.qty >= item.stock}
+                        className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${item.stock && item.qty >= item.stock ? 'text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:bg-[#e2e8e2]'}`}>
                         <span className="material-symbols-outlined text-[16px]">add</span>
                       </button>
                     </div>
