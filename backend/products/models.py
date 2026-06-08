@@ -384,3 +384,43 @@ class CategoryMinimumOrderQuantity(models.Model):
     
     def __str__(self):
         return f"{self.category.name}: {self.minimum_quantity} units minimum"
+
+class Offer(models.Model):
+    title = models.CharField(max_length=255, db_index=True)
+    slug = models.SlugField(unique=True, max_length=255, db_index=True)
+    banner_image = models.ImageField(upload_to='offers/banners/', help_text="Banner image for the offer")
+    description = CKEditor5Field('Description', config_name='default', blank=True, null=True)
+    start_date = models.DateTimeField(blank=True, null=True, help_text="Optional start date for the offer")
+    end_date = models.DateTimeField(blank=True, null=True, help_text="Optional end date for the offer timer")
+    is_active = models.BooleanField(default=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            base_slug = slugify(self.title)
+            unique_slug = base_slug
+            counter = 1
+            while Offer.objects.filter(slug=unique_slug).exclude(pk=self.pk).exists():
+                unique_slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = unique_slug
+        super().save(*args, **kwargs)
+
+class OfferItem(models.Model):
+    offer = models.ForeignKey(Offer, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    offer_price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Custom price for this product during the offer")
+
+    class Meta:
+        unique_together = ('offer', 'product')
+
+    def __str__(self):
+        return f"{self.product.name} in {self.offer.title}"

@@ -116,7 +116,17 @@ async function refreshAccessToken() {
 
 export class ApiError extends Error {
     constructor(status, statusText, data) {
-        const message = data ? .detail || data ? .message || (typeof data ? .error === 'string' ? data.error : null) || statusText || `HTTP ${status}`;
+        let message = data?.detail || data?.message || (typeof data?.error === 'string' ? data.error : null);
+        if (!message && data && typeof data === 'object') {
+            // Extract the first field error from DRF payload (e.g. { banner_image: ["This field is required."] })
+            const firstKey = Object.keys(data)[0];
+            if (firstKey && Array.isArray(data[firstKey])) {
+                message = `${firstKey.replace('_', ' ')}: ${data[firstKey][0]}`;
+            } else if (firstKey && typeof data[firstKey] === 'string') {
+                message = `${firstKey}: ${data[firstKey]}`;
+            }
+        }
+        message = message || statusText || `HTTP ${status}`;
         super(message);
         this.name = "ApiError";
         this.status = status;

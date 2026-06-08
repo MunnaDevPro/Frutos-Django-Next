@@ -317,3 +317,76 @@ class WishlistSerializer(serializers.ModelSerializer):
         product = ProductModel.objects.get(id=product_id)
         wishlist, created = __import__('products.models', fromlist=['Wishlist']).Wishlist.objects.get_or_create(user=user, product=product)
         return wishlist
+
+class OfferItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+    
+    class Meta:
+        model = __import__('products.models', fromlist=['OfferItem']).OfferItem
+        fields = ['id', 'product', 'offer_price']
+
+class OfferSerializer(serializers.ModelSerializer):
+    banner_image_url = serializers.SerializerMethodField()
+    items_data = serializers.CharField(write_only=True, required=False)
+    items = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Offer
+        fields = ['id', 'title', 'slug', 'banner_image', 'banner_image_url', 'description', 'start_date', 'end_date', 'is_active', 'created_at', 'items_data', 'items']
+        extra_kwargs = {
+            'slug': {'required': False, 'allow_blank': True}
+        }
+
+    def get_items(self, obj):
+        """Return offer items with product info (for dashboard edit form)."""
+        qs = obj.items.select_related(
+            'product', 'product__category', 'product__brand', 'product__sub_category'
+        ).prefetch_related('product__additional_images')
+        return OfferItemSerializer(qs, many=True, context=self.context).data
+
+    def get_banner_image_url(self, obj):
+        request = self.context.get('request')
+        if obj.banner_image and hasattr(obj.banner_image, 'url'):
+            if request:
+                return request.build_absolute_uri(obj.banner_image.url)
+            return obj.banner_image.url
+        return None
+
+    def create(self, validated_data):
+        items_json = validated_data.pop('items_data', None)
+        offer = super().create(validated_data)
+        self._handle_items(offer, items_json)
+        return offer
+
+    def update(self, instance, validated_data):
+        items_json = validated_data.pop('items_data', None)
+        offer = super().update(instance, validated_data)
+        if items_json is not None:
+            self._handle_items(offer, items_json)
+        return offer
+
+    def _handle_items(self, offer, items_json):
+        if items_json:
+            import json
+            try:
+                items = json.loads(items_json)
+                offer.items.all().delete()
+                OfferItem = __import__('products.models', fromlist=['OfferItem']).OfferItem
+                Product = __import__('products.models', fromlist=['Product']).Product
+                
+                offer_items = []
+                for item in items:
+                    product_id = item.get('product_id') or item.get('id')
+                    offer_price = item.get('offer_price')
+                    if product_id and offer_price:
+                        product = Product.objects.get(pk=product_id)
+                        offer_items.append(OfferItem(offer=offer, product=product, offer_price=offer_price))
+                OfferItem.objects.bulk_create(offer_items)
+            except Exception as e:
+                pass
+
+class OfferDetailSerializer(OfferSerializer):
+    items = OfferItemSerializer(many=True, read_only=True)
+
+    class Meta(OfferSerializer.Meta):
+        fields = OfferSerializer.Meta.fields + ['items']

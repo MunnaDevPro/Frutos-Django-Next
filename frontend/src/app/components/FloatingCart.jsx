@@ -1,68 +1,107 @@
 'use client'
 import { useCart } from '@/app/context/CartContext'
 import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import Image from 'next/image'
 
 export default function FloatingCart() {
   const { totalItems, setSidebarOpen } = useCart()
   const pathname = usePathname()
+  const [isBumping, setIsBumping] = useState(false)
+
+  // Trigger bump animation whenever totalItems changes
+  useEffect(() => {
+    if (totalItems === 0) return
+    setIsBumping(true)
+    const timer = setTimeout(() => setIsBumping(false), 400)
+    return () => clearTimeout(timer)
+  }, [totalItems])
 
   if (pathname?.startsWith('/dashboard')) return null
 
   return (
-    <button
-      onClick={() => setSidebarOpen(true)}
-      style={{
-        position: 'fixed',
-        right: '0px',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        zIndex: 9990,
-        background: '#00694C',
-        color: 'white',
-        border: 'none',
-        borderTopLeftRadius: '12px',
-        borderBottomLeftRadius: '12px',
-        padding: '12px 14px',
-        boxShadow: '-4px 0 20px rgba(0,0,0,0.15)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '6px',
-        cursor: 'pointer',
-        transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
-      }}
-      onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(1.05)'}
-      onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(1)'}
-    >
-      <div style={{ position: 'relative' }}>
-        <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <path d="M16 10a4 4 0 0 1-8 0"></path>
-        </svg>
-        {totalItems > 0 && (
+    <>
+      <style>{`
+        @keyframes cartBump {
+          0%   { transform: scale(1); }
+          20%  { transform: scale(1.15) rotate(-6deg); }
+          40%  { transform: scale(1.15) rotate(6deg); }
+          60%  { transform: scale(1.15) rotate(-3deg); }
+          80%  { transform: scale(1.15) rotate(3deg); }
+          100% { transform: scale(1); }
+        }
+        .bump-anim {
+          animation: cartBump 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+        .floating-cart-wrapper {
+          position: fixed;
+          right: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 9990;
+          transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .floating-cart-wrapper:hover {
+          transform: translateY(-50%) translateX(-4px) scale(1.05);
+        }
+      `}</style>
+
+      <div className="floating-cart-wrapper">
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className={isBumping ? 'bump-anim' : ''}
+          style={{
+            background: '#ffffff',
+            border: '1px solid rgba(0,0,0,0.05)',
+            borderRadius: '50%',
+            width: '64px',
+            height: '64px',
+            boxShadow: '0 12px 32px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0,0,0,0.06)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            willChange: 'transform',
+            position: 'relative'
+          }}
+        >
+          <Image 
+            src="/bag3d.png" 
+            alt="Cart" 
+            width={44} 
+            height={44} 
+            style={{ 
+              objectFit: 'contain', 
+              mixBlendMode: 'multiply',
+              transform: 'translateY(2px)' // slight adjustment to center visually
+            }} 
+          />
+          
           <span style={{
             position: 'absolute',
-            top: '-8px',
-            right: '-10px',
+            top: '-2px',
+            right: '-4px',
             background: '#FF3B30',
             color: 'white',
             borderRadius: '50%',
-            width: '20px',
-            height: '20px',
+            minWidth: '24px',
+            height: '24px',
+            padding: '0 6px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '11px',
-            fontWeight: 'bold',
+            fontSize: '13px',
+            fontWeight: '900',
             lineHeight: 1,
-            boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+            boxShadow: '0 4px 10px rgba(255, 59, 48, 0.4)',
+            opacity: totalItems > 0 ? 1 : 0,
+            transition: 'opacity 0.2s ease',
           }}>
             {totalItems > 99 ? '99+' : totalItems}
           </span>
-        )}
+        </button>
       </div>
-      <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px', marginTop: '2px' }}>CART</span>
-    </button>
+    </>
   )
 }

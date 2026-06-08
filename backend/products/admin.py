@@ -542,3 +542,26 @@ class WishlistAdmin(admin.ModelAdmin):
     search_fields = ('user__email', 'user__username', 'product__name')
     list_filter = ('created_at',)
     readonly_fields = ('created_at',)
+
+class OfferItemInline(admin.TabularInline):
+    model = __import__('products.models', fromlist=['OfferItem']).OfferItem
+    extra = 1
+
+@admin.register(Offer)
+class OfferAdmin(admin.ModelAdmin):
+    """Admin for Offers/Banners"""
+    list_display = ('title', 'is_active', 'start_date', 'end_date', 'created_at')
+    list_filter = ('is_active', 'start_date', 'end_date')
+    search_fields = ('title', 'description')
+    prepopulated_fields = {'slug': ('title',)}
+    readonly_fields = ('created_at', 'updated_at')
+    inlines = [OfferItemInline]
+    
+    fieldsets = (
+        ('Offer Details', {
+            'fields': ('title', 'slug', 'banner_image', 'description', 'is_active')
+        }),
+        ('Timing', {
+            'fields': ('start_date', 'end_date')
+        }),
+    )

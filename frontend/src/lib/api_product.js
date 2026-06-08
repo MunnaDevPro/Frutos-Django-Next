@@ -185,9 +185,9 @@ function normalizeProduct(p) {
 
     // ✅ category সবসময় string হবে, কখনো object না
     const categoryName =
-        (typeof p.category === 'string' ? p.category : p.category ? .name) ||
-        p.sub_category ? .category ? .name ||
-        p.sub_category ? .category_name ||
+        (typeof p.category === 'string' ? p.category : p.category?.name) ||
+        p.sub_category?.category?.name ||
+        p.sub_category?.category_name ||
         p.sub_category_name ||
         null
 
@@ -304,4 +304,43 @@ export async function submitReview(token, data) {
     }
 
     return res.json()
+}
+
+// ─── Offers ───────────────────────────────────────────────────────────────────
+
+export async function getOffers() {
+    const data = await apiFetch(`${BASE_ROUTE}/offers/`, { cache: 'no-store' })
+    return toArray(data).map(offer => ({
+        id: offer.id,
+        title: offer.title,
+        slug: offer.slug,
+        image: buildImageUrl(offer.banner_image_url || offer.banner_image),
+        description: offer.description,
+        startDate: offer.start_date,
+        endDate: offer.end_date,
+        isActive: offer.is_active,
+    }))
+}
+
+export async function getOfferBySlug(slug) {
+    const data = await apiFetch(`${BASE_ROUTE}/offers/${slug}/`, { cache: 'no-store' })
+    return {
+        id: data.id,
+        title: data.title,
+        slug: data.slug,
+        image: buildImageUrl(data.banner_image_url || data.banner_image),
+        description: data.description,
+        startDate: data.start_date,
+        endDate: data.end_date,
+        isActive: data.is_active,
+        products: data.items ? data.items.map(item => {
+            const normalized = normalizeProduct(item.product);
+            return {
+                ...normalized,
+                oldPrice: normalized.price,
+                price: Number(item.offer_price),
+                onSale: true, // We can optionally force this to true to highlight the offer price
+            };
+        }) : [],
+    }
 }

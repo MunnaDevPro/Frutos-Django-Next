@@ -8,13 +8,14 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from orders.models import Order
-from .models import Product, Category, SubCategory, Color, Brand, Size, ProductSpecification, ProductAdditionalImage, Review
+from .models import Product, Category, SubCategory, Color, Brand, Size, ProductSpecification, ProductAdditionalImage, Review, Offer
 from django.db.models import Count, ProtectedError
 from .serializers import (
     ProductSerializer, ProductWriteSerializer,
     CategorySerializer, SubCategorySerializer,
     ColorSerializer, BrandSerializer, SizeSerializer,
-    ReviewSerializer, ReviewCreateSerializer
+    ReviewSerializer, ReviewCreateSerializer,
+    OfferSerializer, OfferDetailSerializer
 )
 from .permissions import IsShopOwnerOrReadOnly
 from .filters import ProductFilter
@@ -583,3 +584,29 @@ class ReviewViewSet(viewsets.ModelViewSet):
         
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+class OfferViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows offers to be viewed or edited.
+    """
+    permission_classes = [IsAdminOrReadOnly]
+    lookup_field = 'slug'
+
+    def get_queryset(self):
+        qs = Offer.objects.prefetch_related(
+            'items',
+            'items__product',
+            'items__product__category',
+            'items__product__brand',
+            'items__product__sub_category',
+            'items__product__additional_images',
+        ).order_by('-created_at')
+        if self.request.user and self.request.user.is_authenticated and (self.request.user.is_staff or getattr(self.request.user, 'user_type', '') == 'ADMIN'):
+            return qs
+        return qs.filter(is_active=True)
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return OfferDetailSerializer
+        return OfferSerializer
+

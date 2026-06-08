@@ -45,6 +45,7 @@ const navGroups = [
       { name: "Leftover Packs", href: "/dashboard/leftover-packs", icon: Package },
       { name: "Categories", href: "/dashboard/categories", icon: Layers },
       { name: "Brands", href: "/dashboard/brands", icon: Tag },
+      { name: "Offers", href: "/dashboard/offers", icon: Tag },
       { name: "Reviews", href: "/dashboard/reviews", icon: Star },
     ],
   },

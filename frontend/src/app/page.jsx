@@ -5,8 +5,9 @@ import ProductGrid        from '@/app/components/ProductGrid'
 import LeftoverPackBanner from '@/app/components/LeftoverPackBanner'
 import WeekendBox         from '@/app/components/WeekendBox'
 import HowItWorks         from '@/app/components/HowItWorks'
+import OffersSection      from '@/app/components/OffersSection'
 
-import { getProducts, getCategories } from '@/lib/api_product'
+import { getProducts, getCategories, getOffers } from '@/lib/api_product'
 import { getHomepageData }            from '@/lib/api_homepage'
 import { normalizeFeatureCards, normalizeSteps } from '@/app/config/homepageIcons'
 
@@ -14,10 +15,11 @@ export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
   // Fetch all data in parallel
-  const [products, categories, homepageData] = await Promise.all([
+  const [products, categories, homepageData, offers] = await Promise.all([
     getProducts(),
     getCategories(),
     getHomepageData(),
+    getOffers().catch(() => []), // fallback in case API isn't ready
   ])
 
   const { hero, feature_cards, how_it_works, steps, leftover_banner } = homepageData
@@ -34,6 +36,7 @@ export default async function HomePage() {
       />
 
       <div className='bg-[var(--section-color)]'>
+        <OffersSection offers={offers} />
         <ProductGrid
           initialProducts={products}
           categories={categories}
