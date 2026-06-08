@@ -2,10 +2,9 @@
 import { useCart } from '@/app/context/CartContext'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
 
 export default function FloatingCart() {
-  const { totalItems, setSidebarOpen } = useCart()
+  const { totalItems, subtotal, setSidebarOpen } = useCart()
   const pathname = usePathname()
   const [isBumping, setIsBumping] = useState(false)
 
@@ -24,10 +23,10 @@ export default function FloatingCart() {
       <style>{`
         @keyframes cartBump {
           0%   { transform: scale(1); }
-          20%  { transform: scale(1.15) rotate(-6deg); }
-          40%  { transform: scale(1.15) rotate(6deg); }
-          60%  { transform: scale(1.15) rotate(-3deg); }
-          80%  { transform: scale(1.15) rotate(3deg); }
+          20%  { transform: scale(1.1) rotate(-3deg); }
+          40%  { transform: scale(1.1) rotate(3deg); }
+          60%  { transform: scale(1.1) rotate(-1deg); }
+          80%  { transform: scale(1.1) rotate(1deg); }
           100% { transform: scale(1); }
         }
         .bump-anim {
@@ -35,72 +34,106 @@ export default function FloatingCart() {
         }
         .floating-cart-wrapper {
           position: fixed;
-          right: 16px;
+          right: 20px;
           top: 50%;
           transform: translateY(-50%);
           z-index: 9990;
           transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .floating-cart-wrapper:hover {
-          transform: translateY(-50%) translateX(-4px) scale(1.05);
+        .cart-top {
+          background: transparent;
+          width: 100%;
+          padding: 16px 4px 14px 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .icon-container {
+          position: relative;
+          display: inline-flex;
+        }
+        .cart-icon {
+          width: 28px;
+          height: 28px;
+          fill: none;
+          stroke: #ffffff;
+          stroke-width: 1.8;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+        .cart-badge {
+          position: absolute;
+          top: -6px;
+          right: -8px;
+          background: #ef4444; /* Modern red */
+          color: white;
+          border-radius: 50%;
+          min-width: 20px;
+          height: 20px;
+          padding: 0 5px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+          font-weight: 700;
+          line-height: 1;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+          border: 2px solid var(--common-color, #00694C); /* Matches the cart background to blend seamlessly */
+          font-family: system-ui, -apple-system, sans-serif;
+        }
+        .cart-bottom {
+          background: rgba(0, 0, 0, 0.18); /* Elegant dark overlay over the main color */
+          width: 100%;
+          padding: 10px 4px;
+          text-align: center;
+          border-top: 1px solid rgba(255, 255, 255, 0.08); /* Subtle separator */
+        }
+        .cart-price-text {
+          color: #ffffff;
+          font-size: 13px;
+          font-weight: 700;
+          letter-spacing: 0.3px;
+          line-height: 1;
+          font-family: system-ui, -apple-system, sans-serif;
         }
       `}</style>
 
       <div className="floating-cart-wrapper">
-        <button
+        <div
           onClick={() => setSidebarOpen(true)}
-          className={isBumping ? 'bump-anim' : ''}
+          className={`cart-container ${isBumping ? 'bump-anim' : ''}`}
           style={{
-            background: '#ffffff',
-            border: '1px solid rgba(0,0,0,0.05)',
-            borderRadius: '50%',
-            width: '64px',
-            height: '64px',
-            boxShadow: '0 12px 32px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0,0,0,0.06)',
+            background: 'var(--common-color, #00694C)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            boxShadow: '0 10px 25px -5px rgba(0,0,0,0.3), 0 8px 10px -6px rgba(0,0,0,0.1)',
+            cursor: 'pointer',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            willChange: 'transform',
-            position: 'relative'
+            width: '72px',
+            willChange: 'transform'
           }}
         >
-          <Image 
-            src="/bag3d.png" 
-            alt="Cart" 
-            width={44} 
-            height={44} 
-            style={{ 
-              objectFit: 'contain', 
-              mixBlendMode: 'multiply',
-              transform: 'translateY(2px)' // slight adjustment to center visually
-            }} 
-          />
-          
-          <span style={{
-            position: 'absolute',
-            top: '-2px',
-            right: '-4px',
-            background: '#FF3B30',
-            color: 'white',
-            borderRadius: '50%',
-            minWidth: '24px',
-            height: '24px',
-            padding: '0 6px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '13px',
-            fontWeight: '900',
-            lineHeight: 1,
-            boxShadow: '0 4px 10px rgba(255, 59, 48, 0.4)',
-            opacity: totalItems > 0 ? 1 : 0,
-            transition: 'opacity 0.2s ease',
-          }}>
-            {totalItems > 99 ? '99+' : totalItems}
-          </span>
-        </button>
+          <div className="cart-top">
+            <div className="icon-container">
+              <svg className="cart-icon" viewBox="0 0 24 24">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+              {totalItems > 0 && (
+                <span className="cart-badge">
+                  {totalItems > 99 ? '99+' : totalItems}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="cart-bottom">
+            <span className="cart-price-text">৳{Math.round(subtotal)}</span>
+          </div>
+        </div>
       </div>
     </>
   )
