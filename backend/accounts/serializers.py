@@ -251,3 +251,46 @@ class ChangePasswordSerializer(serializers.Serializer):
         user.set_password(self.validated_data['newPassword'])
         user.save()
         return user
+
+
+# ─── Support Ticket ───────────────────────────────────────────────────────────
+
+from .models import SupportTicket, SupportTicketImage
+
+class SupportTicketImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SupportTicketImage
+        fields = ['id', 'image', 'created_at']
+
+
+class SupportTicketSerializer(serializers.ModelSerializer):
+    userName = serializers.CharField(source='user.name', read_only=True)
+    userEmail = serializers.CharField(source='user.email', read_only=True)
+    images = SupportTicketImageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = SupportTicket
+        fields = [
+            'id', 'subject', 'description', 'images', 'category', 'priority',
+            'status', 'admin_response', 'created_at', 'updated_at',
+            'userName', 'userEmail'
+        ]
+        read_only_fields = ['id', 'status', 'admin_response', 'created_at', 'updated_at']
+
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        ticket = super().create(validated_data)
+        
+        # Handle multiple images
+        request = self.context.get('request')
+        if request and request.FILES:
+            images = request.FILES.getlist('images')
+            for image in images:
+                SupportTicketImage.objects.create(ticket=ticket, image=image)
+                
+        return ticket
+
+
+class AdminSupportTicketSerializer(SupportTicketSerializer):
+    class Meta(SupportTicketSerializer.Meta):
+        read_only_fields = ['id', 'created_at', 'updated_at']

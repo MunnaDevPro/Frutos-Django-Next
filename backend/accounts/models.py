@@ -131,3 +131,61 @@ class PasswordResetOTP(models.Model):
 
     def is_valid(self):
         return not self.is_used and (timezone.now() - self.created_at).seconds < 600  # 10 min
+
+
+# ─── SupportTicket 
+
+class SupportTicket(models.Model):
+    PRIORITY_CHOICES = [
+        ('LOW', 'Low'),
+        ('MEDIUM', 'Medium'),
+        ('HIGH', 'High'),
+        ('URGENT', 'Urgent'),
+    ]
+    STATUS_CHOICES = [
+        ('OPEN', 'Open'),
+        ('IN_PROGRESS', 'In Progress'),
+        ('RESOLVED', 'Resolved'),
+        ('CLOSED', 'Closed'),
+    ]
+    CATEGORY_CHOICES = [
+        ('GENERAL', 'General'),
+        ('TECHNICAL', 'Technical'),
+        ('PAYMENT', 'Payment'),
+        ('ACCOUNT', 'Account'),
+        ('ORDER', 'Order'),
+        ('PRODUCT', 'Product'),
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='support_tickets')
+    subject = models.CharField(max_length=255)
+    description = models.TextField()
+    category = models.CharField(max_length=15, choices=CATEGORY_CHOICES, default='GENERAL')
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='MEDIUM')
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='OPEN', db_index=True)
+    admin_response = models.TextField(blank=True, null=True)
+    responded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='responded_support_tickets'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        app_label = 'accounts'
+        ordering = ['-created_at']
+        verbose_name = "Support Ticket"
+        verbose_name_plural = "Support Tickets"
+
+    def __str__(self):
+        return f"Ticket #{self.id} by {self.user.email} - {self.subject}"
+
+
+class SupportTicketImage(models.Model):
+    ticket = models.ForeignKey(SupportTicket, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='support_tickets/')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        app_label = 'accounts'
+        ordering = ['created_at']

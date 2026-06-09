@@ -48,4 +48,10 @@ urlpatterns = [
     path('admin/users/create/',  views.AdminUserCreateView.as_view(), name='admin-user-create'),
     path('admin/users/<str:pk>/', views.AdminUserDetailView.as_view(), name='admin-user-detail'),
 
-    path('dashboard/admin/', views.AdminDashboardStatsView.as_view(), name='admin-dashboard-stats'),]
+    path('dashboard/admin/', views.AdminDashboardStatsView.as_view(), name='admin-dashboard-stats'),
+    
+    # ── Support Tickets ────────────────────────────────────────────────────────
+    path('tickets/', views.SupportTicketListCreateView.as_view(), name='support-tickets'),
+    path('admin/tickets/', views.AdminSupportTicketListView.as_view(), name='admin-support-tickets'),
+    path('admin/tickets/<int:pk>/', views.AdminSupportTicketDetailView.as_view(), name='admin-support-ticket-detail'),
+]

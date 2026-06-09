@@ -703,6 +703,7 @@ class AdminUserListView(APIView):
                 'business_name':    None,
                 'wholesale_status': None,
                 'is_wholesale':     False,
+                'photo':            request.build_absolute_uri(u.profile.avatar.url) if (hasattr(u, 'profile') and getattr(u.profile, 'avatar', None) and getattr(u.profile.avatar, 'name', None)) else None,
             })
 
         # ── Wholesale users ───────────────────────────────────────
@@ -727,6 +728,7 @@ class AdminUserListView(APIView):
                     'business_name':    u.business_name,
                     'wholesale_status': u.status,
                     'is_wholesale':     True,
+                    'photo':            request.build_absolute_uri(u.profile_image.url) if (u.profile_image and getattr(u.profile_image, 'name', None)) else None,
                 })
         except Exception as e:
             print(f'[AdminUserListView] wholesale fetch error: {e}')
@@ -936,3 +938,60 @@ class AdminDashboardStatsView(APIView):
                 'pending_orders': pending_orders,
             }
         })
+
+
+# ─── Support Tickets ──────────────────────────────────────────────────────────
+
+from .models import SupportTicket
+from .serializers import SupportTicketSerializer, AdminSupportTicketSerializer
+
+class SupportTicketListCreateView(generics.ListCreateAPIView):
+    """
+    GET  /api/auth/tickets/  — list user's own tickets
+    POST /api/auth/tickets/  — create new ticket
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = SupportTicketSerializer
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_queryset(self):
+        return SupportTicket.objects.filter(user=self.request.user)
+
+
+class AdminSupportTicketListView(generics.ListAPIView):
+    """
+    GET  /api/auth/admin/tickets/  — list ALL tickets for admin
+    """
+    permission_classes = [permissions.IsAdminUser]
+    serializer_class = AdminSupportTicketSerializer
+
+    def get_queryset(self):
+        qs = SupportTicket.objects.all()
+        status_param = self.request.query_params.get('status')
+        if status_param and status_param != 'all':
+            qs = qs.filter(status=status_param)
+        
+        search = self.request.query_params.get('search')
+        if search:
+            from django.db.models import Q
+            qs = qs.filter(
+                Q(subject__icontains=search) | 
+                Q(user__email__icontains=search) |
+                Q(user__name__icontains=search)
+            )
+            
+        return qs
+
+
+class AdminSupportTicketDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    GET    /api/auth/admin/tickets/<id>/
+    PATCH  /api/auth/admin/tickets/<id>/
+    DELETE /api/auth/admin/tickets/<id>/
+    """
+    permission_classes = [permissions.IsAdminUser]
+    serializer_class = AdminSupportTicketSerializer
+    queryset = SupportTicket.objects.all()
+
+    def perform_update(self, serializer):
+        serializer.save(responded_by=self.request.user)

@@ -172,14 +172,17 @@ export function AuthProvider({ children }) {
 
   async function authFetch(url, options = {}) {
     const access = getAccess()
-    const res    = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-        ...(access ? { Authorization: `Bearer ${access}` } : {}),
-      },
-    })
+    const isFormData = typeof window !== 'undefined' && options.body instanceof FormData
+    const defaultHeaders = isFormData ? {} : { 'Content-Type': 'application/json' }
+
+    const headers = {
+      ...defaultHeaders,
+      ...options.headers,
+      ...(access ? { Authorization: `Bearer ${access}` } : {}),
+    }
+
+    const res = await fetch(url, { ...options, headers })
+
     // Auto-retry once if 401 (try refresh)
     if (res.status === 401) {
       await refreshAccessToken()
@@ -188,7 +191,7 @@ export function AuthProvider({ children }) {
       return fetch(url, {
         ...options,
         headers: {
-          'Content-Type': 'application/json',
+          ...defaultHeaders,
           ...options.headers,
           Authorization: `Bearer ${newAccess}`,
         },

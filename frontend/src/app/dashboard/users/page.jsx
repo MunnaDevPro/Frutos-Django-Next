@@ -54,7 +54,7 @@ function WholesaleStatusBadge({ value }) {
 
 const columns = [
   { key: "id",               label: "ID",        render: (v) => <span className="text-xs text-slate-400">{String(v).startsWith('ws_') ? `WS-${v.replace('ws_','')}` : v}</span> },
-  { key: "avatar",           label: "Photo",     render: (v, row) => (
+  { key: "photo",            label: "Profile Photo", render: (v, row) => (
     <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center border border-slate-200 shrink-0">
       {v ? (
         <img src={v} alt={row.name || "User"} className="w-full h-full object-cover" />
@@ -253,9 +253,9 @@ export default function UsersPage() {
         {viewItem && (
           <div className="space-y-4">
             <div className="flex justify-center mb-4">
-              <div className="w-20 h-20 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center border border-slate-200">
-                {viewItem.avatar ? (
-                  <img src={viewItem.avatar} alt={viewItem.name || "User"} className="w-full h-full object-cover" />
+              <div className="w-16 h-16 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center border border-slate-200 shrink-0">
+                {viewItem.photo ? (
+                  <img src={viewItem.photo} alt={viewItem.name || "User"} className="w-full h-full object-cover" />
                 ) : (
                   <span className="text-2xl font-semibold text-slate-500">{(viewItem.name || viewItem.email || "U").charAt(0).toUpperCase()}</span>
                 )}

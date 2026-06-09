@@ -148,6 +148,7 @@ import OrdersTab        from './tabs/OrdersTab'
 import NotificationsTab from './tabs/NotificationsTab'
 import SavedItemsTab    from './tabs/SavedItemsTab'
 import TrackingTab      from './tabs/TrackingTab'
+import SupportTicketsTab from './tabs/SupportTicketsTab'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api'
 
@@ -158,6 +159,7 @@ const TABS = [
   { id: 'addresses',     label: 'Saved Addresses',  icon: 'location_on'     },
   { id: 'orders',        label: 'Order History',    icon: 'receipt_long'    },
   { id: 'notifications', label: 'Notifications',    icon: 'notifications'   },
+  { id: 'tickets',       label: 'Support Tickets',  icon: 'help'            },
 ]
 
 export default function ProfileClient({
@@ -353,6 +355,10 @@ export default function ProfileClient({
                 initialNotifications={initialNotifications}
                 onCountChange={setUnreadCount}
               />
+            )}
+
+            {activeTab === 'tickets' && (
+              <SupportTicketsTab authFetch={authFetch} />
             )}
           </main>
         </div>

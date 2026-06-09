@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -78,14 +78,16 @@ function TicketDetailModal({ ticket, onClose, onReplySuccess }) {
   const [submitting, setSubmitting] = useState(false);
   const [viewerSrc, setViewerSrc] = useState(null);
 
-  const images = extractImageUrls(ticket.description);
+  const descriptionImages = extractImageUrls(ticket.description);
+  const attachedImages = ticket.images ? ticket.images.map(img => img.image) : [];
+  const images = [...new Set([...descriptionImages, ...attachedImages])];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!replyText.trim()) { toast.error("Reply cannot be empty"); return; }
     setSubmitting(true);
     try {
-      await api.patch(`/api/auth/vendor/tickets/${ticket.id}/`, {
+      await api.patch(`/api/auth/admin/tickets/${ticket.id}/`, {
         admin_response: replyText,
         status: newStatus,
       });
@@ -134,11 +136,11 @@ function TicketDetailModal({ ticket, onClose, onReplySuccess }) {
             <div className="grid grid-cols-2 gap-3">
               <div className="flex items-center gap-2 text-sm text-slate-600">
                 <User className="w-4 h-4 shrink-0 text-slate-400" />
-                <span className="font-medium text-slate-800">{ticket.vendor_name || "—"}</span>
+                <span className="font-medium text-slate-800">{ticket.userName || "—"}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-slate-600">
                 <Mail className="w-4 h-4 shrink-0 text-slate-400" />
-                <span>{ticket.vendor_email || "—"}</span>
+                <span>{ticket.userEmail || "—"}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-slate-600">
                 <Tag className="w-4 h-4 shrink-0 text-slate-400" />
@@ -198,7 +200,7 @@ function TicketDetailModal({ ticket, onClose, onReplySuccess }) {
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
                 rows={4}
-                placeholder="Write your response to the vendor..."
+                placeholder="Write your response to the user..."
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-1 focus:ring-gray-400 resize-none"
               />
               <div className="flex items-center gap-3">
@@ -250,7 +252,7 @@ export default function TicketsPage() {
       const params = { page, page_size: PAGE_SIZE };
       if (activeStatus !== "all") params.status = activeStatus;
       if (search.trim()) params.search = search.trim();
-      const res = await api.get("/api/auth/vendor/tickets/", params);
+      const res = await api.get("/api/auth/admin/tickets/", params);
       if (Array.isArray(res)) {
         setTickets(res);
         setTotalCount(res.length);
@@ -270,7 +272,7 @@ export default function TicketsPage() {
     try {
       const statuses = ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"];
       const results = await Promise.allSettled(
-        statuses.map((s) => api.get("/api/auth/vendor/tickets/", { status: s, page_size: 1 }))
+        statuses.map((s) => api.get("/api/auth/admin/tickets/", { status: s, page_size: 1 }))
       );
       const newCounts = {};
       results.forEach((r, i) => {
@@ -371,7 +373,7 @@ export default function TicketsPage() {
                 <tr className="border-b border-slate-200 bg-slate-50">
                   <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">#</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Subject</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Vendor</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">User</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Priority</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
@@ -390,8 +392,8 @@ export default function TicketsPage() {
                         <p className="text-xs text-slate-400 mt-0.5 max-w-[220px] truncate">{ticket.description}</p>
                       </td>
                       <td className="px-4 py-3">
-                        <p className="text-slate-800 font-medium text-xs">{ticket.vendor_name || "—"}</p>
-                        <p className="text-xs text-slate-400">{ticket.vendor_email || ""}</p>
+                        <p className="text-slate-800 font-medium text-xs">{ticket.userName || "—"}</p>
+                        <p className="text-xs text-slate-400">{ticket.userEmail || ""}</p>
                       </td>
                       <td className="px-4 py-3">
                         <span className="text-xs text-slate-600">{CATEGORY_LABEL[ticket.category] || ticket.category}</span>
