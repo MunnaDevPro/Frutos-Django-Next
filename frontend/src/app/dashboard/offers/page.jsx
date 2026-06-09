@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { Plus, Pencil, Trash2, Upload, X, ImageIcon, Tag, Package, AlertCircle, CheckCircle2 } from "lucide-react";
@@ -82,14 +82,14 @@ function ProductDropdownItem({ product, onClick, alreadyAdded }) {
         <div className="flex items-center gap-2 mt-1.5">
           {discountPrice ? (
             <>
-              <span className="text-sm font-bold text-amber-600">৳{discountPrice.toFixed(2)}</span>
-              <span className="text-xs text-slate-400 line-through">৳{price.toFixed(2)}</span>
+              <span className="text-sm font-bold text-amber-600">€{discountPrice.toFixed(2)}</span>
+              <span className="text-xs text-slate-400 line-through">€{price.toFixed(2)}</span>
               <span className="text-[10px] px-1.5 py-0.5 bg-red-100 text-red-600 rounded font-bold">
                 -{Math.round(((price - discountPrice) / price) * 100)}%
               </span>
             </>
           ) : (
-            <span className="text-sm font-bold text-gray-800">৳{price.toFixed(2)}</span>
+            <span className="text-sm font-bold text-gray-800">€{price.toFixed(2)}</span>
           )}
           {product.unit && (
             <span className="text-[10px] text-slate-400">/ {product.unit}</span>
@@ -124,7 +124,7 @@ function SelectedProductRow({ item, idx, onRemove, onUpdatePrice }) {
         <div className="text-sm font-semibold text-slate-800 truncate">{prod.name || "—"}</div>
         <div className="flex items-center gap-2 mt-0.5">
           <span className="text-xs text-slate-500">
-            Original: <span className="font-medium text-slate-700">৳{origPrice.toFixed(2)}</span>
+            Original: <span className="font-medium text-slate-700">€{origPrice.toFixed(2)}</span>
           </span>
           {savings && parseFloat(savings) > 0 && (
             <span className="text-[10px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded font-bold">
@@ -136,7 +136,7 @@ function SelectedProductRow({ item, idx, onRemove, onUpdatePrice }) {
 
       {/* Original Price (static display) */}
       <div className="text-sm text-slate-500">
-        ৳{prod.price || item.old_price || "—"}
+        €{prod.price || item.old_price || "—"}
       </div>
 
       {/* Offer Price Input */}

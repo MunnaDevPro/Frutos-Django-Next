@@ -82,7 +82,7 @@
 //               Welcome back, <span className="font-medium" style={{ color: '#151e13' }}>{displayUser?.firstName || displayUser?.email}</span>
 //             </p>
 //           </div>
-//           <button onClick={logout} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-[#eaeaea] bg-white text-[#6d7a73]">
+//           <button onClick={logout} className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-[#eaeaea] bg-white text-[#6d7a73]">
 //             <span className="material-symbols-outlined text-base">logout</span>
 //             <span className="hidden sm:inline">Sign Out</span>
 //           </button>
@@ -266,7 +266,7 @@ export default function ProfileClient({
           </div>
           <button
             onClick={logout}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-red-600 transition-all shadow-sm"
+            className="cursor-pointer flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-red-600 transition-all shadow-sm"
           >
             <span className="material-symbols-outlined text-[20px]">logout</span>
             <span>Sign Out</span>
@@ -283,7 +283,7 @@ export default function ProfileClient({
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`relative flex items-center gap-3 px-5 py-3.5 rounded-xl text-sm font-semibold flex-shrink-0 w-auto lg:w-full text-left transition-all duration-300 ${
+                  className={`cursor-pointer relative flex items-center gap-3 px-5 py-3.5 rounded-xl text-sm font-semibold flex-shrink-0 w-auto lg:w-full text-left transition-all duration-300 ${
                     isActive 
                       ? 'bg-[#00694C] text-white shadow-md' 
                       : 'bg-white text-gray-600 border border-gray-200 hover:border-[#00694C]/30 hover:bg-gray-50'

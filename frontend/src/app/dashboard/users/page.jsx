@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
@@ -67,7 +67,6 @@ const columns = [
   { key: "email",            label: "Email" },
   { key: "user_type",        label: "Role",      render: (v) => <RoleBadge value={v} /> },
   { key: "business_name",    label: "Business",  render: (v) => v || <span className="text-slate-400">—</span> },
-  { key: "wholesale_status", label: "WS Status", render: (v) => <WholesaleStatusBadge value={v} /> },
   { key: "is_active",        label: "Status",    render: (v) => (
     <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${v ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"}`}>
       {v ? "Active" : "Inactive"}
@@ -268,7 +267,6 @@ export default function UsersPage() {
                 ["Email",     viewItem.email],
                 ["Role",      viewItem.user_type],
                 ["Business",  viewItem.business_name || "—"],
-                ["WS Status", viewItem.wholesale_status || "—"],
                 ["Status",    viewItem.is_active ? "Active" : "Inactive"],
                 ["Joined",    viewItem.date_joined ? new Date(viewItem.date_joined).toLocaleDateString() : "—"],
               ].map(([label, val]) => (

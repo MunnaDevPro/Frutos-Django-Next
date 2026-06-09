@@ -530,7 +530,19 @@ class OrderViewSet(viewsets.ModelViewSet):
                 'error': f'Failed to fetch order: {str(e)}',
                 'detail': 'There was an error retrieving the order details. Please try again.'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def perform_update(self, serializer):
+        from accounts.notifications import send_order_status_notification
         
+        # Capture the old status from the existing instance
+        old_status = serializer.instance.status
+        
+        # Save the updated instance
+        updated_instance = serializer.save()
+        
+        # Send instant notification via SSE if order status changed
+        if updated_instance.status != old_status:
+            send_order_status_notification(updated_instance)
 
     def create(self, request, *args, **kwargs):
         """

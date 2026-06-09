@@ -1,6 +1,6 @@
 "use client";
 
-import { DollarSign, ShoppingCart, Users, Package, Loader2, Store, MapPin, ToggleLeft, ToggleRight, Archive, Tag } from "lucide-react";
+import { Euro, ShoppingCart, Users, Package, Loader2, Store, MapPin, ToggleLeft, ToggleRight, Archive, Tag } from "lucide-react";
 import useSWR from "swr";
 import { AreaChart, Area, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import Container from "@/app/dashboard/_components/Container";
@@ -202,11 +202,11 @@ export default function DashboardHomePage() {
               <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="p-2 bg-green-50 text-green-600 rounded-lg">
-                    <DollarSign className="w-5 h-5" />
+                    <Euro className="w-5 h-5" />
                   </div>
                   <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Revenue</p>
                 </div>
-                <p className="text-2xl font-black text-green-600">৳{Number(stats?.total_revenue || 0).toLocaleString()}</p>
+                <p className="text-2xl font-black text-green-600">€{Number(stats?.total_revenue || 0).toLocaleString()}</p>
               </div>
             </>
         }
@@ -291,7 +291,7 @@ export default function DashboardHomePage() {
                 <YAxis tick={{ fontSize: 11, fill: '#64748b' }} stroke="#cbd5e1" axisLine={false} tickLine={false} dx={-10} />
                 <Tooltip
                   contentStyle={{ fontSize: "12px", borderRadius: "12px", border: "none", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
-                  formatter={(v, n) => [n === "revenue" ? `৳${Number(v).toLocaleString()}` : v, n === "revenue" ? "Revenue" : "Orders"]}
+                  formatter={(v, n) => [n === "revenue" ? `€${Number(v).toLocaleString()}` : v, n === "revenue" ? "Revenue" : "Orders"]}
                 />
                 <Area type="monotone" dataKey="revenue" stroke="#4f46e5" fill="url(#revGrad)" strokeWidth={3} dot={{ r: 3, fill: '#4f46e5', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
               </AreaChart>
@@ -421,7 +421,7 @@ export default function DashboardHomePage() {
                           <tr key={order.id || order.order_number} className="hover:bg-slate-50 transition-colors">
                             <td className="px-6 py-4 font-bold text-indigo-600">#{order.order_number}</td>
                             <td className="px-6 py-4 font-medium text-slate-700">{order.customer_name}</td>
-                            <td className="px-6 py-4 font-bold text-slate-800">৳{Number(order.total_amount).toLocaleString()}</td>
+                            <td className="px-6 py-4 font-bold text-slate-800">€{Number(order.total_amount).toLocaleString()}</td>
                             <td className="px-6 py-4">
                               <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full ${sc.bg} ${sc.text}`}>
                                 {order.status_display || order.status}

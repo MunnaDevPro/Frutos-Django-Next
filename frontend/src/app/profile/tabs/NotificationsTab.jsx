@@ -441,7 +441,7 @@ export default function NotificationsTab({ authFetch, initialNotifications = nul
           const orders = await res.json()
           const list   = toArray(orders)
           const match  = meta.orderNumber
-            ? list.find(o => o.orderNumber === meta.orderNumber)
+            ? list.find(o => (o.order_number || o.orderNumber) === meta.orderNumber)
             : list[0]
           if (match) setOrderCache(p => ({ ...p, [notif.id]: match }))
         } catch { /* silently fail */ }
@@ -504,22 +504,22 @@ export default function NotificationsTab({ authFetch, initialNotifications = nul
               const isFetching   = fetchingOrder[notif.id]
 
               const meta = fetchedOrder ? {
-                orderNumber:  fetchedOrder.orderNumber  || rawMeta.orderNumber,
+                orderNumber:  fetchedOrder.order_number || fetchedOrder.orderNumber  || rawMeta.orderNumber,
                 status:       fetchedOrder.status       || rawMeta.status,
-                customerName: fetchedOrder.customerName || rawMeta.customerName,
-                street:       fetchedOrder.street       || rawMeta.street,
+                customerName: fetchedOrder.customer_name || fetchedOrder.customerName || rawMeta.customerName,
+                street:       fetchedOrder.street_address || fetchedOrder.street       || rawMeta.street,
                 city:         fetchedOrder.city         || rawMeta.city,
                 postcode:     fetchedOrder.postcode     || rawMeta.postcode,
-                deliveryDate: fetchedOrder.deliveryDate || rawMeta.deliveryDate,
-                deliverySlot: fetchedOrder.deliverySlot || rawMeta.deliverySlot,
-                subtotal:     fetchedOrder.subtotal     ?? rawMeta.subtotal,
-                deliveryFee:  fetchedOrder.deliveryFee  ?? rawMeta.deliveryFee,
-                total:        fetchedOrder.total        ?? rawMeta.total,
+                deliveryDate: fetchedOrder.delivery_date || fetchedOrder.deliveryDate || rawMeta.deliveryDate,
+                deliverySlot: fetchedOrder.delivery_slot_label || fetchedOrder.deliverySlot || rawMeta.deliverySlot,
+                subtotal:     fetchedOrder.cart_subtotal ?? fetchedOrder.subtotal     ?? rawMeta.subtotal,
+                deliveryFee:  (fetchedOrder.total_amount && fetchedOrder.cart_subtotal) ? (Number(fetchedOrder.total_amount) - Number(fetchedOrder.cart_subtotal)) : (fetchedOrder.deliveryFee ?? rawMeta.deliveryFee),
+                total:        (fetchedOrder.total_amount || fetchedOrder.total) ?? rawMeta.total,
                 items: fetchedOrder.items?.map(i => ({
-                  product_name:  i.productName,
-                  product_image: i.productImage,
+                  product_name:  i.product_name || i.productName,
+                  product_image: i.product_image || i.productImage,
                   quantity:      i.quantity,
-                  unit_price:    i.unitPrice,
+                  unit_price:    i.unit_price || i.unitPrice,
                 })) || rawMeta.items,
               } : rawMeta
 

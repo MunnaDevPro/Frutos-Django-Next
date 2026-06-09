@@ -33,13 +33,23 @@ def send_order_status_notification(order):
     status_key = order.status  # e.g. 'SHIPPED'
     title_tpl, msg_tpl = STATUS_MESSAGES.get(
         status_key,
-        ('Order Update 📦', 'Your order {order_number} status has been updated to {status}.'),
+        ('Order Update ', 'Your order {order_number} status has been updated to {status}.'),
     )
 
     ctx = {
         'order_number': order.order_number,
         'status':       order.get_status_display(),
     }
+    
+    # Map status to material symbols
+    status_icons = {
+        'PENDING':    'shopping_bag',
+        'PROCESSING': 'inventory_2',
+        'SHIPPED':    'local_shipping',
+        'DELIVERED':  'check_circle',
+        'CANCELLED':  'cancel',
+    }
+    icon_name = status_icons.get(status_key, 'local_shipping')
 
     try:
         Notification.objects.create(
@@ -51,6 +61,7 @@ def send_order_status_notification(order):
                 'orderNumber': order.order_number,
                 'status':      order.status,
                 'total':       str(order.total_amount),
+                'icon':        icon_name,
             },
         )
         logger.info(

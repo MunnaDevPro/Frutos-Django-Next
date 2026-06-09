@@ -1,6 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from . import views
+from products.views import WishlistListCreateView, WishlistItemDeleteView, WishlistClearView
 
 urlpatterns = [
     # ── Auth ──────────────────────────────────────────────────────────────────
@@ -31,6 +32,12 @@ urlpatterns = [
 
 
 
+    path('wishlist/',                    WishlistListCreateView.as_view(),   name='wishlist-list-create'),
+    path('wishlist/<uuid:product_id>/',  WishlistItemDeleteView.as_view(),   name='wishlist-item-delete'),
+    path('wishlist/clear/',              WishlistClearView.as_view(),        name='wishlist-clear'),
+
+
+
     path('password-reset/send-otp/', views.SendPasswordResetOTPView.as_view(),       name='password-reset-send-otp'),
     path('password-reset/verify/',   views.VerifyOTPAndResetPasswordView.as_view(),  name='password-reset-verify'),
 
@@ -39,6 +46,6 @@ urlpatterns = [
     # Admin user management
     path('admin/users/',         views.AdminUserListView.as_view(),   name='admin-user-list'),
     path('admin/users/create/',  views.AdminUserCreateView.as_view(), name='admin-user-create'),
-    path('admin/users/<int:pk>/', views.AdminUserDetailView.as_view(), name='admin-user-detail'),
+    path('admin/users/<str:pk>/', views.AdminUserDetailView.as_view(), name='admin-user-detail'),
 
     path('dashboard/admin/', views.AdminDashboardStatsView.as_view(), name='admin-dashboard-stats'),]

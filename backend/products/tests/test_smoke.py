@@ -44,8 +44,8 @@ class WishlistSmokeTest(APITestCase):
         self.assertEqual(len(data), 1)
 
         # remove item
-        pk = data[0]['id']
-        r = self.client.delete(f"/api/auth/wishlist/{pk}/")
+        product_id = data[0]['product']['id']
+        r = self.client.delete(f"/api/auth/wishlist/{product_id}/")
         self.assertIn(r.status_code, (204, 200))
 
         # clear (should be idempotent)

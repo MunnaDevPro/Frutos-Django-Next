@@ -123,7 +123,7 @@ export default function AddressesTab({ authFetch, initialAddresses = null }) {
           </label>
           <div className="flex gap-3">
             <button type="submit" className="cursor-pointer flex-1 py-2.5 rounded-xl font-bold text-sm text-white" style={{ background: '#00694C' }}>Save Address</button>
-            <button type="button" onClick={() => setShowForm(false)} className="px-5 py-2.5 rounded-xl font-bold text-sm" style={{ background: '#f0f4f0', color: '#6d7a73' }}>Cancel</button>
+            <button type="button" onClick={() => setShowForm(false)} className="cursor-pointer px-5 py-2.5 rounded-xl font-bold text-sm" style={{ background: '#f0f4f0', color: '#6d7a73' }}>Cancel</button>
           </div>
         </form>
       )}

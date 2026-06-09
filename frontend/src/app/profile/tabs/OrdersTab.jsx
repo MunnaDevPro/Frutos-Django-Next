@@ -57,7 +57,7 @@
 //           <div key={order.id} className="rounded-2xl overflow-hidden"
 //             style={{ border: `1.5px solid ${isOpen ? '#00694C40' : '#eaeaea'}`, background: '#fff' }}>
 
-//             <button onClick={() => setExpanded(isOpen ? null : order.id)} className="w-full text-left"
+//             <button onClick={() => setExpanded(isOpen ? null : order.id)} className="cursor-pointer w-full text-left"
 //               style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
 //               <div className="flex items-center justify-between p-4 md:p-5"
 //                 style={{ background: isOpen ? '#F0FAF5' : '#f8fbf8', borderBottom: isOpen ? '1px solid #e0eee8' : 'none' }}>
@@ -409,7 +409,7 @@ export default function OrdersTab({ authFetch, initialOrders = null, onDeleteOrd
               style={{ border: `1.5px solid ${isOpen ? '#00694C40' : '#eaeaea'}`, background: '#fff' }}>
 
               {/* ── Accordion header ── */}
-              <button onClick={() => setExpanded(isOpen ? null : order.id)} className="w-full text-left"
+              <button onClick={() => setExpanded(isOpen ? null : order.id)} className="cursor-pointer w-full text-left"
                 style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
                 <div className="flex items-center justify-between p-4 md:p-5"
                   style={{ background: isOpen ? '#F0FAF5' : '#f8fbf8', borderBottom: isOpen ? '1px solid #e0eee8' : 'none' }}>

@@ -33,8 +33,8 @@ const columns = [
     </div>
   )},
   { key: "name",           label: "Name" },
-  { key: "price",          label: "Price",      render: (v) => `৳${Number(v).toLocaleString()}` },
-  { key: "discount_price", label: "Sale Price",  render: (v) => v ? `৳${Number(v).toLocaleString()}` : "—" },
+  { key: "price",          label: "Price",      render: (v) => `€${Number(v).toLocaleString()}` },
+  { key: "discount_price", label: "Sale Price",  render: (v) => v ? `€${Number(v).toLocaleString()}` : "—" },
   { key: "stock",          label: "Stock" },
   { key: "shop",           label: "Shop",       render: (v) => v?.name || "—" },
   { key: "category",       label: "Category",   render: (v) => v?.name || "—" },
@@ -350,17 +350,17 @@ function ProductForm({
         <div className="space-y-3">
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className={labelCls}>Price (৳) <span className="text-red-500">*</span></label>
+              <label className={labelCls}>Price (€) <span className="text-red-500">*</span></label>
               <input required type="number" step="0.01" min="0" className={inputCls}
                 value={form.price} onChange={e => handleChange("price", e.target.value)} placeholder="0.00" />
             </div>
             <div>
-              <label className={labelCls}>Sale Price (৳)</label>
+              <label className={labelCls}>Sale Price (€)</label>
               <input type="number" step="0.01" min="0" className={inputCls}
                 value={form.discount_price || ""} onChange={e => handleChange("discount_price", e.target.value)} placeholder="0.00" />
             </div>
             <div>
-              <label className={labelCls}>Wholesale Price (৳)</label>
+              <label className={labelCls}>Wholesale Price (€)</label>
               <input type="number" step="0.01" min="0" className={inputCls}
                 value={form.wholesale_price || ""} onChange={e => handleChange("wholesale_price", e.target.value)} placeholder="0.00" />
             </div>
@@ -642,9 +642,9 @@ function ProductView({ item }) {
 
       <div>
         <h4 className="text-xs font-medium uppercase tracking-wider text-slate-400 mb-2">Pricing & Inventory</h4>
-        <Row label="Price"          value={`৳${Number(item.price).toLocaleString()}`} />
-        <Row label="Sale Price"     value={item.discount_price  ? `৳${Number(item.discount_price).toLocaleString()}`  : "—"} />
-        <Row label="Wholesale Price"value={item.wholesale_price ? `৳${Number(item.wholesale_price).toLocaleString()}` : "—"} />
+        <Row label="Price"          value={`€${Number(item.price).toLocaleString()}`} />
+        <Row label="Sale Price"     value={item.discount_price  ? `€${Number(item.discount_price).toLocaleString()}`  : "—"} />
+        <Row label="Wholesale Price"value={item.wholesale_price ? `€${Number(item.wholesale_price).toLocaleString()}` : "—"} />
         <Row label="Min Purchase"   value={item.minimum_purchase || "—"} />
         <Row label="Commission %"   value={item.affiliate_commission_rate || "—"} />
         <Row label="Stock"          value={item.stock} />

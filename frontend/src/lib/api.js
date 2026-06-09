@@ -290,7 +290,7 @@ export async function deleteWholesaleNotification(accessToken, id) {
 }
 
 export async function getWholesaleOrders(accessToken) {
-    const res = await fetch(`${API_BASE}/orders/my-orders/`, {
+    const res = await fetch(`${API_BASE}/orders/`, {
         headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
         cache: 'no-store',
     })

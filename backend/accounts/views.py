@@ -265,6 +265,8 @@ def notification_stream(request):
         )
         tick = 0
         while True:
+            from django.db import close_old_connections
+            close_old_connections()
             new_notifs = (
                 Notification.objects
                 .filter(user=user)
@@ -714,9 +716,9 @@ class AdminUserListView(APIView):
                     Q(business_name__icontains=search) |
                     Q(contact_name__icontains=search)
                 )
-            for i, u in enumerate(ws_qs, start=1):
+            for u in ws_qs:
                 ws_data.append({
-                    'id':               f'ws_{i}',
+                    'id':               f'ws_{u.id}',
                     'name':             u.contact_name or u.email,
                     'email':            u.email,
                     'user_type':        'WHOLESALE',
@@ -768,10 +770,33 @@ class AdminUserListView(APIView):
 class AdminUserDetailView(generics.RetrieveUpdateDestroyAPIView):
     """GET/PATCH/DELETE /api/auth/admin/users/<id>/"""
     permission_classes = [permissions.IsAdminUser]
-    queryset           = User.objects.all()
+
+    def get_object(self):
+        pk = str(self.kwargs.get('pk'))
+        if pk.startswith('ws_'):
+            from wholesale.models import WholesaleUser
+            from rest_framework.generics import get_object_or_404
+            real_id = pk.replace('ws_', '')
+            return get_object_or_404(WholesaleUser, pk=real_id)
+        
+        from rest_framework.generics import get_object_or_404
+        return get_object_or_404(User, pk=pk)
 
     def retrieve(self, request, *args, **kwargs):
         u = self.get_object()
+        
+        from wholesale.models import WholesaleUser
+        if isinstance(u, WholesaleUser):
+            return Response({
+                'id':               f'ws_{u.id}',
+                'name':             u.contact_name or u.email,
+                'email':            u.email,
+                'user_type':        'WHOLESALE',
+                'is_active':        u.is_active,
+                'date_joined':      u.applied_at,
+                'wholesale_status': u.status,
+            })
+
         ws_status = None
         if getattr(u, 'user_type', None) == 'WHOLESALER':
             try:
@@ -791,6 +816,17 @@ class AdminUserDetailView(generics.RetrieveUpdateDestroyAPIView):
     def partial_update(self, request, *args, **kwargs):
         u    = self.get_object()
         data = request.data
+
+        from wholesale.models import WholesaleUser
+        if isinstance(u, WholesaleUser):
+            if 'name' in data:
+                u.contact_name = data['name']
+            if 'is_active' in data:
+                u.is_active = data['is_active'] in [True, 'true', '1']
+            if 'wholesale_status' in data:
+                u.status = data['wholesale_status']
+            u.save()
+            return Response({'success': True})
 
         if 'name' in data:
             u.name = data['name']

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { Printer, Download, ArrowLeft, Loader2, FileText, Receipt } from "lucide-react";
@@ -44,10 +44,10 @@ function POSInvoice({ order, items, subtotal, total, shipping, storeName, logoUr
               </div>
               <div className="flex justify-between text-slate-500 text-[10px]">
                 <span>
-                  {item.quantity} x ৳{Number(item.unit_price).toLocaleString()}
+                  {item.quantity} x €{Number(item.unit_price).toLocaleString()}
                   {(item.color_name || item.size_name) && ` (${[item.color_name, item.size_name].filter(Boolean).join("/")})`}
                 </span>
-                <span className="text-slate-800 font-medium">৳{(item.quantity * Number(item.unit_price)).toLocaleString()}</span>
+                <span className="text-slate-800 font-medium">€{(item.quantity * Number(item.unit_price)).toLocaleString()}</span>
               </div>
             </div>
           ))}
@@ -59,15 +59,15 @@ function POSInvoice({ order, items, subtotal, total, shipping, storeName, logoUr
         {/* Totals */}
         <div className="text-[11px] space-y-0.5">
           <div className="flex justify-between text-slate-600">
-            <span>Subtotal</span><span>৳{subtotal.toLocaleString()}</span>
+            <span>Subtotal</span><span>€{subtotal.toLocaleString()}</span>
           </div>
           {shipping > 0 && (
             <div className="flex justify-between text-slate-600">
-              <span>Shipping</span><span>৳{shipping.toLocaleString()}</span>
+              <span>Shipping</span><span>€{shipping.toLocaleString()}</span>
             </div>
           )}
           <div className="flex justify-between font-bold text-sm text-slate-800 pt-1 border-t border-dashed border-gray-300 mt-1">
-            <span>TOTAL</span><span>৳{total.toLocaleString()}</span>
+            <span>TOTAL</span><span>€{total.toLocaleString()}</span>
           </div>
         </div>
 
@@ -154,8 +154,8 @@ function A4Invoice({ order, items, subtotal, total, shipping, storeName, logoUrl
                 <td className="py-3 text-slate-800">{item.product_name || `Product #${item.product}`}</td>
                 <td className="py-3 text-slate-500 text-xs">{[item.color_name, item.size_name].filter(Boolean).join(" / ") || "—"}</td>
                 <td className="py-3 text-center text-slate-600">{item.quantity}</td>
-                <td className="py-3 text-right text-slate-600">৳{Number(item.unit_price).toLocaleString()}</td>
-                <td className="py-3 text-right font-medium text-slate-800">৳{(item.quantity * Number(item.unit_price)).toLocaleString()}</td>
+                <td className="py-3 text-right text-slate-600">€{Number(item.unit_price).toLocaleString()}</td>
+                <td className="py-3 text-right font-medium text-slate-800">€{(item.quantity * Number(item.unit_price)).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
@@ -166,17 +166,17 @@ function A4Invoice({ order, items, subtotal, total, shipping, storeName, logoUrl
           <div className="w-64 space-y-1.5">
             <div className="flex justify-between text-sm">
               <span className="text-slate-500">Subtotal</span>
-              <span className="text-slate-800">৳{subtotal.toLocaleString()}</span>
+              <span className="text-slate-800">€{subtotal.toLocaleString()}</span>
             </div>
             {shipping > 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-slate-500">Shipping</span>
-                <span className="text-slate-800">৳{shipping.toLocaleString()}</span>
+                <span className="text-slate-800">€{shipping.toLocaleString()}</span>
               </div>
             )}
             <div className="flex justify-between text-sm font-semibold pt-2 border-t border-slate-200">
               <span className="text-slate-800">Total</span>
-              <span className="text-slate-800">৳{total.toLocaleString()}</span>
+              <span className="text-slate-800">€{total.toLocaleString()}</span>
             </div>
           </div>
         </div>

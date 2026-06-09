@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { Plus, Pencil, Trash2, Ticket, Truck } from "lucide-react";
@@ -126,7 +126,7 @@ function CouponForm({ initial = {}, onSubmit, submitLabel = "Save" }) {
           <label className={lbl}>Discount Type *</label>
           <div className="flex gap-2">
             <button type="button" className={v.discount_type === "PERCENT" ? btnActive : btnInactive} onClick={() => set("discount_type", "PERCENT")}>% Percentage</button>
-            <button type="button" className={v.discount_type === "FLAT"    ? btnActive : btnInactive} onClick={() => set("discount_type", "FLAT")}>৳ Flat Amount</button>
+            <button type="button" className={v.discount_type === "FLAT"    ? btnActive : btnInactive} onClick={() => set("discount_type", "FLAT")}>€ Flat Amount</button>
           </div>
         </div>
 
@@ -134,7 +134,7 @@ function CouponForm({ initial = {}, onSubmit, submitLabel = "Save" }) {
         {v.discount_type === "PERCENT" ? (
           <div><label className={lbl}>Discount % *</label><input required type="number" min="0" max="100" step="0.01" className={inp} value={v.discount_percent} onChange={e => set("discount_percent", e.target.value)} placeholder="e.g., 20" /></div>
         ) : (
-          <div><label className={lbl}>Flat Discount Amount (৳) *</label><input required type="number" min="0" step="0.01" className={inp} value={v.discount_amount} onChange={e => set("discount_amount", e.target.value)} placeholder="e.g., 50" /></div>
+          <div><label className={lbl}>Flat Discount Amount (€) *</label><input required type="number" min="0" step="0.01" className={inp} value={v.discount_amount} onChange={e => set("discount_amount", e.target.value)} placeholder="e.g., 50" /></div>
         )}
 
         {/* Min quantity + usage limit */}
@@ -143,7 +143,7 @@ function CouponForm({ initial = {}, onSubmit, submitLabel = "Save" }) {
 
         {/* Min cart total — only for CART_TOTAL_DISCOUNT */}
         {v.type === "CART_TOTAL_DISCOUNT" && (
-          <div><label className={lbl}>Min Cart Total (৳)</label><input type="number" min="0" step="0.01" className={inp} value={v.min_cart_total || ""} onChange={e => set("min_cart_total", e.target.value)} placeholder="0.00" /></div>
+          <div><label className={lbl}>Min Cart Total (€)</label><input type="number" min="0" step="0.01" className={inp} value={v.min_cart_total || ""} onChange={e => set("min_cart_total", e.target.value)} placeholder="0.00" /></div>
         )}
 
         {/* Status + dates */}
@@ -208,8 +208,8 @@ function FreeShippingForm({ initial = {}, onSubmit, submitLabel = "Save" }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div><label className={lbl}>Rule Name</label><input className={inp} value={name} onChange={e => setName(e.target.value)} placeholder="e.g., Free shipping over ৳500" /></div>
-        <div><label className={lbl}>Threshold Amount (৳) *</label><input required type="number" min="0" step="0.01" className={inp} value={threshold} onChange={e => setThreshold(e.target.value)} placeholder="e.g., 500" /></div>
+        <div><label className={lbl}>Rule Name</label><input className={inp} value={name} onChange={e => setName(e.target.value)} placeholder="e.g., Free shipping over €500" /></div>
+        <div><label className={lbl}>Threshold Amount (€) *</label><input required type="number" min="0" step="0.01" className={inp} value={threshold} onChange={e => setThreshold(e.target.value)} placeholder="e.g., 500" /></div>
         <div>
           <label className={lbl}>Status</label>
           <SearchableSelect
@@ -259,7 +259,7 @@ export default function CouponsPage() {
     { key: "type_display", label: "Type" },
     { key: "discount_percent", label: "Discount", render: (v, row) => (
       <span className="font-medium text-green-600">
-        {row.discount_type === "FLAT" ? `৳${parseFloat(row.discount_amount).toFixed(2)}` : `${v}%`}
+        {row.discount_type === "FLAT" ? `€${parseFloat(row.discount_amount).toFixed(2)}` : `${v}%`}
       </span>
     )},
     { key: "usage_limit", label: "Usage", render: (v, row) => v != null ? <span className="text-xs">{row.used_count}/{v}</span> : <span className="text-xs text-slate-400">Unlimited</span> },
@@ -271,7 +271,7 @@ export default function CouponsPage() {
 
   const freeShippingColumns = [
     { key: "name", label: "Name", render: (v) => v || <span className="text-slate-400 text-xs">Unnamed</span> },
-    { key: "threshold_amount", label: "Threshold (৳)", render: (v) => <span className="font-medium">৳{parseFloat(v).toLocaleString()}</span> },
+    { key: "threshold_amount", label: "Threshold (€)", render: (v) => <span className="font-medium">€{parseFloat(v).toLocaleString()}</span> },
     { key: "applicable_categories", label: "Categories", render: (v) => v?.length ? v.map(c => c.name).join(", ") : <span className="text-slate-400 text-xs">All categories</span> },
     { key: "active", label: "Status", render: (v) => <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${v ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"}`}>{v ? "Active" : "Inactive"}</span> },
     { key: "created_at", label: "Created", render: formatDate },

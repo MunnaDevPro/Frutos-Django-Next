@@ -91,6 +91,8 @@ class Notification(models.Model):
 
     @property
     def icon(self):
+        if isinstance(self.metadata, dict) and 'icon' in self.metadata:
+            return self.metadata['icon']
         return {
             'order_update':  'local_shipping',
             'promo':         'local_offer',

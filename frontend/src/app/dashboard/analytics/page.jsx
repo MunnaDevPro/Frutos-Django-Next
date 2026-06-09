@@ -1,4 +1,4 @@
-﻿// "use client";
+// "use client";
 
 // import {
 //   BarChart, Bar, PieChart, Pie, Cell,
@@ -599,9 +599,9 @@ export default function AnalyticsPage() {
 
       {/* KPI Row 1 */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <KpiCard label="Total Revenue" value={`à§³${totalRevenue.toLocaleString()}`} icon={DollarSign} color="emerald" sub="all time" />
+        <KpiCard label="Total Revenue" value={`€${totalRevenue.toLocaleString()}`} icon={DollarSign} color="emerald" sub="all time" />
         <KpiCard label="Total Orders" value={totalOrders.toLocaleString()} icon={ShoppingCart} color="blue" sub={`${pendingCount} pending`} />
-        <KpiCard label="Avg Order Value" value={`à§³${avgOrderValue.toLocaleString()}`} icon={TrendingUp} color="indigo" sub="per order" />
+        <KpiCard label="Avg Order Value" value={`€${avgOrderValue.toLocaleString()}`} icon={TrendingUp} color="indigo" sub="per order" />
         <KpiCard label="Delivery Rate" value={`${deliveryRate}%`} icon={CheckCircle} color="emerald" sub={`${deliveredCount} delivered`} />
         <KpiCard label="Total Users" value={totalUsers.toLocaleString()} icon={Users} color="violet" sub={`${stats?.total_customers || 0} customers`} />
         <KpiCard label="Products" value={totalProducts.toLocaleString()} icon={Package} color="amber" sub="listed" />
@@ -609,7 +609,7 @@ export default function AnalyticsPage() {
 
       {/* Charts Row 1: Revenue + Daily Orders */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <ChartCard title="Monthly Revenue (à§³)">
+        <ChartCard title="Monthly Revenue (€)">
           <div className="h-56">
             {monthlyData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -623,7 +623,7 @@ export default function AnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} stroke="#9ca3af" />
                   <YAxis tick={{ fontSize: 11 }} stroke="#9ca3af" />
-                  <Tooltip content={<CustomTooltip prefix="à§³" />} />
+                  <Tooltip content={<CustomTooltip prefix="€" />} />
                   <Area type="monotone" dataKey="revenue" name="Revenue" stroke="#4f46e5" fill="url(#revGrad)" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
                 </AreaChart>
               </ResponsiveContainer>
@@ -881,10 +881,10 @@ export default function AnalyticsPage() {
              <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
                {allOffers.length === 0 ? (
                  <p className="text-xs text-slate-400 py-4">No offers available</p>
-               ) : allOffers.slice(0, 4).map(offer => (
+               ) : [...allOffers].sort((a, b) => (b.items?.length || 0) - (a.items?.length || 0)).slice(0, 4).map(offer => (
                  <div key={offer.id || offer.slug} className="flex items-center gap-3 p-2 rounded-lg border border-slate-100 bg-slate-50/50">
-                   {offer.image ? (
-                     <img src={offer.image} alt={offer.title} className="w-8 h-8 rounded-md object-cover flex-shrink-0" />
+                   {offer.banner_image_url || offer.banner_image ? (
+                     <img src={offer.banner_image_url || offer.banner_image} alt={offer.title} className="w-8 h-8 rounded-md object-cover flex-shrink-0" />
                    ) : (
                      <div className="w-8 h-8 rounded-md bg-gray-200 flex items-center justify-center flex-shrink-0">
                        <Tag className="w-3 h-3 text-slate-400" />
@@ -892,7 +892,7 @@ export default function AnalyticsPage() {
                    )}
                    <div className="flex-1 min-w-0">
                      <p className="text-xs font-medium text-slate-800 truncate">{offer.title}</p>
-                     <p className="text-[10px] text-slate-500">{offer.discount_percentage ? `${offer.discount_percentage}% OFF` : 'Offer'}</p>
+                     <p className="text-[10px] text-slate-500">{offer.items?.length || 0} Products</p>
                    </div>
                    <span className={`flex-shrink-0 w-2 h-2 rounded-full ${offer.is_active !== false ? 'bg-emerald-400' : 'bg-gray-400'}`} />
                  </div>
@@ -919,7 +919,7 @@ export default function AnalyticsPage() {
                </div>
                <div className="bg-blue-50 border border-blue-100 rounded-lg p-3">
                   <p className="text-xs text-blue-600 font-medium">Pack Revenue</p>
-                  <p className="text-2xl font-bold text-blue-700 mt-1">à§³{leftoverPackRevenue.toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-blue-700 mt-1">€{leftoverPackRevenue.toLocaleString()}</p>
                </div>
              </div>
              
@@ -997,7 +997,7 @@ export default function AnalyticsPage() {
                     <tr key={product.id || i} className="border-b border-gray-50 last:border-0 hover:bg-slate-50 transition-colors">
                       <td className="px-4 py-2.5 text-xs text-slate-400">{i + 1}</td>
                       <td className="px-4 py-2.5 font-medium text-slate-800 max-w-[200px] truncate">{product.name}</td>
-                      <td className="px-4 py-2.5 text-slate-700">à§³{Number(product.price || 0).toLocaleString()}</td>
+                      <td className="px-4 py-2.5 text-slate-700">€{Number(product.price || 0).toLocaleString()}</td>
                       <td className="px-4 py-2.5 text-slate-700 font-medium">{product.stock ?? "â€”"}</td>
                       <td className="px-4 py-2.5">
                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${product.is_active !== false ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>

@@ -425,6 +425,7 @@ export default function WholesaleModal({ isOpen, onClose }) {
         setServerError('Invalid email or password. Please try again.')
       } else {
         onClose()
+        window.location.href = '/wholesale/profile'
       }
     } catch {
       setServerError('Login failed. Please try again.')
@@ -730,7 +731,7 @@ export default function WholesaleModal({ isOpen, onClose }) {
                   </div>
                 ))}
               </div>
-              <button onClick={onClose} className="ws-btn">Done</button>
+              <button onClick={() => { onClose(); window.location.href = '/wholesale/profile'; }} className="ws-btn">Done</button>
             </div>
           )}
         </div>

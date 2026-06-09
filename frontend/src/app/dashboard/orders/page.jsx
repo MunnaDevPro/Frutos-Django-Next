@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -40,8 +40,7 @@ const columns = [
   { key: "order_number", label: "Order #" },
   { key: "customer_name", label: "Customer" },
   { key: "customer_email", label: "Email" },
-  { key: "total_amount", label: "Total", render: (v) => `৳${Number(v || 0).toLocaleString()}` },
-  { key: "cart_subtotal", label: "Subtotal", render: (v) => v ? `৳${Number(v).toLocaleString()}` : "—" },
+  { key: "total_amount", label: "Total", render: (v) => `€${Number(v || 0).toLocaleString()}` },
   { key: "status", label: "Status", render: (v) => <StatusBadge value={v} /> },
   { key: "payment_status", label: "Payment", render: (v) => <StatusBadge value={v} /> },
   { key: "ordered_at", label: "Date", render: (v) => v ? new Date(v).toLocaleDateString() : "—" },
@@ -251,8 +250,8 @@ export default function OrdersPage() {
                             {[item.color_name, item.size_name].filter(Boolean).join(" / ") || "—"}
                           </td>
                           <td className="px-3 py-2 text-center text-slate-600">{item.quantity}</td>
-                          <td className="px-3 py-2 text-right text-slate-600">৳{Number(item.unit_price).toLocaleString()}</td>
-                          <td className="px-3 py-2 text-right font-medium text-slate-800">৳{(item.quantity * Number(item.unit_price)).toLocaleString()}</td>
+                          <td className="px-3 py-2 text-right text-slate-600">€{Number(item.unit_price).toLocaleString()}</td>
+                          <td className="px-3 py-2 text-right font-medium text-slate-800">€{(item.quantity * Number(item.unit_price)).toLocaleString()}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -264,13 +263,9 @@ export default function OrdersPage() {
             {/* Totals */}
             <div>
               <h4 className="text-xs font-medium uppercase tracking-wider text-slate-400 mb-2">Totals</h4>
-              <div className="flex justify-between py-1.5 border-b border-slate-100">
-                <span className="text-sm text-slate-500">Subtotal</span>
-                <span className="text-sm text-slate-800">৳{Number(viewItem.cart_subtotal || 0).toLocaleString()}</span>
-              </div>
               <div className="flex justify-between py-1.5 font-semibold">
                 <span className="text-sm text-slate-800">Total</span>
-                <span className="text-sm text-slate-800">৳{Number(viewItem.total_amount).toLocaleString()}</span>
+                <span className="text-sm text-slate-800">€{Number(viewItem.total_amount).toLocaleString()}</span>
               </div>
             </div>
 
