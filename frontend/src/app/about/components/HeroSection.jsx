@@ -7,19 +7,31 @@ export default function HeroSection({ data }) {
   return (
     <section style={{ background: '#fff', borderBottom: '1px solid rgba(188,202,193,0.2)' }}>
       <style>{`
-        .hero-inner { display: flex; align-items: center; gap: 48px; }
-        .hero-text  { flex: 1; min-width: 0; }
-        .hero-img-wrap { display: none; }
-        @media (min-width: 1024px) {
+        .hero-inner { display: flex; flex-direction: column; align-items: center; gap: 40px; }
+        .hero-text  { flex: 1; min-width: 0; width: 100%; }
+        .hero-img-wrap { 
+          display: none; 
+          width: 100%; 
+          height: 250px; 
+          position: relative; 
+          border-radius: 20px; 
+          flex-shrink: 0;
+        }
+        
+        @media (min-width: 768px) {
+          .hero-inner { flex-direction: row; gap: 48px; }
           .hero-img-wrap {
             display: block;
+            flex: 0 0 350px;
+            height: 300px;
+          }
+        }
+        
+        @media (min-width: 1024px) {
+          .hero-img-wrap {
             flex: 0 0 420px;
             width: 500px;
             height: 350px;
-            position: relative;
-            border-radius: 20px;
-            // overflow: hidden;
-            flex-shrink: 0;
           }
         }
       `}</style>

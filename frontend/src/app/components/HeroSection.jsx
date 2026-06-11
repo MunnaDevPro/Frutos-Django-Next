@@ -57,31 +57,31 @@ export default function HeroSection({ hero }) {
         </div>
       </div>
 
-      {/* ── DESKTOP Hero ─────────────────────────────────────────────────── */}
-      <div className="hidden md:block max-w-[1280px] mx-auto px-6 lg:px-10 pb-14 md:pb-15">
-        <div className="flex items-center justify-between gap-10">
-          <div className="max-w-[600px] flex-shrink-0">
+      {/* ── DESKTOP & TABLET Hero ────────────────────────────────────────── */}
+      <div className="hidden md:block max-w-[1280px] mx-auto px-6 lg:px-10 pb-10 md:pb-14 lg:pb-15 pt-6 md:pt-10">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8 lg:gap-10">
+          <div className="w-full md:max-w-[50%] lg:max-w-[600px] flex-shrink-0 text-center md:text-left">
             <h1
-              className="text-[#151E13] mb-5"
+              className="text-[#151E13] mb-4 md:mb-5"
               style={{
                 fontFamily: '"Playfair Display", Georgia, serif',
-                fontSize: 'clamp(2.6rem, 4.2vw, 3rem)', fontWeight: 650,
-                lineHeight: 1, textShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+                fontSize: 'clamp(2.2rem, 3.8vw, 3rem)', fontWeight: 650,
+                lineHeight: 1.1, textShadow: '0px 4px 4px rgba(0, 0, 0, 0.15)',
               }}
             >
               {hero.desktop_heading}
             </h1>
             <p
-              className="text-[#3D4943] mb-9"
-              style={{ fontSize: '15.5px', lineHeight: 1.52, maxWidth: '430px' }}
+              className="text-[#3D4943] mb-7 md:mb-9 mx-auto md:mx-0"
+              style={{ fontSize: 'clamp(14px, 1.5vw, 15.5px)', lineHeight: 1.52, maxWidth: '430px' }}
             >
               {hero.desktop_subtext}
             </p>
-            <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="flex items-center justify-center md:justify-start gap-3 flex-wrap">
               <Link
                 href={hero.primary_cta_href}
                 className="inline-flex items-center justify-center bg-[#00694C] text-white font-semibold rounded-[8px] hover:bg-[#085041] transition-all duration-200 hover:-translate-y-0.5"
-                style={{ fontSize: '14px', padding: '13px 30px', boxShadow: '0 4px 18px rgba(0,105,76,0.28)' }}
+                style={{ fontSize: '14px', padding: '12px 24px', boxShadow: '0 4px 18px rgba(0,105,76,0.28)' }}
               >
                 {hero.primary_cta_text}
               </Link>
@@ -89,21 +89,20 @@ export default function HeroSection({ hero }) {
                 href={hero.secondary_cta_href}
                 className="inline-flex items-center justify-center font-semibold rounded-[8px] hover:text-[var(--logo-color)] transition-all duration-200"
                 style={{
-                  fontSize: '14px', padding: '12px 30px',
+                  fontSize: '14px', padding: '11px 24px',
                   borderColor: '#ECF7E4', borderWidth: '3px', borderStyle: 'solid',
-                  color: 'var(--common-color)', boxShadow: '0 8px 12px -4px rgba(0, 0, 0, 0.1)',
+                  color: 'var(--common-color)', boxShadow: '0 4px 8px -2px rgba(0, 0, 0, 0.05)',
                 }}
               >
                 {hero.secondary_cta_text}
               </Link>
             </div>
           </div>
-          <div className="flex-1">
+          <div className="w-full md:flex-1 mt-8 md:mt-0 flex justify-center">
             <img
               src={hero.desktop_image_url}
               alt="Fresh produce"
-              className="w-full h-auto object-contain"
-              style={{ maxHeight: '480px' }}
+              className="w-full h-auto object-contain max-h-[350px] md:max-h-[420px] lg:max-h-[480px]"
             />
           </div>
         </div>

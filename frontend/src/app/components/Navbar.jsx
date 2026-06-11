@@ -307,21 +307,20 @@ useEffect(() => {
   return (
     <>
       <header className="sticky top-0 z-50 bg-[#FAFAF8] backdrop-blur-sm border-b border-[#BCCAC1]/35">
-        <nav className="max-w-[1280px] mx-auto px-6 lg:px-10 h-[60px] flex items-center gap-6">
+        <nav className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 h-[60px] flex items-center justify-between md:justify-start md:gap-6">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-[4px] shrink-0 mr-2">
+          <Link href="/" className="flex items-center gap-[4px] shrink-0 mr-2 md:mr-0">
               <Image
                   src={navbarLogoUrl || '/el-erbol-logo.png'}
                   alt={`${brandName} logo`}
                   width={45}
                   height={50}
                   priority
-                  className="object-contain"
+                  className="object-contain w-[35px] md:w-[45px] h-auto"
               />
-              <span style={{
+              <span className="text-[18px] md:text-[22px]" style={{
                   fontFamily: '"Playfair Display", Georgia, serif',
-                  fontSize: '22px',
                   fontWeight: 700,
                   letterSpacing: '-0.01em',
                   color: '#085041'
@@ -331,14 +330,14 @@ useEffect(() => {
           </Link>
 
           {/* Desktop nav links */}
-          <ul className={`${newsreader.className} hidden md:flex items-center gap-7`}>
+          <ul className={`${newsreader.className} hidden md:flex items-center gap-4 lg:gap-7`}>
             {navLinks.map(({ label, href }) => {
               const active = isActive(href)
               return (
                 <li key={label}>
                   <Link href={href}
                     style={{ fontSize: '16px', lineHeight: '20px', fontWeight: active ? 600 : 400, color: active ? '#085041' : '#475569', borderBottom: active ? '2px solid #1D9E75' : '2px solid transparent', paddingBottom: '2px', transition: 'color 0.15s, border-color 0.15s' }}
-                    className="hover:text-[#151E13]">
+                    className="hover:text-[#151E13] whitespace-nowrap">
                     {label}
                   </Link>
                 </li>
@@ -347,10 +346,10 @@ useEffect(() => {
           </ul>
 
           {/* Desktop right */}
-          <div className="hidden md:flex items-center gap-[8px] ml-auto">
+          <div className="hidden md:flex items-center gap-[4px] lg:gap-[8px] ml-auto">
 
             {/* Search */}
-            <div className="relative">
+            <div className="relative hidden lg:block">
               <label className="flex items-center gap-[7px] bg-[#ECF7E4] rounded-full px-[14px] py-[8px] w-[215px] cursor-text">
                 <svg width="14" height="14" fill="none" stroke="#6D7A73" strokeWidth="2" viewBox="0 0 24 24">
                   <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -425,6 +424,16 @@ useEffect(() => {
               )}
             </div>
 
+            {/* Tablet Search Icon */}
+            <button onClick={() => { setMobileSearchOpen(v => !v); setOpen(false) }}
+              className="hidden md:flex lg:hidden w-9 h-9 items-center justify-center rounded-full transition-colors"
+              style={{ backgroundColor: mobileSearchOpen ? '#ECF7E4' : 'transparent' }} aria-label="Search">
+              {mobileSearchOpen
+                ? <svg width="17" height="17" fill="none" stroke="#151E13" strokeWidth="2.2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                : <svg width="19" height="19" fill="none" stroke="#151E13" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              }
+            </button>
+
             {/* ── Bell with unread badge ── */}
             <button onClick={handleBellClick}
               className="w-9 cursor-pointer h-9 flex items-center justify-center rounded-full hover:bg-[#BCCAC1]/25 transition-colors relative">
@@ -458,8 +467,8 @@ useEffect(() => {
                   </Link>
                 ) : (
                   <>
-                    <button onClick={openLogin} style={{ fontSize: '13.5px', fontWeight: 500, color: '#00694C' }}
-                      className="ml-5 px-3 py-1.5 rounded-lg border border-[#00694C]/40 hover:text-[#151E13] transition-colors bg-transparent cursor-pointer">
+                    <button onClick={openLogin} style={{ fontSize: '13.5px', fontWeight: 500, color: '#00694C', whiteSpace: 'nowrap' }}
+                      className="ml-2 lg:ml-5 px-3 py-1.5 rounded-lg border border-[#00694C]/40 hover:text-[#151E13] transition-colors bg-transparent cursor-pointer">
                       Log In
                     </button>
                     <button onClick={openSignup}
@@ -498,29 +507,31 @@ useEffect(() => {
 
 
 
-            {isAuthenticated ? (
-                <div className="flex items-center">
+            {isAuthenticated && (
+                <div className="flex items-center mr-1">
                   <ProfileMenu user={user} logout={logout} isMobile />
                 </div>
-              ) : isWholesaleUser ? (
+            )}
+            
+            {!isAuthenticated && isWholesaleUser && (
                 <Link href="/wholesale/profile"
-                  style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#00694C', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#00694C', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '4px' }}>
                   <span style={{ fontSize: '13px', fontWeight: 700, color: 'white' }}>{wholesaleInitial}</span>
                 </Link>
-              ) : (
-                <button onClick={() => { setOpen(!open); setMobileSearchOpen(false) }}
-                  className="w-9 h-9 flex items-center justify-center" aria-label="Menu">
-                  <svg width="19" height="19" fill="none" stroke="#151E13" strokeWidth="2" viewBox="0 0 24 24">
-                    {open ? <path d="M18 6 6 18M6 6l12 12"/> : <path d="M4 6h16M4 12h16M4 18h16"/>}
-                  </svg>
-                </button>
-              )}
+            )}
+
+            <button onClick={() => { setOpen(!open); setMobileSearchOpen(false) }}
+              className="w-9 h-9 flex items-center justify-center" aria-label="Menu">
+              <svg width="19" height="19" fill="none" stroke="#151E13" strokeWidth="2" viewBox="0 0 24 24">
+                {open ? <path d="M18 6 6 18M6 6l12 12"/> : <path d="M4 6h16M4 12h16M4 18h16"/>}
+              </svg>
+            </button>
           </div>
         </nav>
 
         {/* Mobile Search */}
         {mobileSearchOpen && (
-          <div className="md:hidden bg-[#FAFAF8] border-t border-[#BCCAC1]/35 px-4 py-3"
+          <div className="lg:hidden bg-[#FAFAF8] border-t border-[#BCCAC1]/35 px-4 py-3"
             style={{ animation: 'dropdownFadeIn 0.15s ease' }}>
             <div className="flex items-center gap-2 bg-[#ECF7E4] rounded-full px-4 py-2.5">
               <svg width="15" height="15" fill="none" stroke="#6D7A73" strokeWidth="2" viewBox="0 0 24 24">
@@ -587,7 +598,7 @@ useEffect(() => {
       </header>
 
       {/* Mobile drawer */}
-      {open && !isAuthenticated && (
+      {open && (
         <div className="fixed inset-0 top-[60px] bg-[#F5F5E8] z-40 px-6 pt-8 pb-10 flex flex-col md:hidden overflow-y-auto">
           {navLinks.map(({ label, href }) => {
             const active = isActive(href)
@@ -600,18 +611,21 @@ useEffect(() => {
               </Link>
             )
           })}
-          <div className="flex gap-3 mt-7">
-            <button onClick={() => { setOpen(false); openLogin() }}
-              className="flex-1 text-center border border-[#151E13] rounded-full bg-transparent cursor-pointer"
-              style={{ fontSize: '14px', fontWeight: 500, color: '#151E13', padding: '11px 0' }}>
-              Log In
-            </button>
-            <button onClick={() => { setOpen(false); openSignup() }}
-              className="flex-1 text-center bg-[#00694C] text-white rounded-full border-none cursor-pointer"
-              style={{ fontSize: '14px', fontWeight: 500, padding: '11px 0' }}>
-              Sign Up
-            </button>
-          </div>
+          
+          {!isAuthenticated && !isWholesaleUser && (
+            <div className="flex gap-3 mt-7">
+              <button onClick={() => { setOpen(false); openLogin() }}
+                className="flex-1 text-center border border-[#151E13] rounded-full bg-transparent cursor-pointer"
+                style={{ fontSize: '14px', fontWeight: 500, color: '#151E13', padding: '11px 0' }}>
+                Log In
+              </button>
+              <button onClick={() => { setOpen(false); openSignup() }}
+                className="flex-1 text-center bg-[#00694C] text-white rounded-full border-none cursor-pointer"
+                style={{ fontSize: '14px', fontWeight: 500, padding: '11px 0' }}>
+                Sign Up
+              </button>
+            </div>
+          )}
         </div>
       )}
 

@@ -301,7 +301,7 @@ export default function ProductListingClient({ initialProducts = [], categories 
           </nav>
 
           {/* Page header */}
-          <div className="flex items-end justify-between mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 lg:gap-0 mb-8">
             <div>
               <h1 style={{ fontFamily: '"Newsreader", Georgia, serif', fontSize: '40px', fontStyle: 'italic', color: '#151e13', lineHeight: 1.1, marginBottom: '6px' }}>
                 {activeCategory}
@@ -312,11 +312,11 @@ export default function ProductListingClient({ initialProducts = [], categories 
             </div>
 
             {/* Search + Sort */}
-            <div className="flex items-center gap-3 bg-white rounded-2xl px-4 py-2.5"
+            <div className="flex flex-wrap items-center gap-3 bg-white rounded-2xl px-4 py-2.5 w-full lg:w-auto"
               style={{ border: '0.5px solid rgba(188,202,193,0.35)', boxShadow: '0 1px 6px rgba(0,33,21,0.04)' }}>
 
               {/* Search */}
-              <div className="flex items-center gap-2 rounded-xl px-3 py-2 flex-1 max-w-[260px]"
+              <div className="flex items-center gap-2 rounded-xl px-3 py-2 flex-1 min-w-[200px] lg:max-w-[260px]"
                 style={{ background: '#f2fdea', border: '1px solid rgba(0,105,76,0.1)' }}>
                 <span className="text-[#6D7A73] shrink-0"><SearchIcon /></span>
                 <input

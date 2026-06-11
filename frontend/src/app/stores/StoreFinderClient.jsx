@@ -607,7 +607,7 @@ export default function StoreFinderClient({ initialStores = [] }) {
   return (
     <>
       {/* DESKTOP */}
-      <div className="hidden md:flex bg-white" style={{ height: 'calc(100vh - 10px)' }}>
+      <div className="hidden lg:flex bg-white w-full border-b border-gray-200" style={{ height: 'calc(100vh - 75px)', minHeight: '600px' }}>
         <aside className="flex flex-col overflow-hidden bg-white" style={{ width: '380px', flexShrink: 0, borderRight: '1px solid rgba(188,202,193,0.2)' }}>
 
           <div className="px-6 py-2" style={{ borderBottom: '1px solid rgba(188,202,193,0.15)' }}>
@@ -695,7 +695,7 @@ export default function StoreFinderClient({ initialStores = [] }) {
       </div>
 
       {/* MOBILE */}
-      <div className="md:hidden relative overflow-hidden" style={{ height: '100dvh', background: '#f2fdea', isolation: 'isolate', overflowY: 'hidden', position: 'absolute', width: '100%', top: 0, left: 0 }}>
+      <div className="lg:hidden relative overflow-hidden w-full border-b border-gray-200" style={{ height: 'calc(100vh - 75px)', minHeight: '600px', background: '#f2fdea', isolation: 'isolate' }}>
         <div className="absolute inset-0 z-0">
           <LeafletMap stores={filteredStores} activeStoreId={activeStore?.id} userLocation={userLocation}
             onStoreClick={(id) => { setActiveStoreId(id); setBottomSheetExpanded(false) }} />
@@ -741,7 +741,7 @@ export default function StoreFinderClient({ initialStores = [] }) {
           const activeCloseFmt = formatTime12h(activeStore.closeTime)
           return (
             <div className="absolute bottom-0 left-0 right-0 z-20 rounded-t-3xl"
-              style={{ background: '#fff', boxShadow: '0 -8px 40px rgba(0,33,21,0.12)', transform: bottomSheetExpanded ? 'translateY(0)' : 'translateY(calc(100% - 52vh))', transition: 'transform 0.35s cubic-bezier(0.32, 0.72, 0, 1)', height: '60vh', overflowY: 'auto', overscrollBehavior: 'contain' }}>
+              style={{ background: '#fff', boxShadow: '0 -8px 40px rgba(0,33,21,0.12)', transform: bottomSheetExpanded ? 'translateY(0)' : 'translateY(calc(100% - 240px))', transition: 'transform 0.35s cubic-bezier(0.32, 0.72, 0, 1)', height: '70vh', overflowY: 'auto', overscrollBehavior: 'contain' }}>
 
               <div className="flex justify-center pt-3 pb-1 cursor-pointer" onClick={() => setBottomSheetExpanded(!bottomSheetExpanded)}>
                 <div className="w-10 h-1 rounded-full" style={{ background: '#BCCAC1' }} />
@@ -817,10 +817,6 @@ export default function StoreFinderClient({ initialStores = [] }) {
                     )
                   })}
                 </div>
-              </div>
-
-              <div style={{ borderTop: '1px solid rgba(188,202,193,0.2)', marginTop: '8px' }}>
-                <Footer />
               </div>
             </div>
           )

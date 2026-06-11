@@ -6,14 +6,16 @@ export default function OffersSection({ offers }) {
   if (!offers || offers.length === 0) return null;
 
   return (
-    <section className="container mx-auto px-4 py-8">
+    <section className="max-w-[1280px] mx-auto px-4 md:px-6 lg:px-10 py-8 md:py-10">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Special Offers</h2>
-        <Link href="/offers" className="text-primary-color font-medium hover:underline">
+        <h2 style={{ fontFamily: '"Playfair Display", Georgia, serif', fontSize: 'clamp(1.5rem, 2.8vw, 2.1rem)', fontWeight: 700, color: '#151E13' }}>
+          Special Offers
+        </h2>
+        <Link href="/offers" className="text-[#00694C] font-medium hover:underline text-[14px]">
           View All Offers
         </Link>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {offers.slice(0, 6).map((offer) => (
           <Link key={offer.id} href={`/offers/${offer.slug}`} className="block group">
             <div className="relative rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 aspect-[16/9] bg-gray-100">

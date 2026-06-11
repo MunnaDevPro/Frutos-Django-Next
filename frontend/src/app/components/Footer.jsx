@@ -151,10 +151,10 @@ export default function Footer({ config }) {
   return (
     <footer className="relative bg-[#043328] text-white pt-8 pb-4 border-t border-white/5 mt-8">
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 lg:gap-8 pb-8 border-b border-white/10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-8 border-b border-white/10">
           
           {/* Brand Column */}
-          <div className="lg:col-span-4 lg:pr-6">
+          <div className="lg:col-span-4 lg:pr-6 flex flex-col">
             <Link href="/" className="inline-flex items-center gap-2 mb-4 transition-opacity hover:opacity-80">
               {footer_logo_url ? (
                 <img src={footer_logo_url} alt={`${brand_name} logo`} className="w-8 h-8 object-contain brightness-0 invert" />
@@ -191,46 +191,48 @@ export default function Footer({ config }) {
           </div>
 
           {/* Dynamic Link Columns */}
-          {displayCols.map(col => (
-            <div key={col.id} className="lg:col-span-2">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-white mb-4">
-                {col.title}
-              </h4>
-              <ul className="flex flex-col gap-2">
-                {col.links.map((link, i) => (
-                  <li key={i}>
-                    <Link
-                      href={link.url || '#'}
-                      target={link.open_in_new_tab ? '_blank' : undefined}
-                      rel={link.open_in_new_tab ? 'noopener noreferrer' : undefined}
-                      className="text-xs text-gray-400 hover:text-white transition-colors duration-200"
-                    >
-                      {link.text}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div className="lg:col-span-5 grid grid-cols-2 gap-6 lg:gap-4">
+            {displayCols.map(col => (
+              <div key={col.id} className="lg:px-2">
+                <h4 className="text-[11px] md:text-xs font-semibold uppercase tracking-wider text-white mb-3 md:mb-4">
+                  {col.title}
+                </h4>
+                <ul className="flex flex-col gap-2">
+                  {col.links.map((link, i) => (
+                    <li key={i}>
+                      <Link
+                        href={link.url || '#'}
+                        target={link.open_in_new_tab ? '_blank' : undefined}
+                        rel={link.open_in_new_tab ? 'noopener noreferrer' : undefined}
+                        className="text-[11.5px] md:text-xs text-gray-400 hover:text-white transition-colors duration-200"
+                      >
+                        {link.text}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
 
-          {/* Stores Column (if any) */}
-          {activeStoreLocations.length > 0 && displayCols.length < 3 && (
-            <div className="lg:col-span-2">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-white mb-4">Stores</h4>
-              <ul className="flex flex-col gap-2">
-                {activeStoreLocations.map((store, i) => (
-                  <li key={store.slug || i}>
-                    <Link href={`/stores/${store.slug || ''}`} className="text-xs text-gray-400 hover:text-white transition-colors duration-200">
-                      {store.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+            {/* Stores Column (if any) integrated into the link grid */}
+            {activeStoreLocations.length > 0 && displayCols.length < 3 && (
+              <div className="lg:px-2">
+                <h4 className="text-[11px] md:text-xs font-semibold uppercase tracking-wider text-white mb-3 md:mb-4">Stores</h4>
+                <ul className="flex flex-col gap-2">
+                  {activeStoreLocations.map((store, i) => (
+                    <li key={store.slug || i}>
+                      <Link href={`/stores/${store.slug || ''}`} className="text-[11.5px] md:text-xs text-gray-400 hover:text-white transition-colors duration-200">
+                        {store.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
 
           {/* Contact & Payments Column */}
-          <div className="lg:col-span-3 lg:col-start-10">
+          <div className="lg:col-span-3 lg:pl-6">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-white mb-4">
               Contact Us
             </h4>
