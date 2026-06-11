@@ -304,7 +304,9 @@ class NotificationStreamView:
 
 
 import random
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django.conf import settings
 from .models import PasswordResetOTP
 
@@ -317,8 +319,17 @@ class SendPasswordResetOTPView(APIView):
         if not email:
             return Response({'detail': 'Email is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # User exists check
-        if not User.objects.filter(email__iexact=email).exists():
+        # Check normal user or wholesale user
+        normal_exists = User.objects.filter(email__iexact=email).exists()
+        
+        wholesale_exists = False
+        try:
+            from wholesale.models import WholesaleUser
+            wholesale_exists = WholesaleUser.objects.filter(email__iexact=email).exists()
+        except Exception:
+            pass
+
+        if not (normal_exists or wholesale_exists):
             # Security: same response even if not found
             return Response({'detail': 'If this email exists, an OTP has been sent.'})
 
@@ -326,13 +337,32 @@ class SendPasswordResetOTPView(APIView):
         PasswordResetOTP.objects.filter(email=email).delete()  # old OTPs clear
         PasswordResetOTP.objects.create(email=email, otp=otp)
 
-        send_mail(
-            subject='El Árbol — Password Reset OTP',
-            message=f'Your OTP is: {otp}\n\nValid for 10 minutes. Do not share this with anyone.',
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],
-            fail_silently=False,
-        )
+        # Send beautifully styled HTML email
+        try:
+            html_content = render_to_string('accounts/email/password_reset.html', {'otp': otp})
+            text_content = strip_tags(html_content)
+        except Exception:
+            html_content = None
+            text_content = f'Your OTP is: {otp}\n\nValid for 10 minutes. Do not share this with anyone.'
+
+        if html_content:
+            msg = EmailMultiAlternatives(
+                subject='ICommerce — Password Reset OTP',
+                body=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[email]
+            )
+            msg.attach_alternative(html_content, "text/html")
+            msg.send(fail_silently=False)
+        else:
+            send_mail(
+                subject='ICommerce — Password Reset OTP',
+                message=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+            
         return Response({'detail': 'OTP sent successfully.'})
 
 
@@ -359,15 +389,34 @@ class VerifyOTPAndResetPasswordView(APIView):
         if not record.is_valid():
             return Response({'detail': 'OTP has expired. Please request a new one.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        user_found = False
+        
+        # Try normal user
         try:
             user = User.objects.get(email__iexact=email)
             user.set_password(password)
             user.save()
-            record.is_used = True
-            record.save()
-            return Response({'detail': 'Password reset successful.'})
+            user_found = True
         except User.DoesNotExist:
+            pass
+            
+        # Try wholesale user
+        if not user_found:
+            try:
+                from wholesale.models import WholesaleUser
+                wholesale_user = WholesaleUser.objects.get(email__iexact=email)
+                wholesale_user.set_password(password)
+                wholesale_user.save()
+                user_found = True
+            except Exception:
+                pass
+
+        if not user_found:
             return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        record.is_used = True
+        record.save()
+        return Response({'detail': 'Password reset successful.'})
 
 
 

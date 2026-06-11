@@ -1,14 +1,11 @@
-from pathlib import Path
+﻿from pathlib import Path
 import os
-
-import os
-from dotenv import load_dotenv
-load_dotenv()
-
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+from dotenv import load_dotenv
+load_dotenv(os.path.join(BASE_DIR, '.env'), override=True)
 
 
 # Quick-start development settings - unsuitable for production
@@ -168,7 +165,7 @@ JAZZMIN_SETTINGS = {
     "site_header": "ICommerce",  # Shorter, cleaner header
     "site_brand": "ICommerce",
     "welcome_sign": "Welcome to ICommerce Admin",
-    "copyright": "ICommerce © 2026",
+    "copyright": "ICommerce Â© 2026",
     
     # Logo Configuration
     "site_logo": None,
@@ -192,7 +189,7 @@ JAZZMIN_SETTINGS = {
     # SIDEBAR NAVIGATION - PRIORITY-BASED BUSINESS ARCHITECTURE
     # ========================================================================
     # Critical: Order reflects business priority, NOT alphabetical/app order
-    # High Priority: Orders → Products → Vendors → Customers
+    # High Priority: Orders â†’ Products â†’ Vendors â†’ Customers
     # Medium Priority: Payments, Discounts, Content
     # Low Priority: Configuration, Technical Models
     
@@ -215,17 +212,17 @@ JAZZMIN_SETTINGS = {
     # CRITICAL: Custom ordering - Business Priority Architecture
     # This is the heart of the UX improvement
     "order_with_respect_to": [
-        # ▼ TIER 1: HIGHEST PRIORITY - Daily Operations
+        # â–¼ TIER 1: HIGHEST PRIORITY - Daily Operations
         "orders",          # Orders & transactions (most critical)
         "products",        # Inventory management
         "shops",           # Vendor management
         "users",           # Customer & user management
         
-        # ▼ TIER 2: MEDIUM PRIORITY - Business Operations
+        # â–¼ TIER 2: MEDIUM PRIORITY - Business Operations
         "website",         # Content & CMS
         "sections",        # Homepage sections
         
-        # ▼ TIER 3: LOWEST PRIORITY - System & Configuration
+        # â–¼ TIER 3: LOWEST PRIORITY - System & Configuration
         "auth",            # Django auth (permissions, etc)
     ],
     
@@ -244,9 +241,9 @@ JAZZMIN_SETTINGS = {
     # ========================================================================
     # FontAwesome icons - business-relevant per model
     "icons": {
-        # ─────────────────────────────────────────────────────────────
+        # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         # ORDERS & TRANSACTIONS (Cart, Money, Delivery Icons)
-        # ─────────────────────────────────────────────────────────────
+        # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         "orders": "fas fa-shopping-cart",
         "orders.Order": "fas fa-receipt",  # Receipt icon for orders
         "orders.OrderItem": "fas fa-box-open",
@@ -258,9 +255,9 @@ JAZZMIN_SETTINGS = {
         "orders.Coupon": "fas fa-tags",  # Tags for coupons
         "orders.FreeShippingRule": "fas fa-gift",
         
-        # ─────────────────────────────────────────────────────────────
+        # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         # PRODUCTS & INVENTORY (Box, Tag, Category Icons)
-        # ─────────────────────────────────────────────────────────────
+        # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         "products": "fas fa-boxes",
         "products.Product": "fas fa-cube",  # Single product cube
         "products.Brand": "fas fa-certificate",  # Brand badge
@@ -272,24 +269,24 @@ JAZZMIN_SETTINGS = {
         "products.ProductAdditionalImage": "fas fa-images",
         "products.CategoryMinimumOrderQuantity": "fas fa-boxes-stacked",
         
-        # ─────────────────────────────────────────────────────────────
+        # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         # VENDORS / SHOPS (Store, Business Icons)
-        # ─────────────────────────────────────────────────────────────
+        # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         "shops": "fas fa-store",
         "shops.Shop": "fas fa-store-alt",
         
-        # ─────────────────────────────────────────────────────────────
+        # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         # USERS & CUSTOMERS (People, Address Icons)
-        # ─────────────────────────────────────────────────────────────
+        # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         "users": "fas fa-users",
         "users.User": "fas fa-user",
         "users.Address": "fas fa-map-marker-alt",
         "users.WholesalerProfile": "fas fa-warehouse",
         "users.AffiliateProfile": "fas fa-handshake",
         
-        # ─────────────────────────────────────────────────────────────
+        # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         # CONTENT & WEBSITE (CMS, Banner, Blog Icons)
-        # ─────────────────────────────────────────────────────────────
+        # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         "website": "fas fa-globe",
         "website.NavbarSettings": "fas fa-bars",
         "website.OfferCategory": "fas fa-percent",
@@ -302,17 +299,17 @@ JAZZMIN_SETTINGS = {
         "website.SocialMediaLink": "fas fa-share-nodes",
         "website.SiteSettings": "fas fa-sliders",
         
-        # ─────────────────────────────────────────────────────────────
+        # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         # SECTIONS (Homepage Management)
-        # ─────────────────────────────────────────────────────────────
+        # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         "sections": "fas fa-th-large",
         "sections.Section": "fas fa-puzzle-piece",
         "sections.SectionItem": "fas fa-cube",
         "sections.PageSection": "fas fa-pager",
         
-        # ─────────────────────────────────────────────────────────────
+        # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         # AUTH & PERMISSIONS (System, Low Priority)
-        # ─────────────────────────────────────────────────────────────
+        # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         "auth": "fas fa-shield-halved",
         "auth.User": "fas fa-user-shield",
         "auth.Group": "fas fa-users-cog",
@@ -780,3 +777,14 @@ CKEDITOR_5_CONFIGS = {
 
 CKEDITOR_5_UPLOAD_PATH = "uploads/"
 CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER')
+
+
