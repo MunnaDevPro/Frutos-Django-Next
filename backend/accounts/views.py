@@ -309,38 +309,55 @@ def notification_stream(request):
     context = request.GET.get('context', '')
     admin_types = ['admin_alert', 'out_of_stock', 'wholesale_pending', 'ticket_created']
 
-    def event_stream():
-        base_qs = Notification.objects.filter(user=user)
-        if context == 'dashboard':
-            base_qs = base_qs.filter(type__in=admin_types)
-        else:
-            base_qs = base_qs.exclude(type__in=admin_types)
+    async def event_stream():
+        import asyncio
+        from asgiref.sync import sync_to_async
+        from accounts.models import Notification
 
-        sent_ids = set(base_qs.values_list('id', flat=True))
-        tick = 0
-        while True:
+        def get_initial_ids():
+            base_qs = Notification.objects.filter(user=user)
+            if context == 'dashboard':
+                base_qs = base_qs.filter(type__in=admin_types)
+            else:
+                base_qs = base_qs.exclude(type__in=admin_types)
+            return list(base_qs.values_list('id', flat=True))
+
+        def get_new_notifs(sent_ids):
             from django.db import close_old_connections
             close_old_connections()
-            
-            new_notifs = base_qs.exclude(id__in=sent_ids).order_by('id')
-            for n in new_notifs:
-                sent_ids.add(n.id)
-                payload = {
-                    'id':         n.id,
-                    'type':       n.type,
-                    'title':      n.title,
-                    'message':    n.message,
-                    'isRead':     n.is_read,
-                    'icon':       n.icon,
-                    'metadata':   n.metadata,
-                    'created_at': n.created_at.isoformat(),
-                }
-                yield f"data: {_json.dumps(payload, ensure_ascii=True)}\n\n"
+            base_qs = Notification.objects.filter(user=user)
+            if context == 'dashboard':
+                base_qs = base_qs.filter(type__in=admin_types)
+            else:
+                base_qs = base_qs.exclude(type__in=admin_types)
+            return list(base_qs.exclude(id__in=sent_ids).order_by('id'))
 
-            tick += 1
-            if tick % 5 == 0:
-                yield ": heartbeat\n\n"
-            _time.sleep(1)
+        sent_ids = set(await sync_to_async(get_initial_ids)())
+        tick = 0
+        try:
+            while True:
+                new_notifs = await sync_to_async(get_new_notifs)(sent_ids)
+                for n in new_notifs:
+                    sent_ids.add(n.id)
+                    payload = {
+                        'id':         n.id,
+                        'type':       n.type,
+                        'title':      n.title,
+                        'message':    n.message,
+                        'isRead':     n.is_read,
+                        'icon':       n.icon,
+                        'metadata':   n.metadata,
+                        'created_at': n.created_at.isoformat(),
+                    }
+                    yield f"data: {_json.dumps(payload, ensure_ascii=True)}\n\n"
+
+                tick += 1
+                if tick % 5 == 0:
+                    yield ": heartbeat\n\n"
+                
+                await asyncio.sleep(1)
+        except asyncio.CancelledError:
+            pass
 
     resp = StreamingHttpResponse(event_stream(), content_type='text/event-stream; charset=utf-8')
     resp['Cache-Control']     = 'no-cache'
@@ -1134,8 +1151,10 @@ class SupportTicketReplyView(APIView):
         for image in images:
             SupportTicketMessageAttachment.objects.create(message=msg, file=image)
 
-        return Response(SupportTicketMessageSerializer(msg).data, status=201)
+        from .utils import broadcast_ticket_message
+        broadcast_ticket_message(msg)
 
+        return Response(SupportTicketMessageSerializer(msg).data, status=201)
 
 class AdminSupportTicketReplyView(APIView):
     """
@@ -1160,6 +1179,7 @@ class AdminSupportTicketReplyView(APIView):
             ticket=ticket,
             sender=request.user,
             message=message_text,
+            is_admin_reply=True,
         )
 
         for image in images:
@@ -1171,6 +1191,9 @@ class AdminSupportTicketReplyView(APIView):
             ticket.status = new_status
             ticket.responded_by = request.user
             ticket.save(update_fields=['status', 'responded_by', 'updated_at'])
+
+        from .utils import broadcast_ticket_message
+        broadcast_ticket_message(msg)
 
         return Response(SupportTicketMessageSerializer(msg).data, status=201)
 
@@ -1195,6 +1218,9 @@ class SupportTicketMessageDetailView(APIView):
         msg.is_edited = True
         msg.save(update_fields=['message', 'is_edited'])
 
+        from .utils import broadcast_ticket_message
+        broadcast_ticket_message(msg)
+
         return Response(SupportTicketMessageSerializer(msg).data)
 
     def delete(self, request, ticket_id, msg_id):
@@ -1205,6 +1231,9 @@ class SupportTicketMessageDetailView(APIView):
         msg = get_object_or_404(SupportTicketMessage, id=msg_id, ticket_id=ticket_id, sender=request.user)
         msg.is_deleted = True
         msg.save(update_fields=['is_deleted'])
+
+        from .utils import broadcast_ticket_message
+        broadcast_ticket_message(msg)
 
         return Response(SupportTicketMessageSerializer(msg).data)
 
@@ -1230,6 +1259,9 @@ class AdminSupportTicketMessageDetailView(APIView):
         msg.is_edited = True
         msg.save(update_fields=['message', 'is_edited'])
 
+        from .utils import broadcast_ticket_message
+        broadcast_ticket_message(msg)
+
         return Response(SupportTicketMessageSerializer(msg).data)
 
     def delete(self, request, ticket_id, msg_id):
@@ -1240,6 +1272,9 @@ class AdminSupportTicketMessageDetailView(APIView):
         msg = get_object_or_404(SupportTicketMessage, id=msg_id, ticket_id=ticket_id, sender=request.user)
         msg.is_deleted = True
         msg.save(update_fields=['is_deleted'])
+
+        from .utils import broadcast_ticket_message
+        broadcast_ticket_message(msg)
 
         return Response(SupportTicketMessageSerializer(msg).data)
 

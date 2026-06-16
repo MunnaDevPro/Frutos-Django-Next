@@ -202,11 +202,18 @@ class SupportTicketImage(models.Model):
 
 
 class SupportTicketMessage(models.Model):
+    DELIVERY_STATUS_CHOICES = [
+        ('SENT', 'Sent'),
+        ('DELIVERED', 'Delivered'),
+        ('SEEN', 'Seen'),
+    ]
     ticket = models.ForeignKey(SupportTicket, related_name='messages', on_delete=models.CASCADE)
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='ticket_messages', on_delete=models.CASCADE)
     message = models.TextField(blank=True)
+    delivery_status = models.CharField(max_length=15, choices=DELIVERY_STATUS_CHOICES, default='SENT')
     is_edited = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
+    is_admin_reply = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

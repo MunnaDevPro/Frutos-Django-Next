@@ -58,6 +58,13 @@ function extractImageUrls(text = "") {
 }
 
 /* ─── Image Viewer Modal ─────────────────────────────────────── */
+const getFullUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) return url;
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, '') : 'http://127.0.0.1:8000';
+  return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
 function ImageViewer({ src, onClose }) {
   if (!src) return null;
 
@@ -123,6 +130,7 @@ function TicketDetailModal({ ticket: initialTicket, onClose, onReplySuccess }) {
   const [deleteModalId, setDeleteModalId] = useState(null);
   const [isStatusOpen, setIsStatusOpen] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [ws, setWs] = useState(null);
 
   const STATUS_OPTIONS = [
     { value: "OPEN", label: "Open", icon: "⚪", color: "text-slate-600", bg: "bg-white" },
@@ -152,26 +160,63 @@ function TicketDetailModal({ ticket: initialTicket, onClose, onReplySuccess }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showEmojiPicker]);
 
-  // Poll for new messages every 1.5 seconds
+  // Connect to WebSocket for real-time chat
   useEffect(() => {
-    const interval = setInterval(async () => {
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const apiHost = process.env.NEXT_PUBLIC_API_URL ? new URL(process.env.NEXT_PUBLIC_API_URL).host : '127.0.0.1:8000';
+    const wsUrl = `${wsProtocol}//${apiHost}/ws/chat/ticket/${ticket.id}/`;
+    
+    const socket = new WebSocket(wsUrl);
+    
+    socket.onmessage = (e) => {
       try {
-        const res = await api.get(`/api/auth/admin/tickets/${ticket.id}/`);
-        setTicket(res);
-        setNewStatus(res.status);
-      } catch (e) {}
-    }, 1500);
-    return () => clearInterval(interval);
+        const data = JSON.parse(e.data);
+        if (data.type === 'message') {
+          const newMsg = data.message;
+          setTicket(prev => {
+            const msgs = prev.messages || [];
+            const idx = msgs.findIndex(m => m.id === newMsg.id || (m.isTemp && m.message === newMsg.message));
+            if (idx !== -1) {
+              const updated = [...msgs];
+              updated[idx] = newMsg;
+              return { ...prev, messages: updated };
+            }
+            return { ...prev, messages: [...msgs, newMsg] };
+          });
+        } else if (data.type === 'typing') {
+          if (data.sender_id !== 'admin') {
+            setTicket(prev => ({ ...prev, is_user_typing: data.is_typing }));
+          }
+        } else if (data.type === 'message_status') {
+          setTicket(prev => ({
+            ...prev,
+            messages: (prev.messages || []).map(m => m.id === data.message_id ? { ...m, delivery_status: data.status } : m)
+          }));
+        }
+      } catch(err){}
+    };
+    
+    setWs(socket);
+    return () => socket.close();
   }, [ticket.id]);
 
   // Handle typing indicator
   useEffect(() => {
-    if (!replyText.trim()) return;
-    const timeout = setTimeout(() => {
-      api.post(`/api/auth/admin/tickets/${ticket.id}/typing/`).catch(() => {});
-    }, 300);
-    return () => clearTimeout(timeout);
-  }, [replyText, ticket.id]);
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    
+    if (replyText.trim().length > 0) {
+      ws.send(JSON.stringify({ action: 'typing', is_typing: true, sender_id: 'admin' }));
+      
+      const timeout = setTimeout(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ action: 'typing', is_typing: false, sender_id: 'admin' }));
+        }
+      }, 2000);
+      return () => clearTimeout(timeout);
+    } else {
+      ws.send(JSON.stringify({ action: 'typing', is_typing: false, sender_id: 'admin' }));
+    }
+  }, [replyText, ws, ticket.id]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files || [])
@@ -198,28 +243,73 @@ function TicketDetailModal({ ticket: initialTicket, onClose, onReplySuccess }) {
       toast.error("Message or image is required"); 
       return; 
     }
+
+    // Optimistic UI Update
+    const tempId = `temp_${Date.now()}`;
+    const tempMsg = {
+      id: tempId,
+      message: replyText,
+      senderEmail: 'admin@system.com', // Dummy for admin
+      senderName: 'Admin',
+      created_at: new Date().toISOString(),
+      isTemp: true,
+      delivery_status: 'SENDING',
+      attachments: replyImagePreviews.map(p => ({ file: p }))
+    };
+    
+    setTicket(prev => ({
+      ...prev,
+      messages: [...(prev.messages || []), tempMsg]
+    }));
+
+    const currentText = replyText;
+    const currentImages = [...replyImages];
+    const currentStatus = newStatus;
+    
+    setReplyText("");
+    setReplyImages([]);
+    setReplyImagePreviews([]);
     setSubmitting(true);
+    
     try {
       const formData = new FormData();
-      if (replyText.trim()) formData.append('message', replyText);
-      replyImages.forEach(img => {
+      if (currentText.trim()) formData.append('message', currentText);
+      currentImages.forEach(img => {
         formData.append('images', img)
       });
-      if (newStatus !== ticket.status) formData.append('status', newStatus);
+      if (currentStatus !== ticket.status) formData.append('status', currentStatus);
 
-      await api.post(`/api/auth/admin/tickets/${ticket.id}/reply/`, formData);
-      toast.success("Reply sent successfully");
+      const newMsg = await api.post(`/api/auth/admin/tickets/${ticket.id}/reply/`, formData);
       
-      // Refresh local ticket state instantly
-      const updatedTicket = await api.get(`/api/auth/admin/tickets/${ticket.id}/`);
-      setTicket(updatedTicket);
+      // Update UI with the real message from the API response
+      setTicket(prev => {
+        const msgs = prev.messages || [];
+        const idx = msgs.findIndex(m => m.id === tempId);
+        if (idx !== -1) {
+          const updated = [...msgs];
+          updated[idx] = newMsg;
+          return { ...prev, messages: updated };
+        }
+        
+        // If tempId was already replaced by WebSocket, update by real ID
+        const realIdx = msgs.findIndex(m => m.id === newMsg.id);
+        if (realIdx !== -1) {
+          const updated = [...msgs];
+          updated[realIdx] = newMsg;
+          return { ...prev, messages: updated };
+        }
+        
+        return { ...prev, messages: [...msgs, newMsg] };
+      });
       
-      setReplyText("");
-      setReplyImages([]);
-      setReplyImagePreviews([]);
       onReplySuccess?.();
     } catch (err) {
       toast.error(err?.message || "Failed to send reply");
+      // Revert Optimistic UI
+      setTicket(prev => ({
+        ...prev,
+        messages: (prev.messages || []).filter(m => m.id !== tempId)
+      }));
     } finally {
       setSubmitting(false);
     }
@@ -242,12 +332,16 @@ function TicketDetailModal({ ticket: initialTicket, onClose, onReplySuccess }) {
   };
 
   const handleDeleteMessage = async (msgId) => {
+    // Optimistic UI update
+    setTicket(prev => ({
+      ...prev,
+      messages: (prev.messages || []).map(m => m.id === msgId ? { ...m, is_deleted: true, message: '', attachments: [] } : m)
+    }));
+    setDeleteModalId(null);
+
     try {
       await api.delete(`/api/auth/admin/tickets/${ticket.id}/messages/${msgId}/`);
       toast.success("Message deleted");
-      const updatedTicket = await api.get(`/api/auth/admin/tickets/${ticket.id}/`);
-      setTicket(updatedTicket);
-      setDeleteModalId(null);
     } catch (err) {
       toast.error(err?.message || "Failed to delete message");
     }
@@ -255,15 +349,22 @@ function TicketDetailModal({ ticket: initialTicket, onClose, onReplySuccess }) {
 
   const handleEditSubmit = async (msgId) => {
     if (!editingMessageText.trim()) return;
+    
+    const originalText = editingMessageText;
+    
+    // Optimistic UI update
+    setTicket(prev => ({
+      ...prev,
+      messages: (prev.messages || []).map(m => m.id === msgId ? { ...m, message: originalText, is_edited: true } : m)
+    }));
+    setEditingMessageId(null);
+    setEditingMessageText('');
+    
     try {
       await api.patch(`/api/auth/admin/tickets/${ticket.id}/messages/${msgId}/`, {
-        message: editingMessageText
+        message: originalText
       });
       toast.success("Message updated");
-      setEditingMessageId(null);
-      setEditingMessageText('');
-      const updatedTicket = await api.get(`/api/auth/admin/tickets/${ticket.id}/`);
-      setTicket(updatedTicket);
     } catch (err) {
       toast.error(err?.message || "Failed to update message");
     }
@@ -301,14 +402,14 @@ function TicketDetailModal({ ticket: initialTicket, onClose, onReplySuccess }) {
                 </span>
               </div>
               
-              <h2 className="text-base sm:text-lg font-bold text-slate-800 tracking-tight truncate w-full">{ticket.subject}</h2>
+              <h2 className="text-base sm:text-lg font-bold text-slate-800 tracking-tight truncate w-full">Customer Support</h2>
               
               <div className="flex items-center gap-3 sm:gap-4 text-[11px] text-slate-500 mt-1 font-medium">
                 <span className="flex items-center gap-1 group cursor-default">
                   <div className="p-0.5 bg-slate-100 rounded group-hover:bg-slate-200 transition-colors">
-                    <User className="w-3 h-3 text-slate-600" />
+                    <span className="material-symbols-outlined text-[12px] text-slate-600">support_agent</span>
                   </div>
-                  <span className="truncate max-w-[100px] sm:max-w-none">{ticket.userName || "—"}</span>
+                  <span className="truncate max-w-[100px] sm:max-w-[200px]">{ticket.subject || "—"}</span>
                 </span>
                 <span className="flex items-center gap-1 group cursor-default">
                   <div className="p-0.5 bg-slate-100 rounded group-hover:bg-slate-200 transition-colors">
@@ -369,18 +470,18 @@ function TicketDetailModal({ ticket: initialTicket, onClose, onReplySuccess }) {
 
             {/* New Chat Thread */}
             {ticket.messages && ticket.messages.map((msg) => {
-              const isAdmin = msg.senderEmail !== ticket.userEmail;
+              const isAdminMsg = msg.isAdmin || msg.senderEmail === 'admin@system.com';
               const hasText = msg.message && msg.message.trim().length > 0;
               const isOnlyImages = !hasText && msg.attachments && msg.attachments.length > 0;
 
               return (
-                <div key={msg.id} className={`flex flex-col ${isAdmin ? 'items-end' : 'items-start'} mb-2 group/msg relative w-full`}>
-                  <div className={`flex items-end max-w-[85%] ${isAdmin ? 'justify-end' : 'justify-start'}`}>
+                <div key={msg.id} className={`flex flex-col ${isAdminMsg ? 'items-end' : 'items-start'} mb-2 group/msg relative w-full`}>
+                  <div className={`flex items-end max-w-[85%] ${isAdminMsg ? 'justify-end' : 'justify-start'}`}>
                     
-                    {!isAdmin && (
+                    {!isAdminMsg && (
                       <div className="flex-shrink-0 mr-2 mb-1">
                         {msg.sender_avatar || msg.senderAvatar || ticket.user_avatar || ticket.userAvatar ? (
-                          <img src={msg.sender_avatar || msg.senderAvatar || ticket.user_avatar || ticket.userAvatar} alt="User" className="w-7 h-7 rounded-full object-cover shadow-sm border border-slate-200" />
+                          <img src={getFullUrl(msg.sender_avatar || msg.senderAvatar || ticket.user_avatar || ticket.userAvatar)} alt="User" className="w-7 h-7 rounded-full object-cover shadow-sm border border-slate-200" />
                         ) : (
                           <div className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 shadow-sm border border-slate-200">
                             <User className="w-4 h-4" />
@@ -390,13 +491,13 @@ function TicketDetailModal({ ticket: initialTicket, onClose, onReplySuccess }) {
                     )}
 
                     <div className={`relative ${
-                      msg.is_deleted ? (isAdmin ? 'bg-[#dcf8c6] rounded-xl rounded-tr-none border border-[#dcf8c6] px-2.5 pt-2 pb-1.5 shadow-sm' : 'bg-white rounded-xl rounded-tl-none border border-slate-200/50 px-2.5 pt-2 pb-1.5 shadow-sm')
+                      msg.is_deleted ? (isAdminMsg ? 'bg-[#dcf8c6] rounded-xl rounded-tr-none border border-[#dcf8c6] px-2.5 pt-2 pb-1.5 shadow-sm' : 'bg-white rounded-xl rounded-tl-none border border-slate-200/50 px-2.5 pt-2 pb-1.5 shadow-sm')
                       : isOnlyImages ? '' 
-                      : (isAdmin ? 'bg-[#dcf8c6] rounded-xl rounded-tr-none border border-[#dcf8c6] px-2.5 pt-2 pb-1.5 shadow-sm' : 'bg-white rounded-xl rounded-tl-none border border-slate-200/50 px-2.5 pt-2 pb-1.5 shadow-sm')
+                      : (isAdminMsg ? 'bg-[#dcf8c6] rounded-xl rounded-tr-none border border-[#dcf8c6] px-2.5 pt-2 pb-1.5 shadow-sm' : 'bg-white rounded-xl rounded-tl-none border border-slate-200/50 px-2.5 pt-2 pb-1.5 shadow-sm')
                     }`}>
                     
                     {/* Admin Dropdown */}
-                    {isAdmin && !msg.is_deleted && ticket.status !== 'CLOSED' && (
+                    {isAdminMsg && !msg.is_deleted && ticket.status !== 'CLOSED' && (
                       <div className="absolute top-1 right-2 opacity-0 group-hover/msg:opacity-100 transition-opacity z-10">
                         <button onClick={() => setOpenMenuId(openMenuId === msg.id ? null : msg.id)} className={`hover:text-slate-600 cursor-pointer ${isOnlyImages ? 'text-white drop-shadow-md' : 'text-slate-400'}`}>
                           <ChevronDown className="w-4 h-4" />
@@ -412,14 +513,14 @@ function TicketDetailModal({ ticket: initialTicket, onClose, onReplySuccess }) {
                       </div>
                     )}
 
-                    {!isAdmin && !isOnlyImages && (
+                    {!isAdminMsg && !isOnlyImages && (
                       <div className="text-[12px] font-bold text-[#e87c03] mb-0.5">{msg.senderName || ticket.userName || 'User'}</div>
                     )}
 
                     {msg.is_deleted ? (
                       <div className="flex items-center gap-1.5 italic text-[#667781] py-1">
                         <XCircle className="w-4 h-4" />
-                        <span className="text-[14.5px]">{isAdmin ? "You deleted this message" : "This message was deleted"}</span>
+                        <span className="text-[14.5px]">{isAdminMsg ? "You deleted this message" : "This message was deleted"}</span>
                       </div>
                     ) : editingMessageId === msg.id ? (
                       <div className="flex flex-col gap-2 min-w-[200px] mt-1">
@@ -436,13 +537,13 @@ function TicketDetailModal({ ticket: initialTicket, onClose, onReplySuccess }) {
                       </div>
                     ) : (
                       <>
-                        {hasText && <p className={`text-[14.5px] whitespace-pre-wrap leading-snug text-[#111b21] ${isAdmin ? 'pr-4' : ''}`}>{msg.message}</p>}
+                        {hasText && <p className={`text-[14.5px] whitespace-pre-wrap leading-snug text-[#111b21] ${isAdminMsg ? 'pr-4' : ''}`}>{msg.message}</p>}
                         
                         {msg.attachments && msg.attachments.length > 0 && (
                           <div className={`grid gap-1 max-w-[320px] ${hasText ? 'mt-2' : ''} ${msg.attachments.length === 1 ? 'grid-cols-1' : msg.attachments.length === 2 || msg.attachments.length === 4 ? 'grid-cols-2' : 'grid-cols-3'}`}>
                             {msg.attachments.map((att, i) => (
-                              <button key={i} onClick={() => setViewerSrc(att.file)} className={`relative overflow-hidden cursor-pointer w-full ${isOnlyImages ? 'rounded-xl shadow-sm' : 'rounded-md'}`}>
-                                <img src={att.file} className={`w-full object-cover ${isOnlyImages && msg.attachments.length === 1 ? 'max-h-64 h-auto' : 'aspect-square'} ${isOnlyImages ? '' : 'border border-black/5'}`} alt="attachment" />
+                              <button key={i} onClick={() => setViewerSrc(getFullUrl(att.file))} className={`relative overflow-hidden cursor-pointer w-full ${isOnlyImages ? 'rounded-xl shadow-sm' : 'rounded-md'}`}>
+                                <img src={getFullUrl(att.file)} className={`w-full object-cover ${isOnlyImages && msg.attachments.length === 1 ? 'max-h-64 h-auto' : 'aspect-square'} ${isOnlyImages ? '' : 'border border-black/5'}`} alt="attachment" />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
                                   <ZoomIn className="w-6 h-6 text-white" />
                                 </div>
@@ -456,8 +557,10 @@ function TicketDetailModal({ ticket: initialTicket, onClose, onReplySuccess }) {
                     <div className={`flex justify-end items-center mt-1 space-x-1 float-right text-[11px] ${isOnlyImages ? 'bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full shadow-sm text-slate-700 ml-2' : 'text-[#667781] ml-3'}`}>
                       {msg.is_edited && !msg.is_deleted && <span>edited</span>}
                       <span>{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      {isAdmin && !msg.is_deleted && (
-                        <span className="text-[#53bdeb] tracking-tighter ml-0.5">✓✓</span>
+                      {isAdminMsg && !msg.is_deleted && (
+                        <span className={`tracking-tighter ml-0.5 ${msg.delivery_status === 'SEEN' || msg.delivery_status === 'DELIVERED' ? 'text-[#53bdeb]' : 'text-slate-400'}`} title={msg.delivery_status}>
+                          {msg.delivery_status === 'SENDING' ? <Loader2 className="w-3 h-3 animate-spin inline" /> : msg.delivery_status === 'SENT' ? '✓' : '✓✓'}
+                        </span>
                       )}
                     </div>
                     <div className="clear-both"></div>

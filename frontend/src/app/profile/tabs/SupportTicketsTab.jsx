@@ -85,22 +85,10 @@ export default function SupportTicketsTab({ authFetch }) {
   }, [authFetch])
 
   // Polling for updates if a ticket is selected
+  // Remove polling; we now use WebSockets in TicketChat
   useEffect(() => {
     fetchTickets()
-    
-    // Poll every 1.5 seconds if a ticket is selected to get new messages instantly
-    let interval;
-    if (selectedTicketId) {
-      interval = setInterval(() => {
-        authFetch(`${API_BASE}/auth/tickets/`).then(res => res.json()).then(data => {
-          setTickets(Array.isArray(data) ? data : (data.results || []))
-        }).catch(() => {})
-      }, 1500)
-    }
-    return () => {
-      if (interval) clearInterval(interval)
-    }
-  }, [fetchTickets, selectedTicketId, authFetch])
+  }, [fetchTickets, selectedTicketId])
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files)
@@ -411,6 +399,13 @@ const EMOJI_LIST = [
   '❤️','🧡','💛','💚','💙','🩵','💜','🖤','🩶','🤍','🤎','💔','❤️‍🔥','❤️‍🩹','❣️','💕','💞','💓','💗','💖','💘','💝','💟','🔥','✨','🌟','💫','💥','💢','💦','💧','💤','💨'
 ];
 
+const getFullUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) return url;
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, '') : 'http://127.0.0.1:8000';
+  return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
 function ImageViewer({ src, onClose }) {
   if (!src) return null;
 
@@ -472,23 +467,69 @@ function TicketChat({ ticket: initialTicket, authFetch, onBack, getStatusBadge, 
   const [openMenuId, setOpenMenuId] = useState(null)
   const [deleteModalId, setDeleteModalId] = useState(null)
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const [ws, setWs] = useState(null)
 
   const fileRef = useRef(null)
   const messagesEndRef = useRef(null)
 
   const messagesCount = ticket.messages?.length || 0;
+  
+  useEffect(() => {
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const apiHost = process.env.NEXT_PUBLIC_API_URL ? new URL(process.env.NEXT_PUBLIC_API_URL).host : '127.0.0.1:8000';
+    const wsUrl = `${wsProtocol}//${apiHost}/ws/chat/ticket/${ticket.id}/`;
+    
+    const socket = new WebSocket(wsUrl);
+    
+    socket.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        if (data.type === 'message') {
+          const newMsg = data.message;
+          setTicket(prev => {
+            const msgs = prev.messages || [];
+            // Replace temp message with real one based on matching text/temp ID
+            const idx = msgs.findIndex(m => m.id === newMsg.id || (m.isTemp && m.message === newMsg.message));
+            if (idx !== -1) {
+              const updated = [...msgs];
+              updated[idx] = newMsg;
+              return { ...prev, messages: updated };
+            }
+            return { ...prev, messages: [...msgs, newMsg] };
+          });
+        } else if (data.type === 'typing') {
+          if (data.sender_id !== ticket.userEmail) {
+            setTicket(prev => ({ ...prev, is_admin_typing: data.is_typing }));
+          }
+        }
+      } catch(err){}
+    };
+    
+    setWs(socket);
+    return () => socket.close();
+  }, [ticket.id]);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messagesCount, ticket.is_admin_typing])
 
-  // Handle typing indicator
+  // Handle typing indicator via WebSockets
   useEffect(() => {
-    if (!replyText.trim()) return;
-    const timeout = setTimeout(() => {
-      authFetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api'}/auth/tickets/${ticket.id}/typing/`, { method: 'POST' }).catch(() => {});
-    }, 300);
-    return () => clearTimeout(timeout);
-  }, [replyText, authFetch, ticket.id]);
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    
+    if (replyText.trim().length > 0) {
+      ws.send(JSON.stringify({ action: 'typing', is_typing: true, sender_id: ticket.userEmail }));
+      
+      const timeout = setTimeout(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ action: 'typing', is_typing: false, sender_id: ticket.userEmail }));
+        }
+      }, 2000);
+      return () => clearTimeout(timeout);
+    } else {
+      ws.send(JSON.stringify({ action: 'typing', is_typing: false, sender_id: ticket.userEmail }));
+    }
+  }, [replyText, ws, ticket.userEmail]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -523,13 +564,35 @@ function TicketChat({ ticket: initialTicket, authFetch, onBack, getStatusBadge, 
     e.preventDefault()
     if (!replyText.trim() && replyImages.length === 0) return
 
-    setSending(true)
+    // Optimistic UI update
+    const tempId = `temp_${Date.now()}`;
+    const tempMsg = {
+      id: tempId,
+      message: replyText,
+      senderEmail: ticket.userEmail, // Assume user is sending
+      senderName: 'You',
+      created_at: new Date().toISOString(),
+      isTemp: true,
+      delivery_status: 'SENDING',
+      attachments: replyImagePreviews.map(p => ({ file: p }))
+    };
+    
+    setTicket(prev => ({
+      ...prev,
+      messages: [...(prev.messages || []), tempMsg]
+    }));
+
+    const currentText = replyText;
+    const currentImages = [...replyImages];
+    setReplyText('');
+    setReplyImages([]);
+    setReplyImagePreviews([]);
+    setSending(true);
+
     try {
       const formData = new FormData()
-      if (replyText.trim()) formData.append('message', replyText)
-      replyImages.forEach(img => {
-        formData.append('images', img)
-      })
+      if (currentText.trim()) formData.append('message', currentText)
+      currentImages.forEach(img => formData.append('images', img))
 
       const res = await authFetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api'}/auth/tickets/${ticket.id}/reply/`, {
         method: 'POST',
@@ -537,36 +600,54 @@ function TicketChat({ ticket: initialTicket, authFetch, onBack, getStatusBadge, 
       })
 
       if (!res.ok) throw new Error('Failed to send reply')
-
-      const updatedRes = await authFetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api'}/auth/tickets/${ticket.id}/`);
-      if (updatedRes.ok) {
-        const updatedTicket = await updatedRes.json();
-        setTicket(updatedTicket);
-      }
-
-      setReplyText('')
-      setReplyImages([])
-      setReplyImagePreviews([])
+      
+      const newMsg = await res.json();
+      
+      // Update UI with the real message from the API response
+      setTicket(prev => {
+        const msgs = prev.messages || [];
+        const idx = msgs.findIndex(m => m.id === tempId);
+        if (idx !== -1) {
+          const updated = [...msgs];
+          updated[idx] = newMsg;
+          return { ...prev, messages: updated };
+        }
+        
+        // If tempId was already replaced by WebSocket, update by real ID
+        const realIdx = msgs.findIndex(m => m.id === newMsg.id);
+        if (realIdx !== -1) {
+          const updated = [...msgs];
+          updated[realIdx] = newMsg;
+          return { ...prev, messages: updated };
+        }
+        
+        return { ...prev, messages: [...msgs, newMsg] };
+      });
     } catch (err) {
       alert(err.message)
+      // Remove temp message on failure
+      setTicket(prev => ({
+        ...prev,
+        messages: prev.messages.filter(m => m.id !== tempId)
+      }));
     } finally {
       setSending(false)
     }
   }
 
   const handleDeleteMessage = async (msgId) => {
+    // Optimistic UI update
+    setTicket(prev => ({
+      ...prev,
+      messages: (prev.messages || []).map(m => m.id === msgId ? { ...m, is_deleted: true, message: '', attachments: [] } : m)
+    }));
+    setDeleteModalId(null);
+
     try {
       const res = await authFetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api'}/auth/tickets/${ticket.id}/messages/${msgId}/`, {
         method: 'DELETE',
       })
       if (!res.ok) throw new Error('Failed to delete message')
-      setDeleteModalId(null)
-      
-      const updatedRes = await authFetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api'}/auth/tickets/${ticket.id}/`);
-      if (updatedRes.ok) {
-        const updatedTicket = await updatedRes.json();
-        setTicket(updatedTicket);
-      }
     } catch (err) {
       alert(err.message)
     }
@@ -574,21 +655,24 @@ function TicketChat({ ticket: initialTicket, authFetch, onBack, getStatusBadge, 
 
   const handleEditSubmit = async (msgId) => {
     if (!editingMessageText.trim()) return;
+    
+    const originalText = editingMessageText;
+    
+    // Optimistic UI update
+    setTicket(prev => ({
+      ...prev,
+      messages: (prev.messages || []).map(m => m.id === msgId ? { ...m, message: originalText, is_edited: true } : m)
+    }));
+    setEditingMessageId(null);
+    setEditingMessageText('');
+    
     try {
       const res = await authFetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api'}/auth/tickets/${ticket.id}/messages/${msgId}/`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: editingMessageText })
+        body: JSON.stringify({ message: originalText })
       })
       if (!res.ok) throw new Error('Failed to edit message')
-      setEditingMessageId(null)
-      setEditingMessageText('')
-
-      const updatedRes = await authFetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api'}/auth/tickets/${ticket.id}/`);
-      if (updatedRes.ok) {
-        const updatedTicket = await updatedRes.json();
-        setTicket(updatedTicket);
-      }
     } catch (err) {
       alert(err.message)
     }
@@ -624,9 +708,15 @@ function TicketChat({ ticket: initialTicket, authFetch, onBack, getStatusBadge, 
                 </span>
               </div>
               
-              <h2 className="text-base sm:text-lg font-bold text-slate-800 tracking-tight truncate w-full">{ticket.subject}</h2>
+              <h2 className="text-base sm:text-lg font-bold text-slate-800 tracking-tight truncate w-full">{ticket.userName || "My Account"}</h2>
               
               <div className="flex items-center gap-3 sm:gap-4 text-[11px] text-slate-500 mt-1 font-medium">
+                <span className="flex items-center gap-1 group cursor-default">
+                  <div className="p-0.5 bg-slate-100 rounded group-hover:bg-slate-200 transition-colors">
+                    <User className="w-3 h-3 text-slate-600" />
+                  </div>
+                  <span className="truncate max-w-[150px]">{ticket.subject}</span>
+                </span>
                 <span className="flex items-center gap-1 group cursor-default">
                   <div className="p-0.5 bg-slate-100 rounded group-hover:bg-slate-200 transition-colors">
                     <Tag className="w-3 h-3 text-slate-600" />
@@ -690,18 +780,18 @@ function TicketChat({ ticket: initialTicket, authFetch, onBack, getStatusBadge, 
             )}
 
             {ticket.messages && ticket.messages.map((msg) => {
-              const isUser = msg.senderEmail === ticket.userEmail;
+              const isUserMsg = !msg.isAdmin;
               const hasText = msg.message && msg.message.trim().length > 0;
               const isOnlyImages = !hasText && msg.attachments && msg.attachments.length > 0;
 
               return (
-                <div key={msg.id} className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} mb-2 group/msg relative w-full`}>
-                  <div className={`flex items-end max-w-[85%] ${isUser ? 'justify-end' : 'justify-start'}`}>
+                <div key={msg.id} className={`flex flex-col ${isUserMsg ? 'items-end' : 'items-start'} mb-2 group/msg relative w-full`}>
+                  <div className={`flex items-end max-w-[85%] ${isUserMsg ? 'justify-end' : 'justify-start'}`}>
                     
-                    {!isUser && (
+                    {!isUserMsg && (
                       <div className="flex-shrink-0 mr-2 mb-1">
                         {msg.sender_avatar || msg.senderAvatar ? (
-                          <img src={msg.sender_avatar || msg.senderAvatar} alt="Support" className="w-7 h-7 rounded-full object-cover shadow-sm border border-slate-200" />
+                          <img src={getFullUrl(msg.sender_avatar || msg.senderAvatar)} alt="Support" className="w-7 h-7 rounded-full object-cover shadow-sm border border-slate-200" />
                         ) : (
                           <div className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 shadow-sm border border-slate-200">
                             <span className="material-symbols-outlined text-[14px]">support_agent</span>
@@ -711,12 +801,12 @@ function TicketChat({ ticket: initialTicket, authFetch, onBack, getStatusBadge, 
                     )}
 
                     <div className={`relative ${
-                      msg.is_deleted ? (isUser ? 'bg-[#dcf8c6] rounded-xl rounded-tr-none border border-[#dcf8c6] px-2.5 pt-2 pb-1.5 shadow-sm' : 'bg-white rounded-xl rounded-tl-none border border-slate-200/50 px-2.5 pt-2 pb-1.5 shadow-sm')
+                      msg.is_deleted ? (isUserMsg ? 'bg-[#dcf8c6] rounded-xl rounded-tr-none border border-[#dcf8c6] px-2.5 pt-2 pb-1.5 shadow-sm' : 'bg-white rounded-xl rounded-tl-none border border-slate-200/50 px-2.5 pt-2 pb-1.5 shadow-sm')
                       : isOnlyImages ? '' 
-                      : (isUser ? 'bg-[#dcf8c6] rounded-xl rounded-tr-none border border-[#dcf8c6] px-2.5 pt-2 pb-1.5 shadow-sm' : 'bg-white rounded-xl rounded-tl-none border border-slate-200/50 px-2.5 pt-2 pb-1.5 shadow-sm')
+                      : (isUserMsg ? 'bg-[#dcf8c6] rounded-xl rounded-tr-none border border-[#dcf8c6] px-2.5 pt-2 pb-1.5 shadow-sm' : 'bg-white rounded-xl rounded-tl-none border border-slate-200/50 px-2.5 pt-2 pb-1.5 shadow-sm')
                     }`}>
                     
-                    {isUser && !msg.is_deleted && ticket.status !== 'CLOSED' && (
+                    {isUserMsg && !msg.is_deleted && ticket.status !== 'CLOSED' && (
                       <div className="absolute top-1 right-2 opacity-0 group-hover/msg:opacity-100 transition-opacity z-10">
                         <button onClick={() => setOpenMenuId(openMenuId === msg.id ? null : msg.id)} className={`hover:text-slate-600 cursor-pointer ${isOnlyImages ? 'text-white drop-shadow-md' : 'text-slate-400'}`}>
                           <ChevronDown className="w-4 h-4" />
@@ -732,14 +822,14 @@ function TicketChat({ ticket: initialTicket, authFetch, onBack, getStatusBadge, 
                       </div>
                     )}
 
-                    {!isUser && !isOnlyImages && (
-                      <div className="text-[12px] font-bold text-[#e87c03] mb-0.5">{msg.senderName || 'Support Team'}</div>
+                    {!isUserMsg && !isOnlyImages && (
+                      <div className="text-[12px] font-bold text-[#e87c03] mb-0.5">Support Team</div>
                     )}
 
                     {msg.is_deleted ? (
                       <div className="flex items-center gap-1.5 italic text-[#667781] py-1">
                         <XCircle className="w-4 h-4" />
-                        <span className="text-[14.5px]">{isUser ? "You deleted this message" : "This message was deleted"}</span>
+                        <span className="text-[14.5px]">{isUserMsg ? "You deleted this message" : "This message was deleted"}</span>
                       </div>
                     ) : editingMessageId === msg.id ? (
                       <div className="flex flex-col gap-2 min-w-[200px] mt-1">
@@ -756,13 +846,13 @@ function TicketChat({ ticket: initialTicket, authFetch, onBack, getStatusBadge, 
                       </div>
                     ) : (
                       <>
-                        {hasText && <p className={`text-[14.5px] whitespace-pre-wrap leading-snug text-[#111b21] ${isUser ? 'pr-4' : ''}`}>{msg.message}</p>}
+                        {hasText && <p className={`text-[14.5px] whitespace-pre-wrap leading-snug text-[#111b21] ${isUserMsg ? 'pr-4' : ''}`}>{msg.message}</p>}
                         
                         {msg.attachments && msg.attachments.length > 0 && (
                           <div className={`grid gap-1 max-w-[320px] ${hasText ? 'mt-2' : ''} ${msg.attachments.length === 1 ? 'grid-cols-1' : msg.attachments.length === 2 || msg.attachments.length === 4 ? 'grid-cols-2' : 'grid-cols-3'}`}>
                             {msg.attachments.map((att, i) => (
-                              <button key={i} onClick={() => setViewerSrc(att.file)} className={`relative overflow-hidden cursor-pointer w-full ${isOnlyImages ? 'rounded-xl shadow-sm' : 'rounded-md'}`}>
-                                <img src={att.file} className={`w-full object-cover ${isOnlyImages && msg.attachments.length === 1 ? 'max-h-64 h-auto' : 'aspect-square'} ${isOnlyImages ? '' : 'border border-black/5'}`} alt="attachment" />
+                              <button key={i} onClick={() => setViewerSrc(getFullUrl(att.file))} className={`relative overflow-hidden cursor-pointer w-full ${isOnlyImages ? 'rounded-xl shadow-sm' : 'rounded-md'}`}>
+                                <img src={getFullUrl(att.file)} className={`w-full object-cover ${isOnlyImages && msg.attachments.length === 1 ? 'max-h-64 h-auto' : 'aspect-square'} ${isOnlyImages ? '' : 'border border-black/5'}`} alt="attachment" />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
                                   <ZoomIn className="w-6 h-6 text-white" />
                                 </div>
@@ -776,8 +866,10 @@ function TicketChat({ ticket: initialTicket, authFetch, onBack, getStatusBadge, 
                     <div className={`flex justify-end items-center mt-1 space-x-1 float-right text-[11px] ${isOnlyImages ? 'bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full shadow-sm text-slate-700 ml-2' : 'text-[#667781] ml-3'}`}>
                       {msg.is_edited && !msg.is_deleted && <span>edited</span>}
                       <span>{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      {isUser && !msg.is_deleted && (
-                        <span className="text-[#53bdeb] tracking-tighter ml-0.5">✓✓</span>
+                      {isUserMsg && !msg.is_deleted && (
+                        <span className={`tracking-tighter ml-0.5 ${msg.delivery_status === 'SEEN' || msg.delivery_status === 'DELIVERED' ? 'text-[#53bdeb]' : 'text-slate-400'}`} title={msg.delivery_status}>
+                          {msg.delivery_status === 'SENDING' ? <Loader2 className="w-3 h-3 animate-spin inline" /> : msg.delivery_status === 'SENT' ? '✓' : '✓✓'}
+                        </span>
                       )}
                     </div>
                     <div className="clear-both"></div>

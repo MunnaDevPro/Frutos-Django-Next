@@ -275,10 +275,10 @@ class SupportTicketMessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SupportTicketMessage
-        fields = ['id', 'senderName', 'senderEmail', 'isAdmin', 'message', 'attachments', 'is_edited', 'is_deleted', 'created_at']
+        fields = ['id', 'senderName', 'senderEmail', 'isAdmin', 'message', 'attachments', 'is_edited', 'is_deleted', 'delivery_status', 'created_at']
         
     def get_isAdmin(self, obj):
-        return obj.sender.is_staff or obj.sender.is_superuser
+        return obj.is_admin_reply
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
