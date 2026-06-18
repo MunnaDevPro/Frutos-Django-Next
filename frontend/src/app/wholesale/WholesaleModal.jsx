@@ -349,7 +349,14 @@ export default function WholesaleModal({ isOpen, onClose }) {
       }
       await wholesaleRegister(payload)
 
-      // 2. Auto sign-in via NextAuth so they get a session
+      // 2. Clear any existing normal user session before auto sign-in
+      if (session?.user) {
+        localStorage.removeItem('cart_items')
+        if (typeof window !== 'undefined') window.dispatchEvent(new Event('cart_clear'))
+        await signOut({ redirect: false })
+      }
+
+      // 3. Auto sign-in via NextAuth so they get a session
       await signIn('wholesale', {
         email: applyData.email,
         password: applyData.password,
@@ -416,6 +423,13 @@ export default function WholesaleModal({ isOpen, onClose }) {
     setLoading(true)
     setServerError('')
     try {
+      // Clear any existing normal user session before wholesale login
+      if (session?.user) {
+        localStorage.removeItem('cart_items')
+        if (typeof window !== 'undefined') window.dispatchEvent(new Event('cart_clear'))
+        await signOut({ redirect: false })
+      }
+
       const result = await signIn('wholesale', {
         email: loginData.email,
         password: loginData.password,

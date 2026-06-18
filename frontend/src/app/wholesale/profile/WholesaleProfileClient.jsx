@@ -2,9 +2,9 @@
 
 'use client'
 // src/app/wholesale/profile/WholesaleProfileClient.jsx
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { signOut, useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import {
   updateWholesaleProfile, changeWholesalePassword, uploadWholesaleProfileImage,
@@ -20,12 +20,22 @@ import OrderLineTab       from './_tabs/OrderLineTab'
 import AccountInfoTab     from './_tabs/AccountInfoTab'
 export default function WholesaleProfileClient({ initialProfile, initialNotifications, initialOrders, accessToken }) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { update: updateSession } = useSession()
 
   const [profile,       setProfile]       = useState(initialProfile)
   const [notifications, setNotifications] = useState(initialNotifications)
   const [orders,        setOrders]        = useState(initialOrders || [])
-  const [activeTab,     setActiveTab]     = useState('overview')
+  
+  const [activeTab, setActiveTab] = useState(() => {
+    const tab = searchParams?.get('tab')
+    return tab || 'overview'
+  })
+
+  useEffect(() => {
+    const tab = searchParams?.get('tab')
+    if (tab) setActiveTab(tab)
+  }, [searchParams])
 
   // ── Edit profile ──────────────────────────────────────────────────────────
   const [editForm,    setEditForm]    = useState({
@@ -156,12 +166,15 @@ export default function WholesaleProfileClient({ initialProfile, initialNotifica
             <AccountInfoTab profile={profile} onImageUpload={handleImageUpload} imageUploading={imageUploading} />
           )}
           {activeTab === 'orders' && (
-            <OrdersTab orders={orders} onDeleteOrder={handleDeleteOrder} />
+            <OrdersTab orders={orders} onDeleteOrder={handleDeleteOrder} setProfileActiveTab={setActiveTab} accessToken={accessToken} />
           )}
           {activeTab === 'notifications' && (
             <NotificationsTab
-              notifications={notifications} unreadCount={unreadCount}
-              onMarkAllRead={handleMarkAllRead} onDelete={handleDeleteNotif}
+              notifications={notifications}
+              unreadCount={unreadCount}
+              onMarkAllRead={handleMarkAllRead}
+              onDelete={handleDeleteNotif}
+              orders={orders}
             />
           )}
           {activeTab === 'settings' && (

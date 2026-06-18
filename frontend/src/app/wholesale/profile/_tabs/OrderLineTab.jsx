@@ -5,7 +5,9 @@ import { Search, ChevronLeft, ChevronRight, Plus, Minus, Trash2, Printer, Shoppi
 import { getProducts, getCategories } from '@/lib/api'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 import { useCart } from '@/app/context/CartContext'
+import { siteSettingsService } from '@/app/dashboard/_lib/services'
 
 export default function OrderLineTab({ accessToken }) {
   const router = useRouter()
@@ -18,7 +20,6 @@ export default function OrderLineTab({ accessToken }) {
   const [cart, setCart] = useState([])
   const [placingOrder, setPlacingOrder] = useState(false)
   const [orderNumber] = useState(`ORD-${Math.floor(Math.random() * 10000)}`)
-
   useEffect(() => {
     async function fetchData() {
       try {
@@ -30,6 +31,11 @@ export default function OrderLineTab({ accessToken }) {
         setCategories(catsRes || [])
         setProducts(prodsRes || [])
       } catch (err) {
+        if (err.message && err.message.includes('401')) {
+          console.warn('Session expired (401), logging out...')
+          signOut({ callbackUrl: '/wholesale' })
+          return
+        }
         console.error('Error fetching data for order line:', err)
       } finally {
         setLoading(false)
@@ -48,11 +54,17 @@ export default function OrderLineTab({ accessToken }) {
   const addToCart = (product) => {
     setCart(prev => {
       const existing = prev.find(item => item.id === product.id)
-      const step = parseInt(product.wholesaleUnit) || product.minWholesaleQty || 1
+      const step = parseInt(product.minimum_purchase) || parseInt(product.minWholesaleQty) || 1
+      const stock = product.inStock || 0
+      
       if (existing) {
-        return prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + step } : item)
+        return prev.map(item => item.id === product.id ? { ...item, quantity: Math.min(item.quantity + step, stock) } : item)
       }
-      return [...prev, { ...product, quantity: step }]
+      
+      const initialQty = Math.min(step, stock)
+      if (initialQty <= 0) return prev
+      
+      return [...prev, { ...product, quantity: initialQty }]
     })
   }
 
@@ -63,13 +75,35 @@ export default function OrderLineTab({ accessToken }) {
   const updateQuantity = (productId, delta) => {
     setCart(prev => prev.map(item => {
       if (item.id === productId) {
-        const step = parseInt(item.wholesaleUnit) || item.minWholesaleQty || 1
-        const newQ = item.quantity + (delta * step)
+        const newQ = (parseInt(item.quantity) || 0) + delta
         if (newQ <= 0) return null
-        return { ...item, quantity: newQ }
+        const stock = item.inStock || 0
+        return { ...item, quantity: Math.min(newQ, stock) }
       }
       return item
     }).filter(Boolean))
+  }
+
+  const setExactQuantity = (productId, value) => {
+    if (value === '') {
+      setCart(prev => prev.map(item => item.id === productId ? { ...item, quantity: '' } : item))
+      return
+    }
+    const num = parseInt(value)
+    if (isNaN(num)) return
+    
+    if (num <= 0) {
+      removeFromCart(productId)
+      return
+    }
+
+    setCart(prev => prev.map(item => {
+      if (item.id === productId) {
+        const stock = item.inStock || 0
+        return { ...item, quantity: Math.min(num, stock) }
+      }
+      return item
+    }))
   }
 
   const getQuantityInCart = (productId) => {
@@ -84,8 +118,15 @@ export default function OrderLineTab({ accessToken }) {
     return item.wholesale_unit || item.unit || item.wholesaleUnit || ''
   }
 
-  const subtotal = cart.reduce((sum, item) => sum + (getDisplayPrice(item) * item.quantity), 0)
-  const tax = subtotal * 0.05 // Assuming 5% tax or calculate as needed
+  const subtotal = cart.reduce((sum, item) => sum + (getDisplayPrice(item) * (parseInt(item.quantity) || 0)), 0)
+  
+  // Calculate tax per product using its individual tax_rate (defaulting to 5% if missing)
+  const tax = cart.reduce((sum, item) => {
+    const itemTaxRate = item.tax_rate ? parseFloat(item.tax_rate) / 100 : 0.05
+    return sum + (getDisplayPrice(item) * (parseInt(item.quantity) || 0) * itemTaxRate)
+  }, 0)
+  
+  const effectiveTaxRate = subtotal > 0 ? (tax / subtotal * 100) : 0
   const total = subtotal + tax
 
   const handlePlaceOrder = async () => {
@@ -126,7 +167,7 @@ export default function OrderLineTab({ accessToken }) {
         </div>
 
         {/* Categories Tabs */}
-        <div className="px-4 py-3 border-b border-gray-100 bg-white overflow-x-auto scrollbar-hide flex gap-3 z-10">
+        <div className="px-4 py-3 border-b border-gray-100 bg-white flex flex-wrap gap-3 z-10">
           <button
             onClick={() => setActiveCategory('All')}
             className={`whitespace-nowrap px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${activeCategory === 'All'
@@ -169,18 +210,18 @@ export default function OrderLineTab({ accessToken }) {
               {filteredProducts.map((product) => {
                 const qty = getQuantityInCart(product.id)
                 const isSelected = qty > 0
-                const step = parseInt(product.wholesaleUnit) || product.minWholesaleQty || 1
+                const step = parseInt(product.minimum_purchase) || parseInt(product.minWholesaleQty) || 1
                 const stock = product.inStock || 0
                 const canAddMore = (qty + step) <= stock
                 return (
                   <div key={product.id} className={`bg-white rounded-2xl border transition-all duration-200 flex flex-col h-full overflow-hidden ${isSelected ? 'border-[#085041] shadow-md ring-1 ring-[#085041]/10' : 'border-gray-100 shadow-sm hover:shadow-md'}`}>
 
                     {/* Image Area */}
-                    <div className="relative w-full pt-[75%] bg-[#F8F9FA] flex items-center justify-center overflow-hidden">
-                      <div className="absolute inset-0 flex items-center justify-center p-4">
-                        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden shadow-sm bg-white border border-gray-100 shrink-0 transition-transform duration-300 hover:scale-105">
+                    <div className="relative w-full pt-[65%] sm:pt-[55%] bg-[#F8F9FA] overflow-hidden border-b border-gray-50 shrink-0">
+                      <div className="absolute inset-0 flex items-center justify-center p-3">
+                        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-white shrink-0 flex items-center justify-center">
                           {product.image_url || product.image ? (
-                            <Image src={product.image_url || product.image} alt={product.name || product.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
+                            <Image src={product.image_url || product.image} alt={product.name || product.title} fill className="object-contain p-2 sm:p-3" sizes="(max-width: 768px) 100vw, 33vw" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-[10px] text-[#085041] bg-[#e8f5e9] font-medium">No Img</div>
                           )}
@@ -189,36 +230,45 @@ export default function OrderLineTab({ accessToken }) {
                     </div>
 
                     {/* Content Area */}
-                    <div className="p-3 sm:p-4 flex flex-col flex-1">
-                      <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">
+                    <div className="p-2.5 sm:p-3 flex flex-col flex-1">
+                      <div className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-0.5">
                         {typeof product.category === 'string' ? product.category : product.category?.name || 'Category'}
                       </div>
-                      <h4 className="font-semibold text-gray-900 text-[13px] sm:text-[14px] leading-tight mb-3 line-clamp-2">
+                      <h4 className="font-semibold text-gray-900 text-[12px] sm:text-[13px] leading-tight mb-2 line-clamp-2">
                         {product.name || product.title}
                       </h4>
 
-                      <div className="flex items-center justify-between gap-2 mt-auto pt-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mt-auto pt-2 border-t border-gray-50">
                         {/* Price */}
-                        <div className="flex flex-col">
-                          <span className="font-bold text-gray-900 text-[14px] sm:text-[15px] leading-none shrink-0">
+                        <div className="flex flex-col min-w-[50px]">
+                          <span className="font-bold text-gray-900 text-[13px] sm:text-[14px] leading-none">
                             €{getDisplayPrice(product).toFixed(2)}
                           </span>
                           {getDisplayUnit(product) && <span className="text-[10px] text-gray-400 mt-0.5">/ {getDisplayUnit(product)}</span>}
                         </div>
 
                         {/* Compact Stepper Pill */}
-                        <div className="flex items-center gap-0.5 sm:gap-1 bg-gray-50 rounded-full p-0.5 sm:p-1 border border-gray-100 shrink-0">
+                        <div className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-200 shrink-0 shadow-sm ml-auto">
                           <button
-                            onClick={() => isSelected && updateQuantity(product.id, -1)}
-                            disabled={!isSelected}
-                            className={`w-5 h-5 sm:w-6 sm:h-6 shrink-0 flex items-center justify-center rounded-full transition-colors ${isSelected ? 'bg-white text-gray-700 shadow-sm cursor-pointer hover:bg-gray-100' : 'text-gray-300 cursor-not-allowed'}`}
+                            onClick={() => isSelected && qty > step && updateQuantity(product.id, -1)}
+                            disabled={!isSelected || qty <= step}
+                            className={`w-5 h-5 sm:w-6 sm:h-6 shrink-0 flex items-center justify-center rounded-full transition-colors ${isSelected && qty > step ? 'bg-white text-gray-700 shadow-sm cursor-pointer hover:bg-gray-100' : 'text-gray-300 cursor-not-allowed'}`}
                           >
                             <Minus size={12} strokeWidth={2.5} />
                           </button>
 
-                          <span className={`text-[11px] sm:text-[12px] font-bold min-w-[14px] sm:min-w-[16px] text-center leading-none ${isSelected ? 'text-[#085041]' : 'text-gray-800'}`}>
-                            {qty}
-                          </span>
+                          <input
+                            type="text"
+                            value={qty}
+                            onChange={(e) => setExactQuantity(product.id, e.target.value)}
+                            onBlur={() => {
+                              // If they leave it blank or 0, restore to minimum purchase or 1
+                              if (qty === '' || parseInt(qty) <= 0) {
+                                setExactQuantity(product.id, step)
+                              }
+                            }}
+                            className={`w-6 sm:w-7 text-[11px] sm:text-[12px] font-bold text-center leading-none bg-transparent outline-none border-none p-0 ${isSelected ? 'text-[#085041]' : 'text-gray-800'}`}
+                          />
 
                           <button
                             onClick={() => !isSelected ? addToCart(product) : updateQuantity(product.id, 1)}
@@ -263,9 +313,10 @@ export default function OrderLineTab({ accessToken }) {
             </div>
           ) : (
             cart.map(item => {
-              const step = parseInt(item.wholesaleUnit) || item.minWholesaleQty || 1
+              const step = parseInt(item.minimum_purchase) || parseInt(item.minWholesaleQty) || 1
               const stock = item.inStock || 0
               const canAddMore = (item.quantity + step) <= stock
+              const canDecrease = item.quantity > step
               return (
                 <div key={item.id} className="flex gap-3">
                   <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden relative flex-shrink-0">
@@ -281,9 +332,15 @@ export default function OrderLineTab({ accessToken }) {
                   <div className="flex flex-col items-end gap-1">
                     <span className="text-sm font-bold text-gray-900">€{(getDisplayPrice(item) * item.quantity).toFixed(2)}</span>
                     <div className="flex items-center gap-2 bg-gray-50 rounded-full p-1 px-2 border border-gray-100">
-                      <button onClick={() => updateQuantity(item.id, -1)} className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer">
-                        <Minus size={12} strokeWidth={2.5} />
-                      </button>
+                      {canDecrease ? (
+                        <button onClick={() => updateQuantity(item.id, -1)} className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer">
+                          <Minus size={12} strokeWidth={2.5} />
+                        </button>
+                      ) : (
+                        <button onClick={() => removeFromCart(item.id)} className="text-red-400 hover:text-red-600 transition-colors cursor-pointer">
+                          <Trash2 size={12} strokeWidth={2.5} />
+                        </button>
+                      )}
                       <span className="text-xs font-bold min-w-[24px] text-center flex items-baseline justify-center gap-0.5">
                         {item.quantity}
                         {getDisplayUnit(item) && <span className="text-[9px] font-medium text-gray-500 uppercase tracking-wider">{getDisplayUnit(item)}</span>}
@@ -311,7 +368,7 @@ export default function OrderLineTab({ accessToken }) {
               <span>€{subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-gray-600">
-              <span>Tax (5%)</span>
+              <span>Tax {cart.length > 0 ? `(${Number(effectiveTaxRate.toFixed(1))}%)` : ''}</span>
               <span>€{tax.toFixed(2)}</span>
             </div>
             <div className="pt-2 border-t border-gray-200 flex justify-between font-bold text-lg text-[#085041]">

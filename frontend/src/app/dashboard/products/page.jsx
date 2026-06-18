@@ -64,7 +64,7 @@ function ProductForm({
     name: "", slug: "", description: "", nutritional_info: "",
     origin: "", unit: "", wholesale_unit: "", badge: "", badge_color: "",
     price: "", discount_price: "", wholesale_price: "",
-    minimum_purchase: "", affiliate_commission_rate: "",
+    minimum_purchase: "", tax_rate: "",
     stock: "", is_active: "true",
     weight: "", length: "", width: "", height: "",
     shop: "", brand: "", category: "", sub_category: "", shipping_category: "",
@@ -157,7 +157,7 @@ function ProductForm({
         discount_price:           form.discount_price  || null,
         wholesale_price:          form.wholesale_price || null,
         minimum_purchase:         form.minimum_purchase || null,
-        affiliate_commission_rate: form.affiliate_commission_rate || "",
+        tax_rate:                 form.tax_rate || "5.00",
         stock:                    form.stock || 0,
         is_active:                form.is_active === "true",
         weight:                   form.weight || null,
@@ -367,9 +367,9 @@ function ProductForm({
                 value={form.discount_price || ""} onChange={e => handleChange("discount_price", e.target.value)} placeholder="0.00" />
             </div>
             <div>
-              <label className={labelCls}>Affiliate Commission %</label>
+              <label className={labelCls}>Tax Rate (%)</label>
               <input type="number" step="0.01" min="0" max="100" className={inputCls}
-                value={form.affiliate_commission_rate || ""} onChange={e => handleChange("affiliate_commission_rate", e.target.value)} placeholder="0.00" />
+                value={form.tax_rate || ""} onChange={e => handleChange("tax_rate", e.target.value)} placeholder="5.00" />
             </div>
             <div>
               <label className={labelCls}>Stock <span className="text-red-500">*</span></label>

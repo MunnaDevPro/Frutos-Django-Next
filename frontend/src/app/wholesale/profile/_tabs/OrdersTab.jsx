@@ -1,289 +1,323 @@
-
-
 // src/app/wholesale/profile/_tabs/OrdersTab.jsx
-import { useState } from 'react'
-import Card from '../_shared/Card'
+import { useState, useMemo, useEffect } from 'react'
+import { getWholesaleDailyReports } from '@/lib/api'
+import InvoiceModal from './InvoiceModal'
+import DailyReportModal from './DailyReportModal'
 
-const STATUS_CONFIG = {
-  pending:          { label: 'Pending',          bg: '#FEF3C7', color: '#92400E' },
-  confirmed:        { label: 'Confirmed',        bg: '#D1FAE5', color: '#065F46' },
-  preparing:        { label: 'Preparing',        bg: '#FEF3C7', color: '#92400E' },
-  out_for_delivery: { label: 'Out for Delivery', bg: '#DBEAFE', color: '#1E40AF' },
-  delivered:        { label: 'Delivered',        bg: '#D1FAE5', color: '#065F46' },
-  cancelled:        { label: 'Cancelled',        bg: '#FEE2E2', color: '#991B1B' },
-}
+export default function OrdersTab({ orders, onDeleteOrder, setProfileActiveTab, accessToken }) {
+  const [mainTab, setMainTab] = useState('PREVIOUS ORDER') // 'TRACK YOUR ORDER', 'PREVIOUS ORDER', 'DAILY REPORTS'
+  const [activeTab, setActiveTab] = useState('ALL') // 'ALL', 'PENDING', 'PROCESSING', 'DELIVERED', 'CANCELLED'
+  const [currentPage, setCurrentPage] = useState(1)
+  const [viewOrder, setViewOrder] = useState(null)
+  
+  const [dailyReports, setDailyReports] = useState([])
+  const [loadingReports, setLoadingReports] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
+  
+  const ITEMS_PER_PAGE = 10
 
-// ── Confirmation Modal ────────────────────────────────────────────────────────
-function CancelModal({ orderNumber, onConfirm, onClose }) {
+  // Filter orders based on active tab
+  const filteredOrders = useMemo(() => {
+    return orders.filter(order => {
+      if (activeTab === 'ALL') return true
+      const status = (order.status || '').toUpperCase()
+      if (activeTab === 'PENDING') return status === 'PENDING'
+      if (activeTab === 'PROCESSING') return status === 'PROCESSING' || status === 'CONFIRMED' || status === 'OUT_FOR_DELIVERY'
+      if (activeTab === 'DELIVERED') return status === 'DELIVERED'
+      if (activeTab === 'CANCELLED') return status === 'CANCELLED'
+      return true
+    })
+  }, [orders, activeTab])
+
+  const displayOrders = mainTab === 'TRACK YOUR ORDER' 
+    ? (filteredOrders.length > 0 ? [filteredOrders[0]] : []) 
+    : filteredOrders
+
+  // Pagination logic
+  const totalPages = Math.ceil(displayOrders.length / ITEMS_PER_PAGE)
+  const paginatedOrders = displayOrders.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page)
+    }
+  }
+
+  // Fetch daily reports
+  useEffect(() => {
+    if (mainTab === 'DAILY REPORTS' && accessToken) {
+      setLoadingReports(true)
+      getWholesaleDailyReports(accessToken)
+        .then(data => setDailyReports(Array.isArray(data) ? data : (data?.results || [])))
+        .catch(err => console.error(err))
+        .finally(() => setLoadingReports(false))
+    }
+  }, [mainTab, accessToken])
+
+  const getStatusBadge = (status) => {
+    const s = (status || '').toLowerCase()
+    if (s === 'pending') return <span className="bg-amber-50 text-amber-600 border border-amber-200 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">Pending</span>
+    if (s.includes('process') || s.includes('confirm')) return <span className="bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">Processing</span>
+    if (s === 'delivered' || s === 'completed') return <span className="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">Delivered</span>
+    if (s === 'cancelled') return <span className="bg-rose-50 text-rose-600 border border-rose-200 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">Cancelled</span>
+    return <span className="bg-gray-50 text-gray-600 border border-gray-200 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">{status}</span>
+  }
+
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        onClick={onClose}
-        style={{
-          position: 'fixed', inset: 0,
-          background: 'rgba(8, 30, 19, 0.45)',
-          backdropFilter: 'blur(3px)',
-          zIndex: 1000,
-          animation: 'fadeIn 0.18s ease',
-        }}
-      />
-
-      {/* Modal */}
-      <div style={{
-        position: 'fixed',
-        top: '50%', left: '50%',
-        transform: 'translate(-50%, -50%)',
-        zIndex: 1001,
-        background: '#FFFFFF',
-        borderRadius: 16,
-        padding: '28px 28px 22px',
-        width: 'min(380px, calc(100vw - 32px))',
-        boxShadow: '0 20px 60px rgba(8,30,19,0.18), 0 4px 16px rgba(8,30,19,0.08)',
-        animation: 'popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
-      }}>
-
-        {/* Icon */}
-        <div style={{
-          width: 48, height: 48, borderRadius: 12,
-          background: '#FEE2E2',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          margin: '0 auto 16px',
-        }}>
-          <svg width="22" height="22" fill="none" stroke="#991B1B" strokeWidth="2" viewBox="0 0 24 24">
-            <polyline points="3,6 5,6 21,6"/>
-            <path d="M19,6l-1,14H6L5,6M10,11v6M14,11v6M9,6V4h6v2"/>
-          </svg>
-        </div>
-
-        {/* Text */}
-        <h3 style={{
-          margin: '0 0 8px', textAlign: 'center',
-          fontSize: 17, fontWeight: 700, color: '#151E13',
-          fontFamily: 'inherit',
-        }}>
-          Cancel Order?
-        </h3>
-        <p style={{
-          margin: '0 0 24px', textAlign: 'center',
-          fontSize: 13.5, color: '#6D7A73', lineHeight: 1.5,
-          fontFamily: 'inherit',
-        }}>
-          Are you sure you want to cancel order{' '}
-          <span style={{ fontFamily: 'monospace', fontWeight: 700, color: '#085041' }}>
-            #{orderNumber}
-          </span>
-          ? This action cannot be undone.
-        </p>
-
-        {/* Buttons */}
-        <div style={{ display: 'flex', gap: 10 }}>
-          <button
-            onClick={onClose}
-            style={{
-              flex: 1, padding: '10px 0',
-              background: '#F3F6F4', border: '1px solid #E2EAE5',
-              borderRadius: 10, cursor: 'pointer',
-              fontSize: 13.5, fontWeight: 600, color: '#374151',
-              fontFamily: 'inherit', transition: 'background 0.15s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = '#E8F0EA'}
-            onMouseLeave={e => e.currentTarget.style.background = '#F3F6F4'}
-          >
-            Keep Order
-          </button>
-
-          <button
-            onClick={onConfirm}
-            style={{
-              flex: 1, padding: '10px 0',
-              background: '#991B1B', border: 'none',
-              borderRadius: 10, cursor: 'pointer',
-              fontSize: 13.5, fontWeight: 600, color: '#FFFFFF',
-              fontFamily: 'inherit', transition: 'background 0.15s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = '#7F1D1D'}
-            onMouseLeave={e => e.currentTarget.style.background = '#991B1B'}
-          >
-            Yes, Cancel
-          </button>
-        </div>
+    <div className="w-full">
+      {/* Top action tabs matching the screenshot style (Placeholder functionality for some) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <button 
+          onClick={() => setProfileActiveTab('order_line')}
+          className="bg-emerald-50 border border-emerald-200 text-emerald-700 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 p-3 sm:py-4 rounded-xl shadow-sm font-semibold text-[11px] sm:text-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md cursor-pointer"
+        >
+          <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          <span className="text-center">CREATE ORDER</span>
+        </button>
+        <button 
+          onClick={() => { setMainTab('TRACK YOUR ORDER'); setCurrentPage(1); }}
+          className={`${mainTab === 'TRACK YOUR ORDER' ? 'bg-indigo-100 border-indigo-300 shadow-md scale-100 sm:scale-105 z-10' : 'bg-indigo-50 border-indigo-100 hover:-translate-y-1 hover:shadow-md'} text-indigo-700 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 p-3 sm:py-4 rounded-xl shadow-sm font-semibold text-[11px] sm:text-sm transition-all duration-200 cursor-pointer`}
+        >
+          <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          <span className="text-center">TRACK ORDER</span>
+        </button>
+        <button 
+          onClick={() => { setMainTab('PREVIOUS ORDER'); setCurrentPage(1); }}
+          className={`${mainTab === 'PREVIOUS ORDER' ? 'bg-blue-100 border-blue-300 shadow-md scale-100 sm:scale-105 z-10' : 'bg-blue-50 border-blue-100 hover:-translate-y-1 hover:shadow-md'} text-blue-700 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 p-3 sm:py-4 rounded-xl shadow-sm font-semibold text-[11px] sm:text-sm transition-all duration-200 cursor-pointer`}
+        >
+          <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span className="text-center">PREVIOUS ORDER</span>
+        </button>
+        <button 
+          onClick={() => { setMainTab('DAILY REPORTS'); setCurrentPage(1); }}
+          className={`${mainTab === 'DAILY REPORTS' ? 'bg-rose-100 border-rose-300 shadow-md scale-100 sm:scale-105 z-10' : 'bg-rose-50 border-rose-100 hover:-translate-y-1 hover:shadow-md'} text-rose-700 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 p-3 sm:py-4 rounded-xl shadow-sm font-semibold text-[11px] sm:text-sm transition-all duration-200 cursor-pointer`}
+        >
+          <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span className="text-center">DAILY REPORTS</span>
+        </button>
       </div>
 
-      <style>{`
-        @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-        @keyframes popIn  {
-          from { opacity: 0; transform: translate(-50%, -48%) scale(0.92) }
-          to   { opacity: 1; transform: translate(-50%, -50%) scale(1) }
-        }
-      `}</style>
-    </>
-  )
-}
-
-// ── Main Component ────────────────────────────────────────────────────────────
-export default function OrdersTab({ orders, onDeleteOrder }) {
-  const [confirmOrder, setConfirmOrder] = useState(null) // orderNumber | null
-  const [expandedOrders, setExpandedOrders] = useState({})
-
-  const toggleOrder = (orderId) => {
-    setExpandedOrders(prev => ({ ...prev, [orderId]: !prev[orderId] }))
-  }
-
-  const handleCancelClick = (orderNumber) => {
-    setConfirmOrder(orderNumber)
-  }
-
-  const handleConfirm = () => {
-    onDeleteOrder(confirmOrder)
-    setConfirmOrder(null)
-  }
-
-  const handleClose = () => {
-    setConfirmOrder(null)
-  }
-
-  return (
-    <>
-      {/* Confirmation Modal */}
-      {confirmOrder && (
-        <CancelModal
-          orderNumber={confirmOrder}
-          onConfirm={handleConfirm}
-          onClose={handleClose}
-        />
-      )}
-
-      <Card title="My Orders" icon={
-        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
-          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" />
-        </svg>
-      }>
-        {orders.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: '#9DAAA3' }}>
-            <svg width="38" height="38" fill="none" stroke="currentColor" strokeWidth="1.4" viewBox="0 0 24 24"
-              style={{ margin: '0 auto 12px', display: 'block' }}>
-              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0" />
-            </svg>
-            <p style={{ fontSize: 14, margin: 0 }}>No orders yet.</p>
+      {mainTab === 'DAILY REPORTS' ? (
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+          {/* Table Header / Filters */}
+          <div className="p-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50">
+            <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+              Your last order [Submitted reports]
+            </h2>
+            <button 
+              onClick={() => setShowReportModal(true)}
+              className="bg-[#085041] text-white px-4 py-2 rounded text-sm font-semibold hover:bg-[#064032] hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 cursor-pointer"
+            >
+              Add New
+            </button>
           </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {orders.map(order => {
-              const sc = STATUS_CONFIG[order.status] || { label: order.status, bg: '#F3F4F6', color: '#374151' }
-              const cancellable = !['out_for_delivery', 'delivered'].includes(order.status)
-              const isExpanded = !!expandedOrders[order.id]
 
-              return (
-                <div key={order.id} style={{
-                  background: '#FAFCFA', border: '1px solid #E8F0EA',
-                  borderRadius: 12, overflow: 'hidden',
-                }}>
-                  {/* Header */}
-                  <div 
-                    onClick={() => toggleOrder(order.id)}
-                    style={{
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
-                      padding: '11px 14px', borderBottom: isExpanded ? '1px solid #F0F5F2' : 'none',
-                      flexWrap: 'wrap', gap: 8, cursor: 'pointer',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                      <svg 
-                        width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
-                        style={{ 
-                          color: '#085041', 
-                          transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                          transition: 'transform 0.2s ease'
-                        }}
+          <div className="overflow-x-auto [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full">
+            <table className="w-full text-sm text-left">
+              <thead className="bg-white text-gray-800 border-b border-gray-200 font-bold">
+                <tr>
+                  <th className="px-4 py-3 border-r border-gray-100">S/N</th>
+                  <th className="px-4 py-3 border-r border-gray-100">Shop</th>
+                  <th className="px-4 py-3 border-r border-gray-100">Cash</th>
+                  <th className="px-4 py-3 border-r border-gray-100">Bank</th>
+                  <th className="px-4 py-3 border-r border-gray-100">Expense</th>
+                  <th className="px-4 py-3 border-r border-gray-100">Store</th>
+                  <th className="px-4 py-3 border-r border-gray-100">Buy</th>
+                  <th className="px-4 py-3 border-r border-gray-100">Buy note</th>
+                  <th className="px-4 py-3">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loadingReports ? (
+                  <tr><td colSpan="9" className="px-4 py-8 text-center text-gray-500">Loading reports...</td></tr>
+                ) : dailyReports.length > 0 ? (
+                  dailyReports.map((report, index) => (
+                    <tr key={report.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 border-r border-gray-100 text-gray-500">{index + 1}</td>
+                      <td className="px-4 py-3 border-r border-gray-100">{report.shop || 'Shop'}</td>
+                      <td className="px-4 py-3 border-r border-gray-100">{report.cash}</td>
+                      <td className="px-4 py-3 border-r border-gray-100">{report.bank}</td>
+                      <td className="px-4 py-3 border-r border-gray-100">{report.expenses}</td>
+                      <td className="px-4 py-3 border-r border-gray-100">{report.store}</td>
+                      <td className="px-4 py-3 border-r border-gray-100">{report.purchase}</td>
+                      <td className="px-4 py-3 border-r border-gray-100">{report.purchase_note}</td>
+                      <td className="px-4 py-3">{report.date}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr><td colSpan="9" className="px-4 py-8 text-center text-gray-500">No reports found.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        
+        {/* Table Header / Filters */}
+        <div className="p-4 border-b border-gray-200 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-gray-50">
+          <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+            {mainTab === 'TRACK YOUR ORDER' ? 'Your latest order' : 'Your all orders'}
+          </h2>
+          <div className="flex gap-2 overflow-x-auto w-full lg:w-auto py-1 [&::-webkit-scrollbar]:hidden">
+            {['ALL', 'PENDING', 'PROCESSING', 'DELIVERED', 'CANCELLED'].map(tab => (
+              <button
+                key={tab}
+                onClick={() => { setActiveTab(tab); setCurrentPage(1); }}
+                className={`px-4 py-2 rounded-lg cursor-pointer whitespace-nowrap text-center text-xs font-bold border ${activeTab === tab ? 'bg-[#085041] border-[#085041] text-white' : 'bg-white text-gray-600 border-gray-200'}`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Table */}
+        <div className="hidden md:block overflow-x-auto [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full pb-2">
+          <table className="w-full text-sm text-left min-w-[800px]">
+            <thead className="bg-white text-gray-800 border-b border-gray-200 font-bold">
+              <tr>
+                <th className="px-4 py-3 text-center border-r border-gray-100 w-12">S/N</th>
+                <th className="px-4 py-3 border-r border-gray-100">Shop</th>
+                <th className="px-4 py-3 border-r border-gray-100">Requisition Number</th>
+                <th className="px-4 py-3 border-r border-gray-100">Date</th>
+                <th className="px-4 py-3 border-r border-gray-100">Approved by</th>
+                <th className="px-4 py-3 border-r border-gray-100 text-center">Status</th>
+                <th className="px-4 py-3 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedOrders.length > 0 ? (
+                paginatedOrders.map((order, index) => (
+                  <tr key={order.id || order.order_number} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-3 text-center border-r border-gray-100 text-gray-500">
+                      {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
+                    </td>
+                    <td className="px-4 py-3 border-r border-gray-100 text-gray-700">
+                      {order.customer_name || 'Wholesale Shop'}
+                    </td>
+                    <td className="px-4 py-3 border-r border-gray-100 text-gray-700">
+                      {order.order_number}
+                    </td>
+                    <td className="px-4 py-3 border-r border-gray-100 text-gray-600">
+                      {order.ordered_at ? new Date(order.ordered_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
+                    </td>
+                    <td className="px-4 py-3 border-r border-gray-100 text-gray-600 uppercase">
+                      ACCOUNT MANAGER
+                    </td>
+                    <td className="px-4 py-3 border-r border-gray-100 text-center">
+                      {getStatusBadge(order.status)}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <button 
+                        onClick={() => setViewOrder(order)}
+                        className="bg-white border border-[#085041] text-[#085041] p-1.5 rounded-lg hover:bg-[#085041] hover:text-white transition-all duration-200 cursor-pointer shadow-sm mx-auto flex items-center justify-center group"
+                        title="View Invoice"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                      </svg>
-                      <span style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 700, color: '#085041' }}>
-                        #{order.order_number}
-                      </span>
-                      <span style={{
-                        fontSize: 10.5, fontWeight: 700, padding: '3px 9px',
-                        borderRadius: 100, background: sc.bg, color: sc.color,
-                        textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap',
-                      }}>
-                        {sc.label}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                      <span style={{ fontSize: 13, fontWeight: 800, color: '#085041' }}>
-                        €{Number(order.total_amount).toFixed(2)}
-                      </span>
-                      {cancellable && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleCancelClick(order.order_number); }}
-                          style={{
-                            background: 'none', border: '1px solid #FEE2E2', borderRadius: 8,
-                            padding: '4px 9px', cursor: 'pointer', color: '#991B1B',
-                            fontSize: 11.5, fontWeight: 600, fontFamily: 'inherit',
-                            display: 'flex', alignItems: 'center', gap: 4,
-                          }}
-                        >
-                          <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <polyline points="3,6 5,6 21,6"/>
-                            <path d="M19,6l-1,14H6L5,6M10,11v6M14,11v6M9,6V4h6v2"/>
-                          </svg>
-                          Cancel
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="group-hover:scale-110 transition-transform"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
+                    No orders found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-                  {/* Expandable Content */}
-                  {isExpanded && (
-                    <div style={{ animation: 'fadeIn 0.2s ease-in-out' }}>
-                      {/* Date */}
-                      <div style={{ padding: '4px 14px', fontSize: 11.5, color: '#9DAAA3' }}>
-                    {new Date(order.ordered_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+        {/* Mobile View (Cards) */}
+        <div className="md:hidden flex flex-col">
+          {paginatedOrders.length > 0 ? (
+            paginatedOrders.map((order, index) => (
+              <div key={order.id || order.order_number} className="border-b border-gray-200 p-4">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <span className="text-xs text-gray-500 block">Requisition Number</span>
+                    <span className="font-bold text-gray-800">{order.order_number}</span>
                   </div>
-
-                  {/* Items */}
-                  <div style={{ padding: '8px 14px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {(order.items || []).map(item => (
-                      <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                          {item.product_image && (
-                            <div style={{ width: 30, height: 30, borderRadius: 6, overflow: 'hidden', flexShrink: 0 }}>
-                              <img src={item.product_image} alt={item.product_name}
-                                style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            </div>
-                          )}
-                          <span style={{ color: '#151E13', fontWeight: 500, fontSize: 13, wordBreak: 'break-word' }}>
-                            {item.product_name}
-                          </span>
-                        </div>
-                        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexShrink: 0 }}>
-                          <span style={{ color: '#6D7A73', fontSize: 12 }}>×{item.quantity}</span>
-                          <span style={{ fontWeight: 600, color: '#151E13', fontSize: 13 }}>
-                            €{Number(item.line_total).toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Delivery info */}
-                  {(order.delivery_date || order.delivery_slot_label) && (
-                    <div style={{
-                      padding: '8px 14px', borderTop: '1px solid #F0F5F2',
-                      fontSize: 11.5, color: '#6D7A73', display: 'flex', gap: 12, flexWrap: 'wrap',
-                    }}>
-                      {order.delivery_date && <span> {order.delivery_date}</span>}
-                      {order.delivery_slot_label && <span> {order.delivery_slot_label}</span>}
-                    </div>
-                  )}
-                    </div>
-                  )}
+                  <div>{getStatusBadge(order.status)}</div>
                 </div>
-              )
-            })}
+                <div className="flex justify-between items-center mb-3">
+                  <div>
+                    <span className="text-xs text-gray-500 block">Date</span>
+                    <span className="text-sm text-gray-700">
+                      {order.ordered_at ? new Date(order.ordered_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-500 block">Shop</span>
+                    <span className="text-sm text-gray-700">{order.customer_name || 'Wholesale Shop'}</span>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setViewOrder(order)}
+                  className="w-full bg-white border border-[#085041] text-[#085041] py-2.5 rounded-lg font-bold hover:bg-[#085041] hover:text-white hover:shadow-md transition-all duration-200 cursor-pointer flex justify-center items-center gap-2 text-sm"
+                >
+                  <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                  View Order Details
+                </button>
+              </div>
+            ))
+          ) : (
+             <div className="px-4 py-8 text-center text-gray-500">
+              No orders found.
+            </div>
+          )}
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="p-4 border-t border-gray-200 flex justify-end items-center gap-1">
+            <button 
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-2 py-1 border border-gray-300 rounded text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 bg-white transition-colors cursor-pointer"
+            >
+              &lsaquo;
+            </button>
+            
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`px-3 py-1 border rounded text-sm transition-all duration-200 cursor-pointer ${currentPage === page ? 'bg-[#16a34a] text-white border-[#16a34a] scale-105 shadow-sm' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'}`}
+              >
+                {page}
+              </button>
+            ))}
+            
+            <button 
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-2 py-1 border border-gray-300 rounded text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 bg-white transition-colors cursor-pointer"
+            >
+              &rsaquo;
+            </button>
           </div>
         )}
-      </Card>
-    </>
+      </div>
+      )}
+
+      {/* Invoice Modal */}
+      {viewOrder && (
+        <InvoiceModal order={viewOrder} onClose={() => setViewOrder(null)} />
+      )}
+
+      {/* Daily Report Modal */}
+      {showReportModal && (
+        <DailyReportModal 
+          accessToken={accessToken} 
+          onClose={() => setShowReportModal(false)}
+          onReportCreated={(newReport) => setDailyReports(prev => [newReport, ...(Array.isArray(prev) ? prev : [])])}
+        />
+      )}
+    </div>
   )
 }

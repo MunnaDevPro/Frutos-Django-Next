@@ -449,26 +449,29 @@ export default function DashboardHomePage() {
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-100">
                     {["Order ID", "Customer", "Amount", "Status", "Date"].map(h => (
-                      <th key={h} className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">{h}</th>
+                      <th key={h} className="px-4 py-2.5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {recentOrders.length === 0
-                    ? <tr><td colSpan={5} className="px-6 py-12 text-center text-slate-400 font-medium">No recent orders</td></tr>
+                    ? <tr><td colSpan={5} className="px-4 py-8 text-center text-slate-400 font-medium">No recent orders</td></tr>
                     : recentOrders.map(order => {
                         const sc = STATUS_COLORS[order.status?.toLowerCase()] || { bg: "bg-slate-100", text: "text-slate-600" };
+                        let displayStatus = order.status_display || order.status;
+                        if (displayStatus === 'Pending Confirmation') displayStatus = 'Pending';
+                        
                         return (
                           <tr key={order.id || order.order_number} className="hover:bg-slate-50 transition-colors">
-                            <td className="px-6 py-4 font-bold text-indigo-600">#{order.order_number}</td>
-                            <td className="px-6 py-4 font-medium text-slate-700">{order.customer_name}</td>
-                            <td className="px-6 py-4 font-bold text-slate-800">€{Number(order.total_amount).toLocaleString()}</td>
-                            <td className="px-6 py-4">
-                              <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full ${sc.bg} ${sc.text}`}>
-                                {order.status_display || order.status}
+                            <td className="px-4 py-2.5 font-bold text-indigo-600">#{order.order_number}</td>
+                            <td className="px-4 py-2.5 font-medium text-slate-700">{order.customer_name}</td>
+                            <td className="px-4 py-2.5 font-bold text-slate-800">€{Number(order.total_amount).toLocaleString()}</td>
+                            <td className="px-4 py-2.5">
+                              <span className={`inline-flex px-2.5 py-0.5 text-xs font-bold rounded-full ${sc.bg} ${sc.text}`}>
+                                {displayStatus}
                               </span>
                             </td>
-                            <td className="px-6 py-4 font-medium text-slate-500">
+                            <td className="px-4 py-2.5 font-medium text-slate-500">
                               {order.ordered_at ? new Date(order.ordered_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : "—"}
                             </td>
                           </tr>

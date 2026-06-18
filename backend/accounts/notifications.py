@@ -9,11 +9,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 STATUS_MESSAGES = {
-    'PENDING':    ('Order Placed 🛍️',   'Your order {order_number} has been placed and is awaiting confirmation.'),
-    'PROCESSING': ('Order Processing ⚙️', 'Great news! Your order {order_number} is now being processed and packed.'),
-    'SHIPPED':    ('Order Shipped 🚚',   'Your order {order_number} is on its way! It has been shipped.'),
-    'DELIVERED':  ('Order Delivered ✅', 'Your order {order_number} has been delivered. Enjoy your purchase!'),
-    'CANCELLED':  ('Order Cancelled ❌', 'Your order {order_number} has been cancelled. Contact us if you have questions.'),
+    'PENDING':    ('Order Placed',   'Your order {order_number} has been placed and is awaiting confirmation.'),
+    'PROCESSING': ('Order Processing', 'Great news! Your order {order_number} is now being processed and packed.'),
+    'SHIPPED':    ('Order Shipped',   'Your order {order_number} is on its way! It has been shipped.'),
+    'DELIVERED':  ('Order Delivered', 'Your order {order_number} has been delivered. Enjoy your purchase!'),
+    'CANCELLED':  ('Order Cancelled', 'Your order {order_number} has been cancelled. Contact us if you have questions.'),
 }
 
 
@@ -26,7 +26,18 @@ def send_order_status_notification(order):
     """
     from .models import Notification
 
-    user = order.user
+    user = getattr(order, 'user', None)
+    
+    if user is None and getattr(order, 'wholesale_user', None):
+        user = order.wholesale_user
+        
+    if user is None:
+        # Fallback for wholesale users matched by email
+        if getattr(order, 'is_wholesale_order', False) or getattr(order, 'wholesale_user_id', None):
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            user = User.objects.filter(email=order.customer_email).first()
+
     if user is None:
         return  # guest order — no notification
 
@@ -70,6 +81,27 @@ def send_order_status_notification(order):
         )
     except Exception as exc:
         logger.error('Failed to create notification: %s', exc)
+
+    # ── Wholesale Notification ──────────────────────────────────────────────
+    try:
+        from wholesale.models import WholesaleUser, WholesaleNotification
+        ws_user = WholesaleUser.objects.filter(email=order.customer_email).first()
+        if ws_user:
+            WholesaleNotification.objects.create(
+                user=ws_user,
+                type=WholesaleNotification.Type.ORDER,
+                title=title_tpl.format(**ctx),
+                message=msg_tpl.format(**ctx),
+                metadata={
+                    'orderNumber': order.order_number,
+                    'status':      order.status,
+                    'total':       str(order.total_amount),
+                    'icon':        icon_name,
+                },
+            )
+            logger.info('Wholesale notification created for ws_user=%s', ws_user.id)
+    except Exception as exc:
+        logger.error('Failed to create wholesale notification: %s', exc)
 
 
 def send_admin_notification(notification_type, title, message, metadata=None):

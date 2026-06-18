@@ -438,6 +438,13 @@ class Command(BaseCommand):
                 "setting_type": "number",
                 "group": "blog",
                 "description": "Number of blog posts to show on homepage"
+            },
+            {
+                "key": "tax_percentage",
+                "value": "5",
+                "setting_type": "number",
+                "group": "general",
+                "description": "Tax percentage applied to orders"
             }
         ]
         

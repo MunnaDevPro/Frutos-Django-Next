@@ -398,3 +398,27 @@ export async function updateWholesalePageContent(formData, accessToken) {
     if (!res.ok) throw data
     return data
 }
+
+export async function getWholesaleDailyReports(token) {
+  if (!token) throw new Error('No token provided')
+  const res = await fetch(`${API_BASE}/wholesale/daily-reports/`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  if (!res.ok) throw new Error('Failed to fetch daily reports')
+  return res.json()
+}
+
+export async function createWholesaleDailyReport(token, data) {
+  if (!token) throw new Error('No token provided')
+  const res = await fetch(`${API_BASE}/wholesale/daily-reports/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  })
+  const resData = await res.json()
+  if (!res.ok) throw resData
+  return resData
+}

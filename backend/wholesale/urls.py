@@ -12,6 +12,7 @@ from .views import (
     WholesaleNotificationUnreadCountView,
     WholesaleMarkNotificationsReadView,
     WholesaleNotificationDeleteView,  
+    WholesaleDailyReportListCreateView,
     WholesaleStatusView,
     WholesaleSendPasswordResetOTPView,
     WholesaleVerifyOTPAndResetPasswordView,
@@ -42,6 +43,9 @@ urlpatterns = [
     path('notifications/unread-count/',  WholesaleNotificationUnreadCountView.as_view(), name='notifications-count'),
     path('notifications/mark-read/',     WholesaleMarkNotificationsReadView.as_view(),   name='notifications-mark-read'),
     path('notifications/<int:pk>/delete/', WholesaleNotificationDeleteView.as_view(),    name='notification-delete'),  # ✅ নতুন
+
+    # ─── Daily Reports ────────────────────────────────────────
+    path('daily-reports/', WholesaleDailyReportListCreateView.as_view(), name='daily-reports'),
 
     # ─── Misc ─────────────────────────────────────────────────
     path('status/', WholesaleStatusView.as_view(), name='status'),

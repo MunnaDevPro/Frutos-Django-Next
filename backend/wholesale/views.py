@@ -15,6 +15,7 @@ from .serializers import (
     WholesaleProfileUpdateSerializer,
     ChangePasswordSerializer,
     WholesaleNotificationSerializer,
+    WholesaleDailyReportSerializer,
 )
 from .authentication import WholesaleJWTAuthentication
 from .permissions import IsWholesaleUser
@@ -203,6 +204,18 @@ class WholesaleNotificationDeleteView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except WholesaleNotification.DoesNotExist:
             return Response({'error': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class WholesaleDailyReportListCreateView(generics.ListCreateAPIView):
+    authentication_classes = [WholesaleJWTAuthentication]
+    permission_classes = [IsWholesaleUser]
+    serializer_class = WholesaleDailyReportSerializer
+
+    def get_queryset(self):
+        return self.request.user.daily_reports.all()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class WholesaleStatusView(APIView):

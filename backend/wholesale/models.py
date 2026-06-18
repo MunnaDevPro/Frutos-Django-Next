@@ -171,6 +171,7 @@ class WholesaleNotification(models.Model):
     title = models.CharField(max_length=200)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
+    metadata = models.JSONField(blank=True, default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -180,6 +181,25 @@ class WholesaleNotification(models.Model):
         return f"{self.user.business_name} - {self.title}"
 
 
+class WholesaleDailyReport(models.Model):
+    """Daily reports submitted by wholesale users."""
+    user = models.ForeignKey(
+        WholesaleUser, on_delete=models.CASCADE, related_name='daily_reports'
+    )
+    cash = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    bank = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    expenses = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True, blank=True)
+    store = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True, blank=True)
+    purchase = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True, blank=True)
+    purchase_note = models.TextField(blank=True, null=True)
+    date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-date', '-created_at']
+
+    def __str__(self):
+        return f"Report {self.date} - {self.user.business_name}"
 
 
 # wholesale content

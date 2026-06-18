@@ -30,7 +30,7 @@ export default function ProfileSidebar({ activeTab, setActiveTab, tabs, onLogout
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 py-4">
+      <div className="py-4">
         <nav className="space-y-1.5 pr-6">
           {mainTabs.map(tab => {
             const isActive = activeTab === tab.id
@@ -55,29 +55,39 @@ export default function ProfileSidebar({ activeTab, setActiveTab, tabs, onLogout
       </div>
 
       {/* Bottom Actions */}
-      <div className="p-4 space-y-1 mb-2">
-        <button
-          onClick={() => setActiveTab('settings')}
-          className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-            activeTab === 'settings' ? 'text-[#085041]' : 'text-gray-500 hover:text-gray-900'
-          }`}
-        >
-          <Settings size={18} className={activeTab === 'settings' ? 'text-[#085041]' : 'text-gray-400'} />
-          Settings
-        </button>
-        <button
-          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors cursor-pointer"
-        >
-          <HelpCircle size={18} className="text-gray-400" />
-          Help Center
-        </button>
-        <button
-          onClick={onLogout}
-          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:text-red-600 transition-colors cursor-pointer"
-        >
-          <LogOut size={18} className="text-gray-400" />
-          Logout
-        </button>
+      <div className="py-2 mb-4">
+        <nav className="space-y-1.5 pr-6">
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`w-full flex items-center gap-3 px-6 py-3 text-sm font-medium transition-all duration-200 cursor-pointer rounded-r-full ${
+              activeTab === 'settings' 
+                ? 'bg-[#e8f5e9] text-[#085041]' 
+                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50/50'
+            }`}
+          >
+            <span className={activeTab === 'settings' ? 'text-[#085041]' : 'text-gray-400'}>
+              <Settings size={18} />
+            </span>
+            Settings
+          </button>
+          <button
+            className="w-full flex items-center gap-3 px-6 py-3 text-sm font-medium transition-all duration-200 cursor-pointer rounded-r-full text-gray-500 hover:text-gray-900 hover:bg-gray-50/50"
+          >
+            <span className="text-gray-400">
+              <HelpCircle size={18} />
+            </span>
+            Help Center
+          </button>
+          <button
+            onClick={onLogout}
+            className="w-full flex items-center gap-3 px-6 py-3 text-sm font-medium transition-all duration-200 cursor-pointer rounded-r-full text-gray-500 hover:text-red-600 hover:bg-red-50"
+          >
+            <span className="text-gray-400">
+              <LogOut size={18} />
+            </span>
+            Logout
+          </button>
+        </nav>
       </div>
     </div>
   )

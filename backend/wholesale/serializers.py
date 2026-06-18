@@ -149,10 +149,20 @@ class ChangePasswordSerializer(serializers.Serializer):
 class WholesaleNotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = WholesaleNotification
-        fields = ('id', 'type', 'title', 'message', 'is_read', 'created_at')
-        read_only_fields = ('id', 'type', 'title', 'message', 'created_at')
+        fields = ('id', 'type', 'title', 'message', 'is_read', 'metadata', 'created_at')
+        read_only_fields = ('id', 'type', 'title', 'message', 'metadata', 'created_at')
 
 
+from .models import WholesaleDailyReport
+
+class WholesaleDailyReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WholesaleDailyReport
+        fields = (
+            'id', 'cash', 'bank', 'expenses', 'store', 
+            'purchase', 'purchase_note', 'date', 'created_at'
+        )
+        read_only_fields = ('id', 'created_at')
 
 
 # wholesale content

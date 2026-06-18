@@ -159,7 +159,7 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'id', 'shop', 'brand', 'name', 'slug', 'description', 'category', 'sub_category', 'shipping_category',
-            'price', 'discount_price', 'wholesale_price', 'minimum_purchase', 'affiliate_commission_rate', 'stock', 'is_active',
+            'price', 'discount_price', 'wholesale_price', 'minimum_purchase', 'tax_rate', 'stock', 'is_active',
             'weight', 'length', 'width', 'height',  # Added physical properties for shipping
             'thumbnail_url', 'specifications', 'additional_images',
             'origin', 'unit', 'wholesale_unit', 'badge', 'badge_color',
@@ -256,11 +256,6 @@ class ProductSerializer(serializers.ModelSerializer):
             data.pop('wholesale_price', None)
             data.pop('minimum_purchase', None)
         
-        # Show affiliate_commission_rate to all authenticated users
-        if not (request and hasattr(request, 'user') and request.user and request.user.is_authenticated):
-            # Remove affiliate_commission_rate for unauthenticated users
-            data.pop('affiliate_commission_rate', None)
-        
         return data
 
 
@@ -282,7 +277,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
             'shop', 'brand', 'name', 'slug', 'description',
             'category', 'sub_category', 'shipping_category',
             'price', 'discount_price', 'wholesale_price',
-            'minimum_purchase', 'affiliate_commission_rate',
+            'minimum_purchase', 'tax_rate',
             'origin', 'unit', 'wholesale_unit', 'badge', 'badge_color',
             'stock', 'is_active',
             'weight', 'length', 'width', 'height',
@@ -298,7 +293,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
             'discount_price':          {'allow_null': True, 'required': False},
             'wholesale_price':         {'allow_null': True, 'required': False},
             'minimum_purchase':        {'required': False},
-            'affiliate_commission_rate': {'allow_null': True, 'required': False},
+            'tax_rate':                {'required': False},
             'weight':                  {'allow_null': True, 'required': False},
             'length':                  {'allow_null': True, 'required': False},
             'width':                   {'allow_null': True, 'required': False},

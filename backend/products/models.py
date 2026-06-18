@@ -192,12 +192,11 @@ class Product(models.Model):
         default=1,
         help_text="Minimum quantity required for wholesale orders. Admin can set different values per product (e.g., Mobile=10, Laptop=5, Fashion=60)"
     )
-    affiliate_commission_rate = models.DecimalField(
-        max_digits=5, 
-        decimal_places=2, 
-        null=True, 
-        blank=True,
-        help_text="Commission percentage for affiliates (e.g., 5.00 for 5%)"
+    tax_rate = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=5.00,
+        help_text="Tax percentage for this product (e.g., 5.00 for 5%)"
     )
     stock = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True, db_index=True)

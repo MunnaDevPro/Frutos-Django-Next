@@ -204,21 +204,31 @@ useEffect(() => {
 }, [])
   // ── Fetch unread notification count when authenticated ──────────────────
   useEffect(() => {
-    if (!isAuthenticated) { setUnreadCount(0); return }
+    if (!isAuthenticated && !isWholesaleUser) { setUnreadCount(0); return }
 
     async function fetchCount() {
       try {
-        const res  = await authFetch(`${API_BASE}/auth/notifications/unread-count/`)
-        const data = await res.json()
-        setUnreadCount(data.unreadCount || 0)
+        let res;
+        if (isAuthenticated) {
+          res = await authFetch(`${API_BASE}/auth/notifications/unread-count/`)
+        } else if (isWholesaleUser && session?.user?.accessToken) {
+          res = await fetch(`${API_BASE}/wholesale/notifications/unread-count/`, {
+            headers: { Authorization: `Bearer ${session.user.accessToken}` }
+          })
+        }
+        
+        if (res?.ok) {
+          const data = await res.json()
+          setUnreadCount(data.unread_count ?? data.unreadCount ?? 0)
+        }
       } catch { /* ignore */ }
     }
 
     fetchCount()
-    // Poll every 60 seconds so badge stays fresh
+    // Poll every 10 seconds so badge stays fresh
     const interval = setInterval(fetchCount, 10_000)
     return () => clearInterval(interval)
-  }, [isAuthenticated])
+  }, [isAuthenticated, isWholesaleUser, session])
 
   const filtered = query.trim().length > 0
     ? allProducts.filter(p =>
@@ -280,16 +290,32 @@ useEffect(() => {
 
 
   async function handleBellClick() {
-    if (isAuthenticated) {
+    if (isAuthenticated || isWholesaleUser) {
       setUnreadCount(0)  
       try {
-        await authFetch(`${API_BASE}/auth/notifications/mark-read/`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ all: true }),
-        })
+        if (isAuthenticated) {
+          await authFetch(`${API_BASE}/auth/notifications/mark-read/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ all: true }),
+          })
+        } else if (isWholesaleUser && session?.user?.accessToken) {
+          await fetch(`${API_BASE}/wholesale/notifications/mark-read/`, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.user.accessToken}`
+            },
+            body: JSON.stringify({ all: true }),
+          })
+        }
       } catch { /* ignore */ }
-      router.push('/profile?tab=notifications')
+      
+      if (isWholesaleUser) {
+        router.push('/wholesale/profile?tab=notifications')
+      } else {
+        router.push('/profile?tab=notifications')
+      }
     } 
   }
 
