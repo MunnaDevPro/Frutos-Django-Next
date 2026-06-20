@@ -400,6 +400,12 @@ function TicketDetailModal({ ticket: initialTicket, onClose, onReplySuccess }) {
                 <span className={`px-2 py-0.5 text-[10px] uppercase tracking-wider font-bold rounded-lg shadow-sm transition-transform hover:-translate-y-0.5 cursor-default ${PRIORITY_BADGE[ticket.priority] || ""}`}>
                   {ticket.priority}
                 </span>
+                
+                {ticket.is_wholesale && (
+                  <span className="px-2 py-0.5 text-[10px] uppercase tracking-wider font-bold rounded-lg shadow-sm transition-transform hover:-translate-y-0.5 cursor-default bg-purple-100 text-purple-700">
+                    WHOLESALE
+                  </span>
+                )}
               </div>
               
               <h2 className="text-base sm:text-lg font-bold text-slate-800 tracking-tight truncate w-full">Customer Support</h2>
@@ -986,6 +992,11 @@ export default function TicketsPage() {
                         <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${PRIORITY_BADGE[ticket.priority] || ""}`}>
                           {ticket.priority}
                         </span>
+                        {ticket.is_wholesale && (
+                          <span className="ml-1 px-1.5 py-0.5 text-[9px] rounded-full font-bold bg-purple-100 text-purple-700 uppercase tracking-wider">
+                            WHOLESALE
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full font-medium ${STATUS_BADGE[ticket.status] || ""}`}>

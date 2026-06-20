@@ -57,7 +57,7 @@ function RichContent({ html, className = '', style = {} }) {
 
 function useUnitSelector(product) {
   const unitOptions = product.unitOptions || []
-  const hasUnits    = unitOptions.length > 0
+  const hasUnits = unitOptions.length > 0
 
   const defaultUnit = useMemo(() => {
     if (!hasUnits) return null
@@ -196,7 +196,7 @@ function ReviewForm({ product, session, localToken }) {
         <div>
           <label className="text-xs font-bold uppercase tracking-widest text-[#6D7A73] mb-2 block">Rating</label>
           <div className="flex gap-1">
-            {[1,2,3,4,5].map(i => (
+            {[1, 2, 3, 4, 5].map(i => (
               <button type="button" key={i} onClick={() => setRating(i)} className="p-1 cursor-pointer hover:scale-110 transition-transform">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill={i <= rating ? '#855000' : '#E5E7EB'}>
                   <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
@@ -251,9 +251,11 @@ function TabSection({ product, session, localToken }) {
       <div className="py-8 max-w-[820px]">
         {tab === 'Description' && (
           <div>
-            <h3 style={{ fontFamily: '"Newsreader", Georgia, serif',
-                         fontSize: 'clamp(1.25rem, 2vw, 1.55rem)',
-                         fontWeight: 700, color: '#151E13', marginBottom: '14px' }}>
+            <h3 style={{
+              fontFamily: '"Newsreader", Georgia, serif',
+              fontSize: 'clamp(1.25rem, 2vw, 1.55rem)',
+              fontWeight: 700, color: '#151E13', marginBottom: '14px'
+            }}>
               A Taste of the Sun
             </h3>
             <RichContent html={product.description}
@@ -281,8 +283,10 @@ function TabSection({ product, session, localToken }) {
 
         {tab === 'Nutritional Info' && (
           <div>
-            <h3 style={{ fontFamily: '"Newsreader", Georgia, serif',
-                         fontSize: '1.4rem', fontWeight: 700, color: '#151E13', marginBottom: '20px' }}>
+            <h3 style={{
+              fontFamily: '"Newsreader", Georgia, serif',
+              fontSize: '1.4rem', fontWeight: 700, color: '#151E13', marginBottom: '20px'
+            }}>
               Nutritional Information
             </h3>
             <p style={{ fontSize: '13.5px', color: '#6D7A73', marginBottom: '20px' }}>
@@ -309,8 +313,10 @@ function TabSection({ product, session, localToken }) {
 
         {tab === 'Origin' && (
           <div>
-            <h3 style={{ fontFamily: '"Newsreader", Georgia, serif',
-                         fontSize: '1.4rem', fontWeight: 700, color: '#151E13', marginBottom: '14px' }}>
+            <h3 style={{
+              fontFamily: '"Newsreader", Georgia, serif',
+              fontSize: '1.4rem', fontWeight: 700, color: '#151E13', marginBottom: '14px'
+            }}>
               From {cleanOrigin}
             </h3>
             <RichContent html={product.description}
@@ -322,15 +328,17 @@ function TabSection({ product, session, localToken }) {
           <div>
             <div className="flex items-center gap-5 mb-10">
               <div>
-                <div style={{ fontFamily: '"Newsreader", Georgia, serif',
-                              fontSize: '3.5rem', fontWeight: 700, color: '#151E13', lineHeight: 1 }}>
+                <div style={{
+                  fontFamily: '"Newsreader", Georgia, serif',
+                  fontSize: '3.5rem', fontWeight: 700, color: '#151E13', lineHeight: 1
+                }}>
                   {product.rating.toFixed(1)}
                 </div>
                 <StarRating rating={product.rating} reviews={product.reviews} size={14} />
               </div>
             </div>
             <ReviewForm product={product} session={session} localToken={localToken} />
-            
+
             {product.reviewsList && product.reviewsList.length > 0 ? (
               product.reviewsList.map((r, idx) => {
                 const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -365,8 +373,10 @@ function RelatedProducts({ related }) {
   return (
     <section className="border-t border-[#BCCAC1]/30 pt-12 pb-24 lg:pb-20">
       <div className="flex items-end justify-between mb-8">
-        <h2 style={{ fontFamily: '"Newsreader", Georgia, serif',
-                     fontSize: 'clamp(1.4rem, 2.5vw, 1.9rem)', fontWeight: 700, color: '#151E13' }}>
+        <h2 style={{
+          fontFamily: '"Newsreader", Georgia, serif',
+          fontSize: 'clamp(1.4rem, 2.5vw, 1.9rem)', fontWeight: 700, color: '#151E13'
+        }}>
           You might also enjoy
         </h2>
         <Link href="/shop" className="hidden sm:flex items-center gap-1.5"
@@ -386,9 +396,9 @@ function RelatedProducts({ related }) {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function ProductDetailClient({ product: initialProduct, related }) {
-  const { data: session }    = useSession()
+  const { data: session } = useSession()
   const { getAccess } = useAuth()
-  const isApprovedWholesale  = session?.user?.isApproved === true
+  const isApprovedWholesale = session?.user?.isApproved === true
 
   const [product, setProduct] = useState(initialProduct)
   const [localToken, setLocalToken] = useState(null)
@@ -404,9 +414,9 @@ export default function ProductDetailClient({ product: initialProduct, related }
       if (!product.wholesalePrice && !hasAttemptedRefetch) {
         setHasAttemptedRefetch(true)
         import('@/lib/api_product').then(({ getProductBySlug }) => {
-           getProductBySlug(initialProduct.slug, { token }).then(fetched => {
-             setProduct(fetched)
-           }).catch(console.error)
+          getProductBySlug(initialProduct.slug, { token }).then(fetched => {
+            setProduct(fetched)
+          }).catch(console.error)
         })
       }
     }
@@ -418,15 +428,16 @@ export default function ProductDetailClient({ product: initialProduct, related }
     retailPrice, wholesaleUnitPrice,
   } = useUnitSelector(product)
 
-  const displayPrice      = wholesaleUnitPrice ?? retailPrice
-  const isWholesalePrice  = !!wholesaleUnitPrice
-  const baseRetailPrice   = Number(product.price)
+  const displayPrice = wholesaleUnitPrice ?? retailPrice
+  const isWholesalePrice = !!wholesaleUnitPrice
+  const baseRetailPrice = Number(product.price)
 
-  const [added, setAdded]             = useState(false)
-  const { addItem, setSidebarOpen }   = useCart()
-  const [activeImg, setActiveImg]     = useState(0)
+  const [added, setAdded] = useState(false)
+  const [showStockError, setShowStockError] = useState(false)
+  const { items, addItem, setSidebarOpen } = useCart()
+  const [activeImg, setActiveImg] = useState(0)
   const minQty = (product.wholesalePrice && product.minWholesaleQty) ? Math.max(1, parseInt(product.minWholesaleQty, 10) || 1) : 1;
-  const [qty, setQty]                 = useState(minQty)
+  const [qty, setQty] = useState(minQty)
 
   useEffect(() => {
     setQty(prev => Math.max(prev, minQty))
@@ -440,12 +451,20 @@ export default function ProductDetailClient({ product: initialProduct, related }
 
   function handleAddToCart() {
     if (product.wholesalePrice) {
-      // const minQty = product.minWholesaleQty || 1
-      // if (qty < minQty) {
-      //   // alert(`Minimum ${minQty} ${product.wholesaleUnit || 'units'} required for wholesale pricing.`)
-      //   return
-      // }
+      // ...
     }
+
+    if (product.stock !== undefined && product.stock !== null) {
+      const existingItem = items.find(i => i.id === product.id && (i.item_type || 'product') === (product.item_type || 'product'))
+      const currentCartQty = existingItem ? existingItem.qty : 0
+
+      if (currentCartQty + qty > product.stock) {
+        setShowStockError(true)
+        setTimeout(() => setShowStockError(false), 3500)
+        return
+      }
+    }
+
     addItem(
       { ...product, unit: selectedUnit?.label || product.unit },
       displayPrice,
@@ -467,19 +486,56 @@ export default function ProductDetailClient({ product: initialProduct, related }
   }
 
   const fulfillmentOptions = [
-    { id: 'delivery', label: 'Home Delivery',    sub: 'Today before 8:00 PM', Icon: Truck      },
-    { id: 'collect',  label: 'Click & Collect',  sub: 'Ready in 2 hours',     Icon: Store      },
-    { id: 'instore',  label: 'In-Store Payment', sub: 'Reserve for 24 hours', Icon: CreditCard },
+    { id: 'delivery', label: 'Home Delivery', sub: 'Today before 8:00 PM', Icon: Truck },
+    { id: 'collect', label: 'Click & Collect', sub: 'Ready in 2 hours', Icon: Store },
+    { id: 'instore', label: 'In-Store Payment', sub: 'Reserve for 24 hours', Icon: CreditCard },
   ]
 
   const PLACEHOLDER = 'https://placehold.co/800x600/ECF7E4/00694C?text=No+Image'
-  const raw    = product.images?.length ? product.images : [product.image]
+  const raw = product.images?.length ? product.images : [product.image]
   const images = raw.filter(Boolean).length ? raw.filter(Boolean) : [PLACEHOLDER]
 
   const unitLabel = selectedUnit?.label || product.unit || ''
 
   return (
     <main className="bg-[#F2FDEA] min-h-screen">
+      {showStockError && (
+        <div style={{
+          position: 'fixed', bottom: '24px', left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 9999, width: 'min(380px, calc(100vw - 32px))',
+          background: '#151E13', color: 'white',
+          borderRadius: '14px', padding: '16px 18px',
+          boxShadow: '0 16px 48px rgba(0,0,0,0.35)',
+          display: 'flex', gap: '12px', alignItems: 'flex-start',
+          animation: 'toastIn 0.25s ease',
+        }}>
+          <style>{`@keyframes toastIn{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}`}</style>
+          <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,100,100,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px' }}>
+            <svg width="15" height="15" fill="none" stroke="#F87171" strokeWidth="2.2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontWeight: 700, fontSize: '13.5px', margin: '0 0 5px' }}>
+              Insufficient Stock
+            </p>
+            <p style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.65)', margin: 0, lineHeight: 1.55 }}>
+              Sorry, we only have <strong style={{ color: 'white' }}>{product.stock} {product.unit || 'units'}</strong> in stock.
+            </p>
+          </div>
+          <button
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowStockError(false) }}
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: 'rgba(255,255,255,0.4)', padding: 0, flexShrink: 0
+            }}>
+            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       <style>{`
         .ck-content ul, .ck-content ol { padding-left: 1.25rem; margin: 0; }
@@ -509,8 +565,10 @@ export default function ProductDetailClient({ product: initialProduct, related }
           style={{ scrollbarWidth: 'none', scrollSnapType: 'x mandatory' }}>
           {images.map((img, i) => (
             <div key={i} className="shrink-0 rounded-2xl overflow-hidden"
-              style={{ width: '85%', aspectRatio: '3/4', scrollSnapAlign: 'center',
-                       boxShadow: '0 24px 48px -12px rgba(0,33,21,0.12)' }}>
+              style={{
+                width: '85%', aspectRatio: '3/4', scrollSnapAlign: 'center',
+                boxShadow: '0 24px 48px -12px rgba(0,33,21,0.12)'
+              }}>
               <div className="relative w-full h-full">
                 <Image src={img} alt={product.name} fill className="object-cover" sizes="85vw" />
               </div>
@@ -521,8 +579,10 @@ export default function ProductDetailClient({ product: initialProduct, related }
           {images.map((_, i) => (
             <button key={i} onClick={() => scrollToImage(i)}
               className="rounded-full transition-all duration-300"
-              style={{ height: '6px', width: i === activeImg ? '24px' : '6px',
-                       background: i === activeImg ? '#00694C' : '#BCCAC1' }} />
+              style={{
+                height: '6px', width: i === activeImg ? '24px' : '6px',
+                background: i === activeImg ? '#00694C' : '#BCCAC1'
+              }} />
           ))}
         </div>
       </section>
@@ -537,8 +597,10 @@ export default function ProductDetailClient({ product: initialProduct, related }
           <div className="flex-1 h-px bg-[#BCCAC1]/30" />
         </div>
         <h1 className="font-bold tracking-tight text-[#151E13] mb-3"
-          style={{ fontFamily: '"Newsreader", Georgia, serif',
-                   fontSize: 'clamp(2.4rem, 8vw, 3rem)', lineHeight: 1.1 }}>
+          style={{
+            fontFamily: '"Newsreader", Georgia, serif',
+            fontSize: 'clamp(2.4rem, 8vw, 3rem)', lineHeight: 1.1
+          }}>
           {product.name}
         </h1>
         <div className="flex items-center gap-3 flex-wrap">
@@ -567,8 +629,10 @@ export default function ProductDetailClient({ product: initialProduct, related }
 
           <div className="flex items-baseline gap-2 mb-1">
             <span className="text-3xl font-bold"
-              style={{ color: isWholesalePrice ? '#7C3AED' : '#855000',
-                       fontFamily: '"Newsreader", Georgia, serif' }}>
+              style={{
+                color: isWholesalePrice ? '#7C3AED' : '#855000',
+                fontFamily: '"Newsreader", Georgia, serif'
+              }}>
               €{displayPrice.toFixed(2)}
             </span>
             {isWholesalePrice && (
@@ -617,8 +681,10 @@ export default function ProductDetailClient({ product: initialProduct, related }
           {product.inStock ? (
             <button onClick={handleAddToCart}
               className="w-full flex items-center justify-center gap-3 rounded-xl py-3 transition-all"
-              style={{ background: added ? '#085041' : 'linear-gradient(135deg,#00694C 0%,#008560 100%)',
-                       color: 'white', fontSize: '15px', fontWeight: 700 }}>
+              style={{
+                background: added ? '#085041' : 'linear-gradient(135deg,#00694C 0%,#008560 100%)',
+                color: 'white', fontSize: '15px', fontWeight: 700
+              }}>
               {added ? <><Check size={18} /> Added!</> : <><ShoppingCart size={18} /> Add to Cart</>}
             </button>
           ) : (
@@ -684,8 +750,10 @@ export default function ProductDetailClient({ product: initialProduct, related }
                   {images.map((img, i) => (
                     <button key={i} onClick={() => setActiveImg(i)}
                       className="relative aspect-square rounded-xl overflow-hidden bg-white"
-                      style={{ border: `2px solid ${i === activeImg ? '#00694C' : '#BCCAC1'}`,
-                               opacity: i === activeImg ? 1 : 0.7 }}>
+                      style={{
+                        border: `2px solid ${i === activeImg ? '#00694C' : '#BCCAC1'}`,
+                        opacity: i === activeImg ? 1 : 0.7
+                      }}>
                       <Image src={img} alt={`${product.name} ${i + 1}`} fill sizes="120px"
                         className="cursor-pointer object-cover rounded-lg" />
                     </button>
@@ -699,8 +767,10 @@ export default function ProductDetailClient({ product: initialProduct, related }
 
               <div>
                 <h1 className="font-bold tracking-tight text-[#151E13] mb-2"
-                  style={{ fontFamily: '"Newsreader", Georgia, serif',
-                           fontSize: 'clamp(2rem, 3vw, 2.6rem)', lineHeight: 1.1 }}>
+                  style={{
+                    fontFamily: '"Newsreader", Georgia, serif',
+                    fontSize: 'clamp(2rem, 3vw, 2.6rem)', lineHeight: 1.1
+                  }}>
                   {product.name}
                 </h1>
                 <p className="italic text-lg text-[#00694C] mb-3"
@@ -716,8 +786,10 @@ export default function ProductDetailClient({ product: initialProduct, related }
                   <div>
                     <div className="flex items-baseline gap-3 flex-wrap">
                       <span className="text-3xl font-bold"
-                        style={{ color: isWholesalePrice ? '#7C3AED' : '#855000',
-                                 fontFamily: '"Newsreader", Georgia, serif' }}>
+                        style={{
+                          color: isWholesalePrice ? '#7C3AED' : '#855000',
+                          fontFamily: '"Newsreader", Georgia, serif'
+                        }}>
                         €{displayPrice.toFixed(2)}
                         {unitLabel && (
                           <span className="text-lg font-normal text-[#6D7A73] ml-1">
@@ -737,9 +809,11 @@ export default function ProductDetailClient({ product: initialProduct, related }
                       )}
                     </div>
                     {isWholesalePrice && (
-                      <div style={{ background: 'linear-gradient(135deg,#F5F3FF,#EDE9FE)',
-                                    borderRadius: '7px', padding: '4px 10px', marginTop: '6px',
-                                    display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                      <div style={{
+                        background: 'linear-gradient(135deg,#F5F3FF,#EDE9FE)',
+                        borderRadius: '7px', padding: '4px 10px', marginTop: '6px',
+                        display: 'inline-flex', alignItems: 'center', gap: '5px'
+                      }}>
                         <span style={{ fontSize: '11px', color: '#6D28D9', fontWeight: 700 }}>
                           WHOLESALE · Min. {product.minWholesaleQty} {product.wholesaleUnit || 'units'}
                         </span>
@@ -754,7 +828,7 @@ export default function ProductDetailClient({ product: initialProduct, related }
                   {!isWholesalePrice && savePercent && (
                     <span className="border border-[#855000] text-[#855000] bg-[#FFF8EB] text-[10px] font-bold px-2.5 py-1
                                      rounded uppercase tracking-widest shrink-0"
-                          style={{ letterSpacing: '0.15em' }}>
+                      style={{ letterSpacing: '0.15em' }}>
                       Save {savePercent}%
                     </span>
                   )}
@@ -819,8 +893,10 @@ export default function ProductDetailClient({ product: initialProduct, related }
                   {fulfillmentOptions.map((opt) => (
                     <label key={opt.id}
                       className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all"
-                      style={{ background: 'white',
-                               border: `1px solid ${fulfillment === opt.id ? '#00694C' : '#BCCAC1'}` }}>
+                      style={{
+                        background: 'white',
+                        border: `1px solid ${fulfillment === opt.id ? '#00694C' : '#BCCAC1'}`
+                      }}>
                       <input type="radio" name="fulfillment" value={opt.id}
                         checked={fulfillment === opt.id}
                         onChange={() => setFulfillment(opt.id)}
@@ -843,11 +919,13 @@ export default function ProductDetailClient({ product: initialProduct, related }
                 <button onClick={handleAddToCart}
                   className="w-full cursor-pointer flex items-center justify-center gap-3
                              rounded-xl py-3 transition-all duration-200 shadow-sm"
-                  style={{ background: added
-                             ? '#085041'
-                             : 'linear-gradient(135deg,#00694C 0%,#008560 100%)',
-                           color: 'white', fontSize: '16px', fontWeight: 700,
-                           letterSpacing: '0.05em' }}>
+                  style={{
+                    background: added
+                      ? '#085041'
+                      : 'linear-gradient(135deg,#00694C 0%,#008560 100%)',
+                    color: 'white', fontSize: '16px', fontWeight: 700,
+                    letterSpacing: '0.05em'
+                  }}>
                   {added
                     ? <><Check size={19} /> Added to Cart</>
                     : <><ShoppingCart size={19} /> Add to Cart — €{(displayPrice * qty).toFixed(2)}</>
@@ -913,12 +991,14 @@ export default function ProductDetailClient({ product: initialProduct, related }
           <button onClick={handleAddToCart}
             className="flex-1 h-16 flex items-center justify-center gap-3 rounded-2xl
                        transition-all active:scale-95"
-            style={{ background: added ? '#085041' : 'linear-gradient(135deg,#00694C 0%,#008560 100%)',
-                     color: 'white', boxShadow: '0 24px 48px -12px rgba(0,33,21,0.25)' }}>
+            style={{
+              background: added ? '#085041' : 'linear-gradient(135deg,#00694C 0%,#008560 100%)',
+              color: 'white', boxShadow: '0 24px 48px -12px rgba(0,33,21,0.25)'
+            }}>
             {added
               ? <><Check size={18} /><span className="font-bold uppercase tracking-widest text-sm">Added!</span></>
               : <><ShoppingBag size={18} style={{ fill: 'white', opacity: 0.9 }} />
-                  <span className="font-bold uppercase tracking-widest text-sm">Add to Cart</span></>
+                <span className="font-bold uppercase tracking-widest text-sm">Add to Cart</span></>
             }
           </button>
         </div>

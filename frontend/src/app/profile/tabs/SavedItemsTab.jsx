@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useWishlist } from '@/app/context/WishlistContext'
+import { useSession } from 'next-auth/react'
 import { slugify } from '@/app/lib/slugify'
 import AddToCartButton from '@/app/components/AddToCartButton'
 
@@ -126,7 +127,7 @@ function ConfirmModal({ title, message, confirmLabel = 'Remove', confirmColor = 
   )
 }
 
-function WishlistCard({ product, onRemove }) {
+function WishlistCard({ product, onRemove, isWholesaleUser }) {
   const slug = product.slug || slugify(product.name)
   const [imgError, setImgError] = useState(false)
   const [removing, setRemoving] = useState(false)
@@ -139,8 +140,15 @@ function WishlistCard({ product, onRemove }) {
   }
 
   const cleanOrigin = product.origin?.replace(/^from\s+/i, '')
-  const displayPrice = product.wholesalePrice ? product.wholesalePrice : product.price
-  const isWholesalePrice = !!product.wholesalePrice
+  const displayPrice = (isWholesaleUser && product.wholesalePrice) ? product.wholesalePrice : product.price
+  const isWholesalePrice = isWholesaleUser && !!product.wholesalePrice
+
+  const mediaBase = API_BASE.replace('/api', '')
+  let imageUrl = product.image || product.thumbnail || product.image_url || null
+  if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('data:')) {
+    const clean = imageUrl.replace(/^\/+/, '')
+    imageUrl = `${mediaBase}/${clean}`
+  }
 
   return (
     <div className={`flex flex-col w-full min-w-0 bg-white rounded-2xl overflow-hidden border border-gray-100 transition-all duration-200 group ${removing ? 'scale-[0.96] opacity-0' : 'hover:shadow-sm'}`}
@@ -149,9 +157,9 @@ function WishlistCard({ product, onRemove }) {
       }}
     >
       <Link href={`/products/${slug}`} className="block relative w-full aspect-[4/3] overflow-hidden flex-shrink-0 bg-[#ECF7E4]">
-        {product.image && !imgError ? (
+        {imageUrl && !imgError ? (
           <Image
-            src={product.image}
+            src={imageUrl}
             alt={product.name}
             fill
             sizes="(max-width: 640px) 50vw, 33vw"
@@ -329,6 +337,8 @@ function EmptyState() {
 // ── Main component ────────────────────────────────────────────────────────────
 export default function SavedItemsTab({ authFetch, initialWishlist = null }) {
   const { items, hydrate, remove, clearAll, loaded } = useWishlist()
+  const { data: session } = useSession()
+  const isWholesaleUser = !!session?.user?.accessToken
 
   // Server-fetched data দিয়ে WishlistContext hydrate করো (একবারই চলে)
   useEffect(() => {
@@ -420,13 +430,13 @@ export default function SavedItemsTab({ authFetch, initialWishlist = null }) {
         </button>
       </div>
 
-      {/* Grid */}
       <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
         {items.map(product => (
           <WishlistCard
             key={product.id}
             product={product}
             onRemove={() => setConfirmItem(product)}
+            isWholesaleUser={isWholesaleUser}
           />
         ))}
       </div>

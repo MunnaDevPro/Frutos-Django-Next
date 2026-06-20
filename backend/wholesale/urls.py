@@ -18,6 +18,10 @@ from .views import (
     WholesaleVerifyOTPAndResetPasswordView,
     WholesalePageContentViewSet,
     wholesale_page_content,
+    WholesaleSupportTicketListCreateView,
+    WholesaleSupportTicketReplyView,
+    WholesaleSupportTicketMessageDetailView,
+    WholesaleSupportTicketTypingView,
 )
 
 router = DefaultRouter()
@@ -53,6 +57,12 @@ urlpatterns = [
     # ─── Password Reset ───────────────────────────────────────
     path('auth/password-reset/send-otp/', WholesaleSendPasswordResetOTPView.as_view(),      name='ws-password-reset-send'),
     path('auth/password-reset/verify/',   WholesaleVerifyOTPAndResetPasswordView.as_view(), name='ws-password-reset-verify'),
+
+    # ─── Support Tickets ──────────────────────────────────────
+    path('tickets/', WholesaleSupportTicketListCreateView.as_view(), name='tickets'),
+    path('tickets/<int:ticket_id>/reply/', WholesaleSupportTicketReplyView.as_view(), name='tickets-reply'),
+    path('tickets/<int:ticket_id>/messages/<int:msg_id>/', WholesaleSupportTicketMessageDetailView.as_view(), name='tickets-message'),
+    path('tickets/<int:ticket_id>/typing/', WholesaleSupportTicketTypingView.as_view(), name='tickets-typing'),
 
 
      # Single combined endpoint — Next.js server component uses this (GET only for backwards compat or public)

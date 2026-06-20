@@ -350,3 +350,101 @@ def wholesale_page_content(request):
     instance, created = WholesalePageContent.objects.get_or_create()
     serializer = WholesalePageContentSerializer(instance, context={"request": request})
     return Response(serializer.data)
+
+
+# ─── Support Tickets ──────────────────────────────────────────────────────────
+
+from accounts.models import SupportTicket, SupportTicketMessage, SupportTicketMessageAttachment
+from accounts.serializers import SupportTicketSerializer, SupportTicketMessageSerializer
+from rest_framework import generics
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+
+class WholesaleSupportTicketListCreateView(generics.ListCreateAPIView):
+    authentication_classes = [WholesaleJWTAuthentication]
+    permission_classes = [IsWholesaleUser]
+    serializer_class = SupportTicketSerializer
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_queryset(self):
+        return SupportTicket.objects.filter(wholesale_user=self.request.user)
+
+
+class WholesaleSupportTicketReplyView(APIView):
+    authentication_classes = [WholesaleJWTAuthentication]
+    permission_classes = [IsWholesaleUser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def post(self, request, ticket_id):
+        ticket = get_object_or_404(SupportTicket, id=ticket_id, wholesale_user=request.user)
+        message_text = request.data.get('message', '')
+        images = request.FILES.getlist('images')
+
+        if not message_text and not images:
+            return Response({'detail': 'Message or image is required'}, status=400)
+
+        msg = SupportTicketMessage.objects.create(
+            ticket=ticket,
+            wholesale_sender=request.user,
+            message=message_text,
+        )
+        
+        for image in images:
+            SupportTicketMessageAttachment.objects.create(message=msg, file=image)
+
+        try:
+            from accounts.utils import broadcast_ticket_message
+            broadcast_ticket_message(msg)
+        except ImportError:
+            pass
+
+        return Response(SupportTicketMessageSerializer(msg).data, status=201)
+
+
+class WholesaleSupportTicketMessageDetailView(APIView):
+    authentication_classes = [WholesaleJWTAuthentication]
+    permission_classes = [IsWholesaleUser]
+
+    def patch(self, request, ticket_id, msg_id):
+        msg = get_object_or_404(SupportTicketMessage, id=msg_id, ticket_id=ticket_id, wholesale_sender=request.user)
+        message_text = request.data.get('message')
+        if not message_text:
+            return Response({'detail': 'Message text is required.'}, status=400)
+
+        msg.message = message_text
+        msg.is_edited = True
+        msg.save(update_fields=['message', 'is_edited'])
+
+        try:
+            from accounts.utils import broadcast_ticket_message
+            broadcast_ticket_message(msg)
+        except ImportError:
+            pass
+
+        return Response(SupportTicketMessageSerializer(msg).data)
+
+    def delete(self, request, ticket_id, msg_id):
+        msg = get_object_or_404(SupportTicketMessage, id=msg_id, ticket_id=ticket_id, wholesale_sender=request.user)
+        msg.is_deleted = True
+        msg.save(update_fields=['is_deleted'])
+
+        try:
+            from accounts.utils import broadcast_ticket_message
+            broadcast_ticket_message(msg)
+        except ImportError:
+            pass
+
+        return Response(SupportTicketMessageSerializer(msg).data)
+
+
+class WholesaleSupportTicketTypingView(APIView):
+    authentication_classes = [WholesaleJWTAuthentication]
+    permission_classes = [IsWholesaleUser]
+
+    def post(self, request, ticket_id):
+        ticket = get_object_or_404(SupportTicket, id=ticket_id, wholesale_user=request.user)
+        ticket.user_typing_at = timezone.now()
+        ticket.save(update_fields=['user_typing_at'])
+        return Response({'status': 'typing...'})

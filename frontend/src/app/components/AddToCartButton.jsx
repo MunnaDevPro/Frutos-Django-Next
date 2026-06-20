@@ -11,23 +11,35 @@ export default function AddToCartButton({
   // Pass qty from product detail page; card always passes 1
   qty             = 1,
 }) {
-  const { addItem, setSidebarOpen } = useCart()
-  const [added,     setAdded]     = useState(false)
-  const [showError, setShowError] = useState(false)
+  const { items, addItem, setSidebarOpen } = useCart()
+  const [added, setAdded] = useState(false)
+  const [showStockError, setShowStockError] = useState(false)
 
   function handleClick(e) {
     e.preventDefault()
     e.stopPropagation()
     if (!inStock) return
 
-    // Wholesale minimum check — only block if qty is genuinely below minimum
+    let finalQty = qty
+
+    // Wholesale minimum check — auto increase to minWholesaleQty if below
     if (isWholesale && product.wholesalePrice && qty < minWholesaleQty) {
-      setShowError(true)
-      setTimeout(() => setShowError(false), 3500)
-      return
+      finalQty = minWholesaleQty
     }
 
-    addItem(product, effectivePrice, qty)
+    // Check against available stock
+    if (product.stock !== undefined && product.stock !== null) {
+      const existingItem = items.find(i => i.id === product.id && (i.item_type || 'product') === (product.item_type || 'product'))
+      const currentCartQty = existingItem ? existingItem.qty : 0
+
+      if (currentCartQty + finalQty > product.stock) {
+        setShowStockError(true)
+        setTimeout(() => setShowStockError(false), 3500)
+        return
+      }
+    }
+
+    addItem(product, effectivePrice, finalQty)
     setAdded(true)
     setTimeout(() => setAdded(false), 1500)
   }
@@ -36,7 +48,7 @@ export default function AddToCartButton({
 
   return (
     <>
-      {showError && (
+      {showStockError && (
         <div style={{
           position: 'fixed', bottom: '24px', left: '50%',
           transform: 'translateX(-50%)',
@@ -48,24 +60,21 @@ export default function AddToCartButton({
           animation: 'toastIn 0.25s ease',
         }}>
           <style>{`@keyframes toastIn{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}`}</style>
+          <div style={{ width:'32px', height:'32px', borderRadius:'50%', background:'rgba(255,100,100,0.15)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:'1px' }}>
+            <svg width="15" height="15" fill="none" stroke="#F87171" strokeWidth="2.2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
           <div style={{ flex: 1 }}>
             <p style={{ fontWeight: 700, fontSize: '13.5px', margin: '0 0 5px' }}>
-              Wholesale Minimum Required
+              Insufficient Stock
             </p>
             <p style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.65)', margin: 0, lineHeight: 1.55 }}>
-              You need at least{' '}
-              <strong style={{ color: 'white' }}>
-                {minWholesaleQty} {product.wholesaleUnit || 'units'}
-              </strong>{' '}
-              to unlock the wholesale price of{' '}
-              <strong style={{ color: '#6EE7B7' }}>
-                €{Number(product.wholesalePrice).toFixed(2)}
-              </strong>.{' '}
-              {qty === 1 && 'Please set the quantity on the product page.'}
+              Sorry, we only have <strong style={{ color: 'white' }}>{product.stock} {product.unit || 'units'}</strong> in stock.
             </p>
           </div>
           <button
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowError(false) }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowStockError(false) }}
             style={{ background: 'none', border: 'none', cursor: 'pointer',
                      color: 'rgba(255,255,255,0.4)', padding: 0, flexShrink: 0 }}>
             <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">

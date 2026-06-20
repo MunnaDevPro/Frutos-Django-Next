@@ -125,12 +125,20 @@ function normalizeProduct(p) {
     p = p.product;
   }
   
+  let image = p.thumbnail || p.thumbnail_url || p.image_url || p.image || null;
+  if (image && !image.startsWith('http') && !image.startsWith('data:')) {
+    const base = (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api').replace(/\/$/, '');
+    const mediaBase = base.replace('/api', '');
+    const clean = image.replace(/^\/+/, '');
+    image = `${mediaBase}/${clean}`;
+  }
+  
   return {
     id:             p.id,
     name:           p.name           || p.product_name || '',
     price:          Number(p.price)  || 0,
     oldPrice:       p.oldPrice       || p.old_price    || null,
-    image:          p.image          || '',
+    image:          image            || '',
     origin:         p.origin         || '',
     unit:           p.unit           || '',
     inStock:        p.inStock        ?? p.in_stock     ?? true,

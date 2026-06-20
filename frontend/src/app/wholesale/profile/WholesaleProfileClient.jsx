@@ -18,6 +18,7 @@ import NotificationsTab   from './_tabs/NotificationsTab'
 import SettingsTab        from './_tabs/SettingsTab'
 import OrderLineTab       from './_tabs/OrderLineTab'
 import AccountInfoTab     from './_tabs/AccountInfoTab'
+import WholesaleSupportTicketsTab from './_tabs/WholesaleSupportTicketsTab'
 export default function WholesaleProfileClient({ initialProfile, initialNotifications, initialOrders, accessToken }) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -143,6 +144,7 @@ export default function WholesaleProfileClient({ initialProfile, initialNotifica
     { id: 'order_line',     label: 'Order Line' },
     { id: 'account_info',   label: 'Account Info' },
     { id: 'orders',         label: `Orders${orders.length ? ` (${orders.length})` : ''}` },
+    { id: 'support_tickets',label: 'Support Tickets' },
     { id: 'notifications',  label: `Notification${unreadCount ? ` (${unreadCount})` : ''}` },
     { id: 'settings',       label: 'Settings' },
   ]
@@ -167,6 +169,9 @@ export default function WholesaleProfileClient({ initialProfile, initialNotifica
           )}
           {activeTab === 'orders' && (
             <OrdersTab orders={orders} onDeleteOrder={handleDeleteOrder} setProfileActiveTab={setActiveTab} accessToken={accessToken} />
+          )}
+          {activeTab === 'support_tickets' && (
+            <WholesaleSupportTicketsTab accessToken={accessToken} />
           )}
           {activeTab === 'notifications' && (
             <NotificationsTab

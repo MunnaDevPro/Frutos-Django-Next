@@ -528,7 +528,7 @@ class OrderViewSet(viewsets.ModelViewSet):
             
             queryset = queryset.filter(
                 Q(user=user) | Q(customer_email=user.email, user__isnull=True)
-            ).order_by('-ordered_at')
+            ).filter(is_hidden_from_customer=False).order_by('-ordered_at')
 
         return queryset
 
@@ -581,6 +581,30 @@ class OrderViewSet(viewsets.ModelViewSet):
                 'error': f'Failed to fetch order: {str(e)}',
                 'detail': 'There was an error retrieving the order details. Please try again.'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=False, methods=['post'], url_path='hide-orders')
+    def hide_orders(self, request):
+        """
+        Allows a customer to soft-delete (hide) orders from their profile.
+        Expects payload: { "order_ids": [1, 2, 3] } or { "order_numbers": ["ORD123", "ORD456"] }
+        """
+        order_ids = request.data.get('order_ids', [])
+        order_numbers = request.data.get('order_numbers', [])
+        
+        if not order_ids and not order_numbers:
+            return Response({'detail': 'No order_ids or order_numbers provided'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get the orders belonging to the user
+        queryset = self.get_queryset()
+        
+        orders_to_hide = queryset.none()
+        if order_ids:
+            orders_to_hide = queryset.filter(id__in=order_ids)
+        elif order_numbers:
+            orders_to_hide = queryset.filter(order_number__in=order_numbers)
+        
+        count = orders_to_hide.update(is_hidden_from_customer=True)
+        return Response({'success': True, 'hidden_count': count}, status=status.HTTP_200_OK)
 
     def perform_update(self, serializer):
         from accounts.notifications import send_order_status_notification

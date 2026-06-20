@@ -56,7 +56,7 @@ function fmtDate(iso) {
 }
 
 // ── Single order tracking card ────────────────────────────────────────────────
-function TrackingCard({ order, onClose }) {
+function TrackingCard({ order, onClose, onRemove }) {
   const isCancelled = order.status === 'CANCELLED'
   const activeIdx   = isCancelled ? -1 : (STATUS_INDEX[order.status] ?? 0)
 
@@ -126,6 +126,27 @@ function TrackingCard({ order, onClose }) {
           >
             {STATUS_LABEL[order.status] || order.status}
           </span>
+
+          {onRemove && (
+            <button
+              onClick={() => onRemove(order)}
+              title="Remove Tracking"
+              style={{
+                background: 'rgba(255,255,255,.15)',
+                border: '1px solid rgba(255,255,255,.25)',
+                borderRadius: '8px',
+                padding: '4px 6px',
+                cursor: 'pointer',
+                color: isCancelled ? '#BA1A1A' : '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                transition: 'all .2s ease',
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
+            </button>
+          )}
+
           {onClose && (
             <button
               onClick={onClose}
@@ -138,6 +159,7 @@ function TrackingCard({ order, onClose }) {
                 color: isCancelled ? '#BA1A1A' : '#fff',
                 display: 'flex',
                 alignItems: 'center',
+                transition: 'all .2s ease',
               }}
             >
               <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>close</span>
@@ -601,6 +623,7 @@ export default function TrackingTab({ authFetch, initialOrders = null }) {
   const [selectedId,  setSelectedId]  = useState(null)
   const [lastUpdated, setLastUpdated] = useState(null)
   const [pulseKey,    setPulseKey]    = useState(0)     // force re-render on update
+  const [orderToRemove, setOrderToRemove] = useState(null)
 
   // ── Fetch / refresh ──────────────────────────────────────────────────────
   const fetchOrders = useCallback(async (silent = false) => {
@@ -624,6 +647,16 @@ export default function TrackingTab({ authFetch, initialOrders = null }) {
       setLoading(false)
     }
   }, [authFetch])
+
+  const confirmRemove = async () => {
+    if (!orderToRemove) return
+    // Remove locally from state
+    setOrders((prev) => prev.filter(o => o.orderNumber !== orderToRemove.orderNumber))
+    if (selectedId === orderToRemove.orderNumber) {
+      setSelectedId(null)
+    }
+    setOrderToRemove(null)
+  }
 
   // Initial load if no server data
   useEffect(() => {
@@ -728,41 +761,97 @@ export default function TrackingTab({ authFetch, initialOrders = null }) {
         </p>
       )}
 
-      {/* ── Two-column layout: list + detail ── */}
       <div
         className="tracking-layout"
         style={{
-          display: 'grid',
-          gridTemplateColumns: orders.length > 1 ? '1fr' : '1fr',
+          display: 'flex',
+          flexDirection: 'column',
           gap: '16px',
         }}
       >
-        {/* Order list */}
-        {orders.length > 1 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {orders.length > 1 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <p style={{ fontSize: '11px', fontWeight: 700, color: '#9DAAA3', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>
               Recent Orders
             </p>
-            {orders.map((order) => (
-              <OrderRow
-                key={order.orderNumber + pulseKey}
-                order={order}
-                isSelected={selectedId === order.orderNumber}
-                onClick={() => setSelectedId(order.orderNumber)}
-              />
-            ))}
+            {orders.map((order) => {
+              const isSelected = selectedId === order.orderNumber;
+              return (
+                <div key={order.orderNumber + pulseKey} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <OrderRow
+                    order={order}
+                    isSelected={isSelected}
+                    onClick={() => setSelectedId(isSelected ? null : order.orderNumber)}
+                  />
+                  {isSelected && (
+                    <TrackingCard
+                      order={order}
+                      onClose={() => setSelectedId(null)}
+                      onRemove={(o) => setOrderToRemove(o)}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
-        )}
-
-        {/* Detail card */}
-        {selectedOrder && (
-          <TrackingCard
-            key={selectedOrder.orderNumber + pulseKey}
-            order={selectedOrder}
-            onClose={orders.length === 1 ? null : null}
-          />
+        ) : (
+          selectedOrder && (
+            <TrackingCard
+              key={selectedOrder.orderNumber + pulseKey}
+              order={selectedOrder}
+              onClose={null}
+              onRemove={(o) => setOrderToRemove(o)}
+            />
+          )
         )}
       </div>
+
+      {/* ── Remove Tracking Modal ── */}
+      {orderToRemove && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.5)', padding: '20px', animation: 'fadeIn 0.2s ease', backdropFilter: 'blur(2px)'
+        }}>
+          <div style={{
+            background: '#fff', borderRadius: '20px', padding: '24px', width: '100%', maxWidth: '360px',
+            boxShadow: '0 10px 35px rgba(0,0,0,0.15)', animation: 'slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: '#FFF0F0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span className="material-symbols-outlined" style={{ color: '#BA1A1A', fontSize: '24px' }}>delete</span>
+              </div>
+              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#151e13', fontFamily: '"Newsreader",Georgia,serif', letterSpacing: '-0.3px' }}>
+                Remove Tracking?
+              </h3>
+            </div>
+            <p style={{ fontSize: '14px', color: '#6d7a73', marginBottom: '28px', lineHeight: '1.5' }}>
+              Are you sure you want to remove the tracking history for order <span style={{ fontWeight: 700, color: '#151e13' }}>{orderToRemove.orderNumber}</span>? 
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              <button
+                onClick={() => setOrderToRemove(null)}
+                style={{ padding: '10px 18px', borderRadius: '12px', fontSize: '13px', fontWeight: 600, color: '#3d4943', background: '#F0F5F1', border: 'none', cursor: 'pointer', transition: 'all 0.2s' }}
+                onMouseOver={e => e.currentTarget.style.background = '#E5EDE8'}
+                onMouseOut={e => e.currentTarget.style.background = '#F0F5F1'}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmRemove}
+                style={{ padding: '10px 18px', borderRadius: '12px', fontSize: '13px', fontWeight: 600, color: '#fff', background: '#BA1A1A', border: 'none', cursor: 'pointer', boxShadow: '0 4px 12px rgba(186,26,26,0.2)', transition: 'all 0.2s' }}
+                onMouseOver={e => { e.currentTarget.style.background = '#93000A'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                onMouseOut={e => { e.currentTarget.style.background = '#BA1A1A'; e.currentTarget.style.transform = 'translateY(0)'; }}
+              >
+                Yes, Remove
+              </button>
+            </div>
+          </div>
+          <style>{`
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes slideUp { from { opacity: 0; transform: translateY(15px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+          `}</style>
+        </div>
+      )}
 
       <style>{`
         @keyframes spin        { to { transform: rotate(360deg) } }

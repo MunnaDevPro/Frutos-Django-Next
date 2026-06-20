@@ -182,6 +182,15 @@ class NotificationListView(generics.ListAPIView):
         qs = Notification.objects.filter(user=self.request.user).order_by('-created_at')
         if self.request.query_params.get('unread') == 'true':
             qs = qs.filter(is_read=False)
+            
+        context = self.request.query_params.get('context', '')
+        admin_types = ['admin_alert', 'out_of_stock', 'wholesale_pending', 'ticket_created', 'admin_ticket_reply']
+        
+        if context == 'dashboard':
+            qs = qs.filter(type__in=admin_types)
+        else:
+            qs = qs.exclude(type__in=admin_types)
+            
         return qs
 
     def list(self, request, *args, **kwargs):

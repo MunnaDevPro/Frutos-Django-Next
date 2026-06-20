@@ -298,6 +298,82 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import StatusBadge  from '../components/StatusBadge'
 import ConfirmModal from '../components/ConfirmModal'
+import { toast } from 'react-hot-toast'
+
+// ── Delete Notifications Modal ────────────────────────────────────────────────
+function DeleteNotifsModal({ count, onConfirm, onClose, deleting }) {
+  return (
+    <>
+      <div
+        onClick={onClose}
+        style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(8, 30, 19, 0.45)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 1000,
+          animation: 'mcFadeIn 0.18s ease',
+        }}
+      />
+      <div style={{
+        position: 'fixed', top: '50%', left: '50%',
+        transform: 'translate(-50%, -50%)', zIndex: 1001,
+        background: '#ffffff', borderRadius: 20,
+        padding: '32px 28px 24px',
+        width: 'min(380px, calc(100vw - 32px))',
+        boxShadow: '0 24px 64px rgba(8,30,19,0.18), 0 4px 16px rgba(8,30,19,0.08)',
+        animation: 'mcPopIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
+      }}>
+        <div style={{
+          width: 52, height: 52, borderRadius: 14,
+          background: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          margin: '0 auto 18px',
+        }}>
+          <span className="material-symbols-outlined" style={{ color: '#991B1B', fontSize: 26, fontVariationSettings: "'FILL' 0" }}>
+            delete
+          </span>
+        </div>
+        <h3 style={{
+          margin: '0 0 8px', textAlign: 'center',
+          fontSize: 18, fontWeight: 700, color: '#151e13', fontFamily: '"Newsreader", Georgia, serif',
+        }}>
+          Delete {count > 1 ? `${count} Notifications` : 'Notification'}?
+        </h3>
+        <p style={{
+          margin: '0 0 26px', textAlign: 'center',
+          fontSize: 13.5, color: '#6d7a73', lineHeight: 1.55,
+        }}>
+          Are you sure you want to delete {count > 1 ? 'these notifications' : 'this notification'}?
+        </p>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button
+            onClick={onClose} disabled={deleting}
+            style={{
+              flex: 1, padding: '11px 0', background: '#F3F6F4', border: '1.5px solid #E2EAE5',
+              borderRadius: 12, cursor: deleting ? 'not-allowed' : 'pointer',
+              fontSize: 13.5, fontWeight: 600, color: '#3d4943', fontFamily: 'inherit', opacity: deleting ? 0.6 : 1,
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm} disabled={deleting}
+            style={{
+              flex: 1, padding: '11px 0', background: deleting ? '#b91c1c' : '#991B1B',
+              border: 'none', borderRadius: 12, cursor: deleting ? 'not-allowed' : 'pointer',
+              fontSize: 13.5, fontWeight: 600, color: '#ffffff', fontFamily: 'inherit',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            }}
+          >
+            {deleting
+              ? <><span className="material-symbols-outlined" style={{ fontSize: 15, animation: 'spin .7s linear infinite' }}>progress_activity</span> Deleting…</>
+              : <><span className="material-symbols-outlined" style={{ fontSize: 15 }}>delete</span> Yes, Delete</>
+            }
+          </button>
+        </div>
+      </div>
+    </>
+  )
+}
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api'
 const fmt = (n) => Number(n || 0).toFixed(2)
@@ -325,6 +401,12 @@ export default function NotificationsTab({ authFetch, initialNotifications = nul
   const [fetchingOrder, setFetchingOrder] = useState({})
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [hasNew,        setHasNew]        = useState(false)
+  
+  const [selectedNotifs, setSelectedNotifs] = useState([])
+  const [isSelectionMode, setIsSelectionMode] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+
   const prevIdsRef = useRef(new Set(toArray(initialNotifications).map(n => n.id)))
 
   // ── Fetch / refresh notifications ─────────────────────────────────────────
@@ -493,6 +575,33 @@ export default function NotificationsTab({ authFetch, initialNotifications = nul
     } catch { /* ignore */ }
   }
 
+  const handleDeleteSelected = async () => {
+    if (!selectedNotifs.length || isDeleting) return
+    
+    setIsDeleting(true)
+    try {
+      const res = await authFetch(`${API_BASE}/auth/notifications/bulk-delete/`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedNotifs })
+      })
+      if (res.ok) {
+        setNotifs(prev => prev.filter(n => !selectedNotifs.includes(n.id)))
+        setSelectedNotifs([])
+        setIsSelectionMode(false)
+        if (expanded && selectedNotifs.includes(expanded)) setExpanded(null)
+      } else {
+        toast.error("Failed to delete notifications.")
+      }
+    } catch (e) {
+      console.error(e)
+      toast.error("An error occurred.")
+    } finally {
+      setIsDeleting(false)
+      setShowDeleteModal(false)
+    }
+  }
+
   if (loading) return (
     <div className="py-12 text-center" style={{ color: '#6d7a73' }}>Loading notifications…</div>
   )
@@ -504,23 +613,84 @@ export default function NotificationsTab({ authFetch, initialNotifications = nul
       {confirmDelete !== null && (
         <ConfirmModal onConfirm={confirmDeleteNotif} onCancel={() => setConfirmDelete(null)} />
       )}
+      
+      {showDeleteModal && (
+        <DeleteNotifsModal
+          count={selectedNotifs.length}
+          onConfirm={handleDeleteSelected}
+          onClose={() => !isDeleting && setShowDeleteModal(false)}
+          deleting={isDeleting}
+        />
+      )}
+
       <div>
-        <div className="flex items-center justify-between mb-4">
-          {hasNew && (
-            <button onClick={() => setHasNew(false)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer"
-              style={{ background: '#D1FAE5', color: '#00694C', border: '1px solid #6EE7B7' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>fiber_new</span>
-              New notification arrived
+        {/* ── Top Action Bar ── */}
+        {notifs.length > 0 && (
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center gap-3">
+              {hasNew && (
+                <button onClick={() => setHasNew(false)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer"
+                  style={{ background: '#D1FAE5', color: '#00694C', border: '1px solid #6EE7B7' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>fiber_new</span>
+                  New
+                </button>
+              )}
+              {unread > 0 && (
+                <button onClick={markAll} className="text-sm font-medium cursor-pointer"
+                  style={{ color: '#00694C', background: 'none', border: 'none' }}>
+                  Mark all as read ({unread})
+                </button>
+              )}
+            </div>
+
+            <button 
+              onClick={() => {
+                setIsSelectionMode(!isSelectionMode)
+                setSelectedNotifs([])
+                if (expanded) setExpanded(null)
+              }}
+              className="text-sm font-semibold transition-colors px-4 py-2 rounded-xl flex items-center gap-2 cursor-pointer ml-auto"
+              style={{ 
+                background: isSelectionMode ? '#FEF2F2' : '#F0FAF5',
+                color: isSelectionMode ? '#991B1B' : '#00694C' 
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+                {isSelectionMode ? 'close' : 'checklist'}
+              </span>
+              {isSelectionMode ? 'Cancel' : 'Select'}
             </button>
-          )}
-          {unread > 0 && (
-            <button onClick={markAll} className="text-sm font-medium cursor-pointer ml-auto"
-              style={{ color: '#00694C', background: 'none', border: 'none' }}>
-              Mark all as read ({unread})
-            </button>
-          )}
-        </div>
+          </div>
+        )}
+
+        {/* ── Floating Action Bar ── */}
+        {isSelectionMode && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.18)] border border-gray-100 p-3 flex items-center gap-4 z-50 w-[90%] max-w-[400px] justify-between transition-all" style={{ animation: 'mcPopIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)' }}>
+            <span className="text-sm font-bold pl-2" style={{ color: '#151e13' }}>{selectedNotifs.length} selected</span>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setSelectedNotifs(selectedNotifs.length === notifs.length ? [] : notifs.map(n => n.id))}
+                className="px-4 py-2 text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+                style={{ background: '#f5f9f5', color: '#00694C' }}
+              >
+                {selectedNotifs.length === notifs.length ? 'Deselect All' : 'Select All'}
+              </button>
+              <button 
+                onClick={() => setShowDeleteModal(true)}
+                disabled={selectedNotifs.length === 0 || isDeleting}
+                className={`px-4 py-2 text-sm font-semibold rounded-xl text-white transition-colors flex items-center gap-2 ${selectedNotifs.length === 0 || isDeleting ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90 cursor-pointer'}`}
+                style={{ background: '#991B1B' }}
+              >
+                {isDeleting ? (
+                  <><span className="material-symbols-outlined text-[16px]" style={{ animation: 'spin .7s linear infinite' }}>progress_activity</span></>
+                ) : (
+                  <><span className="material-symbols-outlined text-[16px]">delete</span> Delete</>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
 
         {!notifs.length ? (
           <div className="py-16 text-center">
@@ -557,11 +727,34 @@ export default function NotificationsTab({ authFetch, initialNotifications = nul
               } : rawMeta
 
               return (
-                <div key={notif.id} className="rounded-xl overflow-hidden"
-                  style={{ border: `1px solid ${notif.isRead ? '#eaeaea' : '#B3E5D0'}` }}>
+                <div key={notif.id} className="rounded-xl overflow-hidden transition-all duration-200"
+                  style={{ 
+                    border: `1.5px solid ${isExpanded ? '#00694C40' : (isSelectionMode && selectedNotifs.includes(notif.id) ? '#00694C80' : (notif.isRead ? '#eaeaea' : '#B3E5D0'))}`,
+                    boxShadow: isSelectionMode && selectedNotifs.includes(notif.id) ? '0 4px 12px rgba(0,105,76,0.06)' : 'none'
+                  }}>
                   <div className="flex items-start gap-4 p-4"
                     style={{ background: notif.isRead ? '#fff' : '#F0FAF5' }}>
-                    <div onClick={() => handleClick(notif)}
+                    {isSelectionMode && (
+                      <div className="flex items-center justify-center pt-2 px-1" onClick={(e) => e.stopPropagation()}>
+                        <div 
+                          onClick={() => {
+                            if (selectedNotifs.includes(notif.id)) {
+                              setSelectedNotifs(prev => prev.filter(id => id !== notif.id))
+                            } else {
+                              setSelectedNotifs(prev => [...prev, notif.id])
+                            }
+                          }}
+                          className="w-5 h-5 rounded border cursor-pointer flex items-center justify-center transition-colors"
+                          style={{ 
+                            borderColor: selectedNotifs.includes(notif.id) ? '#00694C' : '#BCCAC1',
+                            background: selectedNotifs.includes(notif.id) ? '#00694C' : '#fff'
+                          }}
+                        >
+                          {selectedNotifs.includes(notif.id) && <span className="material-symbols-outlined text-white text-[14px]">check</span>}
+                        </div>
+                      </div>
+                    )}
+                    <div onClick={() => !isSelectionMode && handleClick(notif)}
                       className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 cursor-pointer"
                       style={{ background: `${iconColor}18` }}>
                       <span className="material-symbols-outlined"
@@ -569,7 +762,7 @@ export default function NotificationsTab({ authFetch, initialNotifications = nul
                         {notif.icon}
                       </span>
                     </div>
-                    <div className="flex-1 min-w-0 cursor-pointer" onClick={() => handleClick(notif)}>
+                    <div className="flex-1 min-w-0 cursor-pointer" onClick={() => !isSelectionMode && handleClick(notif)}>
                       <div className="flex items-start justify-between gap-2">
                         <p className="text-sm font-bold flex items-center gap-2" style={{ color: '#151e13' }}>
                           {notif.title}
@@ -592,12 +785,14 @@ export default function NotificationsTab({ authFetch, initialNotifications = nul
                         {new Date(notif.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
-                    <button onClick={e => { e.stopPropagation(); setConfirmDelete(notif.id) }}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: '#BCCAC1', flexShrink: 0, borderRadius: '8px', transition: 'color .15s, background .15s' }}
-                      onMouseEnter={e => { e.currentTarget.style.color = '#BA1A1A'; e.currentTarget.style.background = '#FEE2E2' }}
-                      onMouseLeave={e => { e.currentTarget.style.color = '#BCCAC1'; e.currentTarget.style.background = 'transparent' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
-                    </button>
+                    {!isSelectionMode && (
+                      <button onClick={e => { e.stopPropagation(); setConfirmDelete(notif.id) }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: '#BCCAC1', flexShrink: 0, borderRadius: '8px', transition: 'color .15s, background .15s' }}
+                        onMouseEnter={e => { e.currentTarget.style.color = '#BA1A1A'; e.currentTarget.style.background = '#FEE2E2' }}
+                        onMouseLeave={e => { e.currentTarget.style.color = '#BCCAC1'; e.currentTarget.style.background = 'transparent' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
+                      </button>
+                    )}
                   </div>
 
                   {isExpanded && notif.type === 'order_update' && (

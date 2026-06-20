@@ -21,7 +21,7 @@ export function Field({ label, value, name, onChange, readOnly, type = 'text', h
         className={`w-full px-4 py-3 rounded-xl border outline-none transition-all text-sm ${
           readOnly 
             ? 'bg-gray-50/80 border-gray-100 text-gray-400 cursor-not-allowed' 
-            : 'bg-gray-50/50 border-gray-200 text-[#151e13] focus:border-[#00694C] focus:ring-1 focus:ring-[#00694C] placeholder-gray-400'
+            : 'bg-white border-gray-200 text-[#151e13] focus:border-[#085041] focus:ring-4 focus:ring-[#085041]/10 placeholder-gray-400 shadow-sm hover:border-gray-300'
         }`}
       />
       {hint && <p className="text-[11px] text-gray-400 mt-1.5">{hint}</p>}

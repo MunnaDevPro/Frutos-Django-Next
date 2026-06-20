@@ -21,20 +21,20 @@ function MinQtyToast({ product, onClose }) {
       display: 'flex', gap: '12px', alignItems: 'flex-start',
     }}>
       <style>{`@keyframes toastIn{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}`}</style>
-      <div style={{ width:'32px', height:'32px', borderRadius:'50%', background:'rgba(255,100,100,0.15)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:'1px' }}>
+      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,100,100,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px' }}>
         <svg width="15" height="15" fill="none" stroke="#F87171" strokeWidth="2.2" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
         </svg>
       </div>
       <div style={{ flex: 1 }}>
-        <p style={{ fontWeight:700, fontSize:'13.5px', margin:'0 0 4px', lineHeight:1.3 }}>Wholesale Minimum Required</p>
-        <p style={{ fontSize:'12.5px', color:'rgba(255,255,255,0.65)', margin:0, lineHeight:1.5 }}>
-          A minimum of <strong style={{ color:'white' }}>{product.minWholesaleQty} {product.wholesaleUnit || 'units'}</strong> is required
-          to unlock the wholesale price of <strong style={{ color:'#6EE7B7' }}>€{price}</strong>.
+        <p style={{ fontWeight: 700, fontSize: '13.5px', margin: '0 0 4px', lineHeight: 1.3 }}>Wholesale Minimum Required</p>
+        <p style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.65)', margin: 0, lineHeight: 1.5 }}>
+          A minimum of <strong style={{ color: 'white' }}>{product.minWholesaleQty} {product.wholesaleUnit || 'units'}</strong> is required
+          to unlock the wholesale price of <strong style={{ color: '#6EE7B7' }}>€{price}</strong>.
         </p>
       </div>
-      <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(255,255,255,0.4)', padding:0, lineHeight:1, flexShrink:0 }}>
-        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', padding: 0, lineHeight: 1, flexShrink: 0 }}>
+        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" /></svg>
       </button>
     </div>
   )
@@ -85,7 +85,7 @@ function WishlistButton({ product }) {
         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
         style={{ transition: 'fill 0.18s, stroke 0.18s' }}
       >
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
       </svg>
     </button>
   )
@@ -93,20 +93,20 @@ function WishlistButton({ product }) {
 
 // ── Main ProductCard ──────────────────────────────────────────────────────────
 export default function ProductCard({ product, notified, onNotify }) {
-  const [isNavigating,    setIsNavigating]    = useState(false)
+  const [isNavigating, setIsNavigating] = useState(false)
   const [showMinQtyToast, setShowMinQtyToast] = useState(false)
   const { data: session } = useSession()
 
-  const sessionUser         = session?.user ?? null
+  const sessionUser = session?.user ?? null
   const isApprovedWholesale = sessionUser?.isApproved === true
 
   const slug = product.slug || slugify(product.name)
   const { name, badge, badgeColor = '', origin, unit, price, oldPrice,
-          wholesalePrice, minWholesaleQty = 1, inStock, image, onSale } = product
+    wholesalePrice, minWholesaleQty = 1, inStock, image, onSale } = product
 
-  const displayPrice     = wholesalePrice ? wholesalePrice : price
+  const displayPrice = wholesalePrice ? wholesalePrice : price
   const isWholesalePrice = !!wholesalePrice
-  const cleanOrigin      = origin?.replace(/^from\s+/i, '')
+  const cleanOrigin = origin?.replace(/^from\s+/i, '')
 
   return (
     <>
@@ -170,7 +170,7 @@ export default function ProductCard({ product, notified, onNotify }) {
                 <div className="flex-shrink-0 text-right" style={{ maxWidth: '72px' }}>
                   <span className="font-serif italic text-[10px] md:text-[11px] text-gray-400 leading-tight block">from</span>
                   <span className="font-serif italic text-[10px] md:text-[11px] text-gray-400 leading-tight block"
-                    style={{ overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>
+                    style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                     {cleanOrigin}
                   </span>
                 </div>
@@ -201,7 +201,7 @@ export default function ProductCard({ product, notified, onNotify }) {
                 {isWholesalePrice && (
                   <div className="flex items-center gap-1 bg-[#F5F3FF] p-1.5 rounded-[6px]">
                     <svg width="9" height="9" fill="#7C3AED" viewBox="0 0 24 24">
-                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
                     </svg>
                     <span className="text-[9px] md:text-[10px] text-[#6D28D9] font-semibold">
                       Min. {minWholesaleQty} {product.wholesaleUnit || 'units'}
@@ -214,10 +214,10 @@ export default function ProductCard({ product, notified, onNotify }) {
                 onClick={e => { e.preventDefault(); onNotify?.() }}
                 className="w-full rounded-lg border transition-colors mt-auto"
                 style={{
-                  fontSize:'12px', fontWeight:500,
+                  fontSize: '12px', fontWeight: 500,
                   color: notified ? '#00694C' : '#151E13',
                   borderColor: notified ? '#00694C' : '#BCCAC1',
-                  padding:'7px 0',
+                  padding: '7px 0',
                 }}
               >
                 {notified ? 'Notified ✓' : 'Notify Me'}

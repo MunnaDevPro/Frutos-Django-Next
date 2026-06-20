@@ -1,5 +1,6 @@
 // src/app/wholesale/profile/_tabs/NotificationsTab.jsx
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Card from '../_shared/Card'
 import StatusBadge from '../_shared/StatusBadge'
 import ConfirmModal from '@/app/profile/components/ConfirmModal'
@@ -19,8 +20,14 @@ export default function NotificationsTab({ notifications, unreadCount, onMarkAll
   const [expanded, setExpanded] = useState(null)
   const [confirmDelete, setConfirmDelete] = useState(null)
 
-  function toggleAccordion(notifId) {
-    setExpanded(p => p === notifId ? null : notifId)
+  const router = useRouter()
+
+  function handleClick(notif) {
+    if (notif.metadata?.ticket_id) {
+      router.push(`/wholesale/profile?tab=support_tickets&ticket_id=${notif.metadata.ticket_id}`)
+      return
+    }
+    setExpanded(p => p === notif.id ? null : notif.id)
   }
 
   return (
@@ -94,7 +101,7 @@ export default function NotificationsTab({ notifications, unreadCount, onMarkAll
                 borderRadius: '12px', overflow: 'hidden'
               }}>
                 <div 
-                  onClick={() => toggleAccordion(n.id)}
+                  onClick={() => handleClick(n)}
                   style={{
                     display: 'flex', gap: 12, padding: '16px',
                     background: n.is_read ? '#fff' : '#F0FAF5',

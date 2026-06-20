@@ -92,23 +92,23 @@ export default function InvoiceModal({ order, onClose }) {
           </div>
 
           {/* Printable Area */}
-          <div className="p-8 bg-white min-h-[500px] relative" ref={printRef}>
+          <div className="p-4 sm:p-8 bg-white min-h-[500px] relative" ref={printRef}>
             
             {/* Watermark */}
             <div className="absolute top-[80px] left-1/2 transform -translate-x-1/2 text-gray-200 text-6xl font-bold uppercase tracking-widest pointer-events-none select-none z-0">
               {statusLabel}
             </div>
 
-            <div className="flex justify-between items-start relative z-10">
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-6 sm:gap-4 relative z-10">
               {/* Left Header */}
               <div className="text-sm text-gray-700 space-y-1">
-                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{siteConfig?.brand_name?.toUpperCase() || 'EL ÁRBOL'}</h1>
-                <h2 className="text-sm font-semibold text-gray-600 tracking-tight mb-1">{siteConfig?.brand_name ? `${siteConfig.brand_name} LLC` : 'EL ÁRBOL LLC'}</h2>
-                <p>{siteConfig?.contact_address || 'Calle de la Huertas 12, 28014 Madrid, Spain'}</p>
-                <p>TEL: {siteConfig?.contact_phone || '+34 900 123 456'}</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">{siteConfig?.brand_name?.toUpperCase() || 'EL ÁRBOL'}</h1>
+                <h2 className="text-xs sm:text-sm font-semibold text-gray-600 tracking-tight mb-1">{siteConfig?.brand_name ? `${siteConfig.brand_name} LLC` : 'EL ÁRBOL LLC'}</h2>
+                <p>{siteConfig?.contact_address || 'House 12, Road 7, Dhanmondi, Dhaka, Bangladesh'}</p>
+                <p>TEL: {siteConfig?.contact_phone || '+15119219836'}</p>
                 <p className="flex items-center gap-1 font-medium mt-1">
                   <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-                  {siteConfig?.contact_email || 'hello@elarbol.com'}
+                  {siteConfig?.contact_email || 'elarbol@gmail.com'}
                 </p>
               </div>
 
@@ -126,8 +126,8 @@ export default function InvoiceModal({ order, onClose }) {
             </div>
 
             {/* Table */}
-            <div className="mt-8 overflow-x-auto relative z-10">
-              <table className="w-full text-[11px] border-collapse">
+            <div className="mt-8 overflow-x-auto relative z-10 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full pb-2">
+              <table className="w-full text-[11px] border-collapse min-w-[700px]">
                 <thead className="bg-[#e5e7eb] text-gray-700">
                   <tr>
                     <th className="border border-gray-200 p-2 text-center font-bold">S/N</th>
@@ -147,10 +147,14 @@ export default function InvoiceModal({ order, onClose }) {
                   {(order.items || []).map((item, i) => (
                     <tr key={item.id || i} className="text-gray-800">
                       <td className="border border-gray-200 p-2 text-center bg-[#f3f4f6]">{i + 1}</td>
-                      <td className="border border-gray-200 p-2 text-center font-semibold">{item.quantity}</td>
+                      <td className="border border-gray-200 p-2 text-center font-semibold">{item.quantity} {item.unit}</td>
                       <td className="border border-gray-200 p-2">{item.product_name}</td>
                       <td className="border border-gray-200 p-2"></td>
-                      <td className="border border-gray-200 p-2"></td>
+                      <td className="border border-gray-200 p-2 text-center">
+                        {(!item.unit || item.unit?.toLowerCase() === 'kg') ? (
+                          <svg className="w-4 h-4 text-gray-800 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>
+                        ) : ''}
+                      </td>
                       <td className="border border-gray-200 p-2"></td>
                       <td className="border border-gray-200 p-2"></td>
                       <td className="border border-gray-200 p-2"></td>

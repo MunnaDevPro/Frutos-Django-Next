@@ -20,6 +20,15 @@ export default function OrderLineTab({ accessToken }) {
   const [cart, setCart] = useState([])
   const [placingOrder, setPlacingOrder] = useState(false)
   const [orderNumber] = useState(`ORD-${Math.floor(Math.random() * 10000)}`)
+
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 6
+
+  // Reset page when category or search changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery, activeCategory])
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -50,6 +59,9 @@ export default function OrderLineTab({ accessToken }) {
     const matchesCategory = activeCategory === 'All' || p.category?.name === activeCategory || p.category === activeCategory
     return matchesSearch && matchesCategory
   })
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
+  const paginatedProducts = filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
   const addToCart = (product) => {
     setCart(prev => {
@@ -135,7 +147,9 @@ export default function OrderLineTab({ accessToken }) {
     try {
       clearCart()
       cart.forEach(item => {
-        addItem(item, getDisplayPrice(item), item.quantity)
+        const step = parseInt(item.minimum_purchase) || parseInt(item.minWholesaleQty) || 1
+        const finalQty = Math.max(parseInt(item.quantity) || 1, step)
+        addItem(item, getDisplayPrice(item), finalQty)
       })
       router.push('/checkout')
     } catch (err) {
@@ -206,88 +220,162 @@ export default function OrderLineTab({ accessToken }) {
           ) : filteredProducts.length === 0 ? (
             <div className="text-center text-gray-500 py-10">No products found.</div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-5">
-              {filteredProducts.map((product) => {
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-5">
+                {paginatedProducts.map((product) => {
                 const qty = getQuantityInCart(product.id)
                 const isSelected = qty > 0
                 const step = parseInt(product.minimum_purchase) || parseInt(product.minWholesaleQty) || 1
                 const stock = product.inStock || 0
                 const canAddMore = (qty + step) <= stock
                 return (
-                  <div key={product.id} className={`bg-white rounded-2xl border transition-all duration-200 flex flex-col h-full overflow-hidden ${isSelected ? 'border-[#085041] shadow-md ring-1 ring-[#085041]/10' : 'border-gray-100 shadow-sm hover:shadow-md'}`}>
+                  <div key={product.id} className={`bg-white rounded-2xl border transition-all duration-300 flex flex-col h-full overflow-hidden group ${isSelected ? 'border-[#085041] shadow-[0_4px_16px_rgb(8,80,65,0.08)] ring-1 ring-[#085041]/20' : 'border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200'}`}>
 
                     {/* Image Area */}
-                    <div className="relative w-full pt-[65%] sm:pt-[55%] bg-[#F8F9FA] overflow-hidden border-b border-gray-50 shrink-0">
-                      <div className="absolute inset-0 flex items-center justify-center p-3">
-                        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-white shrink-0 flex items-center justify-center">
-                          {product.image_url || product.image ? (
-                            <Image src={product.image_url || product.image} alt={product.name || product.title} fill className="object-contain p-2 sm:p-3" sizes="(max-width: 768px) 100vw, 33vw" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-[10px] text-[#085041] bg-[#e8f5e9] font-medium">No Img</div>
-                          )}
+                    <div className="relative w-full aspect-[5/3] sm:aspect-[16/10] bg-[#f8faf9] overflow-hidden group-hover:bg-[#f1f5f3] transition-colors duration-300 shrink-0">
+                      {product.image_url || product.image ? (
+                        <Image 
+                          src={product.image_url || product.image} 
+                          alt={product.name || product.title} 
+                          fill 
+                          className="object-contain mix-blend-multiply p-6 transition-transform duration-500 group-hover:scale-105" 
+                          sizes="(max-width: 768px) 100vw, 33vw" 
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-xs text-[#085041]/60 bg-[#e8f5e9]/50 font-medium">No Image</div>
+                      )}
+                      
+                      {/* Optional Badge */}
+                      {product.discount_price && parseFloat(product.discount_price) < parseFloat(product.price) && (
+                        <div className="absolute top-3 left-3 bg-[#D32F2F] text-white text-[10px] font-bold px-2.5 py-1 rounded-md tracking-wider uppercase shadow-sm">
+                          Sale
                         </div>
-                      </div>
+                      )}
                     </div>
 
                     {/* Content Area */}
-                    <div className="p-2.5 sm:p-3 flex flex-col flex-1">
-                      <div className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-0.5">
+                    <div className="p-2.5 sm:p-3 flex flex-col flex-1 bg-white">
+                      <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">
                         {typeof product.category === 'string' ? product.category : product.category?.name || 'Category'}
                       </div>
-                      <h4 className="font-semibold text-gray-900 text-[12px] sm:text-[13px] leading-tight mb-2 line-clamp-2">
+                      <h4 className="font-semibold text-gray-900 text-[14px] sm:text-[15px] leading-tight mb-2 line-clamp-2 transition-colors group-hover:text-[#085041]">
                         {product.name || product.title}
                       </h4>
 
-                      <div className="flex flex-wrap items-center justify-between gap-2 mt-auto pt-2 border-t border-gray-50">
-                        {/* Price */}
-                        <div className="flex flex-col min-w-[50px]">
-                          <span className="font-bold text-gray-900 text-[13px] sm:text-[14px] leading-none">
+                      <div className="mt-auto flex flex-col gap-2">
+                        {/* Price Area */}
+                        <div className="flex items-baseline gap-2">
+                          <span className="font-bold text-gray-900 text-[16px] sm:text-[18px] leading-none">
                             €{getDisplayPrice(product).toFixed(2)}
                           </span>
-                          {getDisplayUnit(product) && <span className="text-[10px] text-gray-400 mt-0.5">/ {getDisplayUnit(product)}</span>}
+                          {product.discount_price && parseFloat(product.discount_price) < parseFloat(product.price) && (
+                            <span className="text-xs text-gray-400 line-through decoration-gray-300 decoration-1">
+                              €{parseFloat(product.price).toFixed(2)}
+                            </span>
+                          )}
+                          {getDisplayUnit(product) && <span className="text-[11px] text-gray-500 font-medium ml-auto">/ {getDisplayUnit(product)}</span>}
                         </div>
 
-                        {/* Compact Stepper Pill */}
-                        <div className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-200 shrink-0 shadow-sm ml-auto">
-                          <button
-                            onClick={() => isSelected && qty > step && updateQuantity(product.id, -1)}
-                            disabled={!isSelected || qty <= step}
-                            className={`w-5 h-5 sm:w-6 sm:h-6 shrink-0 flex items-center justify-center rounded-full transition-colors ${isSelected && qty > step ? 'bg-white text-gray-700 shadow-sm cursor-pointer hover:bg-gray-100' : 'text-gray-300 cursor-not-allowed'}`}
-                          >
-                            <Minus size={12} strokeWidth={2.5} />
-                          </button>
+                        {/* Controls */}
+                        <div className={`pt-2 border-t ${isSelected ? 'border-[#085041]/10' : 'border-gray-50'}`}>
+                          {isSelected ? (
+                            <div className="flex items-center w-full justify-between bg-gray-50/80 rounded-xl p-1 border border-gray-100">
+                              <button
+                                onClick={() => qty > step && updateQuantity(product.id, -1)}
+                                disabled={qty <= step}
+                                className={`w-7 h-7 shrink-0 flex items-center justify-center rounded-lg transition-colors ${qty > step ? 'bg-white text-gray-700 shadow-sm cursor-pointer hover:bg-gray-100 border border-gray-200' : 'text-gray-300 cursor-not-allowed bg-transparent'}`}
+                              >
+                                <Minus size={14} strokeWidth={2.5} />
+                              </button>
 
-                          <input
-                            type="text"
-                            value={qty}
-                            onChange={(e) => setExactQuantity(product.id, e.target.value)}
-                            onBlur={() => {
-                              // If they leave it blank or 0, restore to minimum purchase or 1
-                              if (qty === '' || parseInt(qty) <= 0) {
-                                setExactQuantity(product.id, step)
-                              }
-                            }}
-                            className={`w-6 sm:w-7 text-[11px] sm:text-[12px] font-bold text-center leading-none bg-transparent outline-none border-none p-0 ${isSelected ? 'text-[#085041]' : 'text-gray-800'}`}
-                          />
+                              <input
+                                type="text"
+                                value={qty}
+                                onChange={(e) => setExactQuantity(product.id, e.target.value)}
+                                onBlur={() => {
+                                  if (qty === '' || parseInt(qty) < step) {
+                                    setExactQuantity(product.id, step)
+                                  }
+                                }}
+                                className="w-12 text-[14px] font-bold text-center leading-none bg-transparent outline-none border-none p-0 text-[#085041]"
+                              />
 
-                          <button
-                            onClick={() => !isSelected ? addToCart(product) : updateQuantity(product.id, 1)}
-                            disabled={!canAddMore}
-                            title={!canAddMore ? "Stock limit reached" : ""}
-                            className={`w-5 h-5 sm:w-6 sm:h-6 shrink-0 flex items-center justify-center rounded-full transition-colors shadow-sm ${canAddMore
-                              ? 'bg-[#085041] text-white hover:bg-[#064034] cursor-pointer'
-                              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                              }`}
-                          >
-                            <Plus size={12} strokeWidth={2.5} />
-                          </button>
+                              <button
+                                onClick={() => updateQuantity(product.id, 1)}
+                                disabled={!canAddMore}
+                                title={!canAddMore ? "Stock limit reached" : ""}
+                                className={`w-7 h-7 shrink-0 flex items-center justify-center rounded-lg transition-all shadow-sm ${canAddMore
+                                  ? 'bg-[#085041] text-white hover:bg-[#064034] cursor-pointer'
+                                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                  }`}
+                              >
+                                <Plus size={14} strokeWidth={2.5} />
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => addToCart(product)}
+                              className="w-full flex items-center justify-center gap-2 bg-white border-2 border-gray-100 hover:border-[#085041] text-gray-700 hover:text-[#085041] rounded-xl py-1.5 text-sm font-semibold transition-all duration-200 cursor-pointer"
+                            >
+                              <Plus size={16} strokeWidth={2.5} />
+                              Add to Order
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
                   </div>
                 )
               })}
-            </div>
+              </div>
+
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center mt-6 mb-2 gap-2 w-full">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+                  
+                  <div className="flex gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter(p => p === 1 || p === totalPages || Math.abs(currentPage - p) <= 1)
+                      .reduce((acc, p, i, arr) => {
+                        if (i > 0 && p - arr[i - 1] > 1) acc.push('...');
+                        acc.push(p);
+                        return acc;
+                      }, [])
+                      .map((p, idx) => (
+                        p === '...' ? (
+                          <span key={`dots-${idx}`} className="w-9 h-9 flex items-center justify-center text-gray-400">...</span>
+                        ) : (
+                          <button
+                            key={p}
+                            onClick={() => setCurrentPage(p)}
+                            className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                              currentPage === p
+                                ? 'bg-[#085041] text-white shadow-sm'
+                                : 'text-gray-600 hover:bg-gray-100'
+                            }`}
+                          >
+                            {p}
+                          </button>
+                        )
+                      ))}
+                  </div>
+
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -320,7 +408,7 @@ export default function OrderLineTab({ accessToken }) {
               return (
                 <div key={item.id} className="flex gap-3">
                   <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden relative flex-shrink-0">
-                    {(item.image_url || item.image) && <Image src={item.image_url || item.image} alt={item.name || item.title} fill className="object-cover" />}
+                    {(item.image_url || item.image) && <Image src={item.image_url || item.image} alt={item.name || item.title} fill className="object-contain mix-blend-multiply p-1" />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h5 className="text-sm font-medium text-gray-900 line-clamp-1">{item.name || item.title}</h5>

@@ -663,6 +663,9 @@ class Order(models.Model):
     shipping_method = models.ForeignKey(ShippingMethod, on_delete=models.PROTECT, null=True, blank=True, help_text="Shipping method", db_index=True)
     tracking_number = models.CharField(max_length=100, blank=True, null=True, help_text="Tracking number for order tracking")
     
+    # Customer visibility
+    is_hidden_from_customer = models.BooleanField(default=False, help_text="If True, order is hidden from the customer's history.")
+    
     # Required customer information fields
     customer_name = models.CharField(max_length=100, help_text="Required customer name")
     customer_email = models.EmailField(help_text="Required customer email", db_index=True)

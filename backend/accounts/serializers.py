@@ -268,14 +268,24 @@ class SupportTicketMessageAttachmentSerializer(serializers.ModelSerializer):
         fields = ['id', 'file', 'created_at']
 
 class SupportTicketMessageSerializer(serializers.ModelSerializer):
-    senderName = serializers.CharField(source='sender.name', read_only=True)
-    senderEmail = serializers.CharField(source='sender.email', read_only=True)
+    senderName = serializers.SerializerMethodField()
+    senderEmail = serializers.SerializerMethodField()
     isAdmin = serializers.SerializerMethodField()
     attachments = SupportTicketMessageAttachmentSerializer(many=True, read_only=True)
 
     class Meta:
         model = SupportTicketMessage
         fields = ['id', 'senderName', 'senderEmail', 'isAdmin', 'message', 'attachments', 'is_edited', 'is_deleted', 'delivery_status', 'created_at']
+        
+    def get_senderName(self, obj):
+        if obj.wholesale_sender:
+            return obj.wholesale_sender.contact_name or obj.wholesale_sender.business_name
+        return obj.sender.name if obj.sender else 'Unknown'
+
+    def get_senderEmail(self, obj):
+        if obj.wholesale_sender:
+            return obj.wholesale_sender.email
+        return obj.sender.email if obj.sender else 'Unknown'
         
     def get_isAdmin(self, obj):
         return obj.is_admin_reply
@@ -291,8 +301,8 @@ class SupportTicketMessageSerializer(serializers.ModelSerializer):
 from django.utils import timezone
 
 class SupportTicketSerializer(serializers.ModelSerializer):
-    userName = serializers.CharField(source='user.name', read_only=True)
-    userEmail = serializers.CharField(source='user.email', read_only=True)
+    userName = serializers.SerializerMethodField()
+    userEmail = serializers.SerializerMethodField()
     images = SupportTicketImageSerializer(many=True, read_only=True)
     messages = SupportTicketMessageSerializer(many=True, read_only=True)
     is_user_typing = serializers.SerializerMethodField()
@@ -307,6 +317,16 @@ class SupportTicketSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'status', 'admin_response', 'created_at', 'updated_at']
 
+    def get_userName(self, obj):
+        if obj.wholesale_user:
+            return obj.wholesale_user.contact_name or obj.wholesale_user.business_name
+        return obj.user.name if obj.user else 'Unknown'
+
+    def get_userEmail(self, obj):
+        if obj.wholesale_user:
+            return obj.wholesale_user.email
+        return obj.user.email if obj.user else 'Unknown'
+
     def get_is_user_typing(self, obj):
         if not obj.user_typing_at: return False
         return (timezone.now() - obj.user_typing_at).total_seconds() < 3
@@ -316,7 +336,11 @@ class SupportTicketSerializer(serializers.ModelSerializer):
         return (timezone.now() - obj.admin_typing_at).total_seconds() < 3
 
     def create(self, validated_data):
-        validated_data['user'] = self.context['request'].user
+        request = self.context.get('request')
+        if hasattr(request.user, 'business_name'):
+            validated_data['wholesale_user'] = request.user
+        else:
+            validated_data['user'] = request.user
         ticket = super().create(validated_data)
         
         # Handle multiple images
@@ -330,5 +354,11 @@ class SupportTicketSerializer(serializers.ModelSerializer):
 
 
 class AdminSupportTicketSerializer(SupportTicketSerializer):
+    is_wholesale = serializers.SerializerMethodField()
+
     class Meta(SupportTicketSerializer.Meta):
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        fields = SupportTicketSerializer.Meta.fields + ['is_wholesale']
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def get_is_wholesale(self, obj):
+        return obj.wholesale_user is not None

@@ -9,8 +9,8 @@ export default function BasketItemList({ items, updateQty, removeItem, isApprove
       {items.map(item => {
         const effectivePrice = item.effectivePrice ?? item.price
         const isWholesaleItem = item.effectivePrice && item.effectivePrice !== item.price
-        const minQty = (item.wholesalePrice && item.minWholesaleQty) ? Math.max(1, parseInt(item.minWholesaleQty, 10)) : 1;
-        const belowMinQty = item.wholesalePrice && item.qty < minQty
+        const minQty = parseInt(item.minimum_purchase) || parseInt(item.minWholesaleQty) || 1;
+        const belowMinQty = item.qty < minQty
 
         return (
           <div

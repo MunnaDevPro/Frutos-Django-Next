@@ -167,7 +167,8 @@ class SupportTicket(models.Model):
         ('PRODUCT', 'Product'),
     ]
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='support_tickets')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='support_tickets', null=True, blank=True)
+    wholesale_user = models.ForeignKey('wholesale.WholesaleUser', on_delete=models.CASCADE, related_name='support_tickets', null=True, blank=True)
     subject = models.CharField(max_length=255)
     description = models.TextField()
     category = models.CharField(max_length=15, choices=CATEGORY_CHOICES, default='GENERAL')
@@ -190,7 +191,8 @@ class SupportTicket(models.Model):
         verbose_name_plural = "Support Tickets"
 
     def __str__(self):
-        return f"Ticket #{self.id} by {self.user.email} - {self.subject}"
+        email = self.user.email if self.user else self.wholesale_user.email if self.wholesale_user else 'Unknown'
+        return f"Ticket #{self.id} by {email} - {self.subject}"
 
 
 class SupportTicketImage(models.Model):
@@ -210,7 +212,8 @@ class SupportTicketMessage(models.Model):
         ('SEEN', 'Seen'),
     ]
     ticket = models.ForeignKey(SupportTicket, related_name='messages', on_delete=models.CASCADE)
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='ticket_messages', on_delete=models.CASCADE)
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='ticket_messages', on_delete=models.CASCADE, null=True, blank=True)
+    wholesale_sender = models.ForeignKey('wholesale.WholesaleUser', related_name='ticket_messages', on_delete=models.CASCADE, null=True, blank=True)
     message = models.TextField(blank=True)
     delivery_status = models.CharField(max_length=15, choices=DELIVERY_STATUS_CHOICES, default='SENT')
     is_edited = models.BooleanField(default=False)
@@ -237,37 +240,67 @@ def notify_on_ticket_message(sender, instance, created, **kwargs):
     if created:
         ticket = instance.ticket
         # If the message is an admin reply, notify the user (even if admin is testing their own ticket)
-        if instance.is_admin_reply or instance.sender != ticket.user:
+        if instance.is_admin_reply or (instance.sender and instance.sender != ticket.user) or (instance.wholesale_sender and instance.wholesale_sender != ticket.wholesale_user):
             from django.utils import timezone
-            # Check if there is an existing unread notification for this ticket
-            existing_notif = Notification.objects.filter(
-                user=ticket.user,
-                type='ticket_reply',
-                is_read=False,
-                metadata__ticket_id=ticket.id
-            ).first()
+            
+            if ticket.wholesale_user:
+                from wholesale.models import WholesaleNotification
+                existing_notif = WholesaleNotification.objects.filter(
+                    user=ticket.wholesale_user,
+                    type=WholesaleNotification.Type.GENERAL,
+                    is_read=False,
+                    metadata__ticket_id=ticket.id
+                ).first()
 
-            if existing_notif:
-                # To trigger SSE and bump to top, delete the old one and create a new one
-                meta = existing_notif.metadata or {}
-                count = meta.get('message_count', 1) + 1
-                existing_notif.delete()
-                
-                Notification.objects.create(
+                if existing_notif:
+                    meta = existing_notif.metadata or {}
+                    count = meta.get('message_count', 1) + 1
+                    existing_notif.delete()
+                    WholesaleNotification.objects.create(
+                        user=ticket.wholesale_user,
+                        type=WholesaleNotification.Type.GENERAL,
+                        title=f'New reply on Ticket #{ticket.id}',
+                        message=f'You received {count} new responses regarding: {ticket.subject}',
+                        metadata={'ticket_id': ticket.id, 'icon': 'support_agent', 'message_count': count}
+                    )
+                else:
+                    WholesaleNotification.objects.create(
+                        user=ticket.wholesale_user,
+                        type=WholesaleNotification.Type.GENERAL,
+                        title=f'New reply on Ticket #{ticket.id}',
+                        message=f'You received a new response regarding: {ticket.subject}',
+                        metadata={'ticket_id': ticket.id, 'icon': 'support_agent', 'message_count': 1}
+                    )
+            elif ticket.user:
+                # Check if there is an existing unread notification for this ticket
+                existing_notif = Notification.objects.filter(
                     user=ticket.user,
                     type='ticket_reply',
-                    title=f'New reply on Ticket #{ticket.id}',
-                    message=f'You received {count} new responses regarding: {ticket.subject}',
-                    metadata={'ticket_id': ticket.id, 'icon': 'support_agent', 'message_count': count}
-                )
-            else:
-                Notification.objects.create(
-                    user=ticket.user,
-                    type='ticket_reply',
-                    title=f'New reply on Ticket #{ticket.id}',
-                    message=f'You received a new response regarding: {ticket.subject}',
-                    metadata={'ticket_id': ticket.id, 'icon': 'support_agent', 'message_count': 1}
-                )
+                    is_read=False,
+                    metadata__ticket_id=ticket.id
+                ).first()
+
+                if existing_notif:
+                    # To trigger SSE and bump to top, delete the old one and create a new one
+                    meta = existing_notif.metadata or {}
+                    count = meta.get('message_count', 1) + 1
+                    existing_notif.delete()
+                    
+                    Notification.objects.create(
+                        user=ticket.user,
+                        type='ticket_reply',
+                        title=f'New reply on Ticket #{ticket.id}',
+                        message=f'You received {count} new responses regarding: {ticket.subject}',
+                        metadata={'ticket_id': ticket.id, 'icon': 'support_agent', 'message_count': count}
+                    )
+                else:
+                    Notification.objects.create(
+                        user=ticket.user,
+                        type='ticket_reply',
+                        title=f'New reply on Ticket #{ticket.id}',
+                        message=f'You received a new response regarding: {ticket.subject}',
+                        metadata={'ticket_id': ticket.id, 'icon': 'support_agent', 'message_count': 1}
+                    )
         else:
             # We update the ticket's updated_at timestamp when a user replies so admins see it's active
             ticket.save(update_fields=['updated_at'])
@@ -276,6 +309,7 @@ def notify_on_ticket_message(sender, instance, created, **kwargs):
             from django.contrib.auth import get_user_model
             User = get_user_model()
             admins = User.objects.filter(is_staff=True)
+            user_email = ticket.user.email if ticket.user else ticket.wholesale_user.email
             for admin_user in admins:
                 existing_notif = Notification.objects.filter(
                     user=admin_user,
@@ -292,7 +326,7 @@ def notify_on_ticket_message(sender, instance, created, **kwargs):
                         user=admin_user,
                         type='admin_ticket_reply',
                         title=f'New message on Ticket #{ticket.id}',
-                        message=f'User {ticket.user.email} sent {count} new messages',
+                        message=f'User {user_email} sent {count} new messages',
                         metadata={'ticket_id': ticket.id, 'icon': 'support_agent', 'message_count': count}
                     )
                 else:
@@ -300,6 +334,6 @@ def notify_on_ticket_message(sender, instance, created, **kwargs):
                         user=admin_user,
                         type='admin_ticket_reply',
                         title=f'New message on Ticket #{ticket.id}',
-                        message=f'User {ticket.user.email} replied to the ticket',
+                        message=f'User {user_email} replied to the ticket',
                         metadata={'ticket_id': ticket.id, 'icon': 'support_agent', 'message_count': 1}
                     )

@@ -262,7 +262,7 @@ export default function ProfileClient({
             <p className="text-sm mt-1 text-gray-500">
               Welcome back,{' '}
               <span className="font-semibold text-[#151e13]">
-                {displayUser?.firstName || displayUser?.email}
+                {[displayUser?.firstName, displayUser?.lastName].filter(Boolean).join(' ') || displayUser?.email}
               </span>
             </p>
           </div>

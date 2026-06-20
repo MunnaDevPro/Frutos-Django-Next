@@ -251,7 +251,7 @@ export default function CartSidebar() {
     return () => { document.body.style.overflow = '' }
   }, [sidebarOpen])
 
-  const violatingItems = items.filter(item => item.wholesalePrice && item.qty < (item.minWholesaleQty || 1))
+  const violatingItems = items.filter(item => item.qty < (parseInt(item.minimum_purchase) || parseInt(item.minWholesaleQty) || 1))
 
   function handleCheckout() {
     if (violatingItems.length > 0) {
@@ -316,13 +316,27 @@ export default function CartSidebar() {
               </button>
             </div>
           ) : (
-            items.map(item => (
+            items.map(item => {
+              const mediaBase = API_BASE.replace('/api', '')
+              let imageUrl = item.image || item.thumbnail || item.image_url || null
+              if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('data:')) {
+                const clean = imageUrl.replace(/^\/+/, '')
+                imageUrl = `${mediaBase}/${clean}`
+              }
+              
+              return (
               <div key={item.id} className="flex gap-4 group">
                 <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-white">
-                  <Image
-                    src={item.image} alt={item.name} width={80} height={80}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+                  {imageUrl ? (
+                    <Image
+                      src={imageUrl} alt={item.name} width={80} height={80}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-[#f0f4f0] flex items-center justify-center">
+                      <span className="material-symbols-outlined text-[#bccac1]">image</span>
+                    </div>
+                  )}
                 </div>
                 <div className="flex-1 flex flex-col justify-between py-0.5">
                   <div className="flex items-start justify-between gap-2">
@@ -339,7 +353,7 @@ export default function CartSidebar() {
                   <div className="flex items-center justify-between mt-2">
                     <div className="flex items-center bg-[#f0f4f0] rounded-lg p-0.5">
                       {(() => {
-                        const minQty = (item.wholesalePrice && item.minWholesaleQty) ? Math.max(1, parseInt(item.minWholesaleQty, 10)) : 1;
+                        const minQty = parseInt(item.minimum_purchase) || parseInt(item.minWholesaleQty) || 1;
                         const disabled = item.qty <= minQty;
                         return (
                           <button onClick={() => updateQty(item.id, Math.max(minQty, item.qty - 1), item.item_type || 'product')} 
@@ -350,9 +364,9 @@ export default function CartSidebar() {
                         );
                       })()}
                       <span className="w-7 text-center font-bold text-sm">{item.qty}</span>
-                      <button onClick={() => updateQty(item.id, item.stock ? Math.min(item.stock, item.qty + 1) : item.qty + 1, item.item_type || 'product')} 
-                        disabled={item.stock && item.qty >= item.stock}
-                        className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${item.stock && item.qty >= item.stock ? 'text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:bg-[#e2e8e2]'}`}>
+                      <button onClick={() => updateQty(item.id, item.stock !== undefined && item.stock !== null ? Math.min(item.stock, item.qty + 1) : item.qty + 1, item.item_type || 'product')} 
+                        disabled={item.stock !== undefined && item.stock !== null && item.qty >= item.stock}
+                        className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${item.stock !== undefined && item.stock !== null && item.qty >= item.stock ? 'invisible' : 'cursor-pointer hover:bg-[#e2e8e2]'}`}>
                         <span className="material-symbols-outlined text-[16px]">add</span>
                       </button>
                     </div>
@@ -362,8 +376,8 @@ export default function CartSidebar() {
                   </div>
                 </div>
               </div>
-            ))
-          )}
+            );
+          }))}
         </div>
 
         {/* Footer */}

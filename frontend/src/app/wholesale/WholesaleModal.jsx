@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { wholesaleRegister } from '@/lib/api'
+import { useAuth } from '@/app/context/AuthContext'
 
 function PineTree() {
   return (
@@ -267,6 +268,7 @@ function WholesaleForgotPasswordFlow({ onBack, onSuccess }) {
 
 export default function WholesaleModal({ isOpen, onClose }) {
   const { data: session } = useSession()
+  const { user: normalUser, logout: normalLogout } = useAuth()
   const [step, setStep] = useState(1)  // 1=apply, 2=login, 3=success
   const [showPass, setShowPass] = useState(false)
   const [errors, setErrors] = useState({})
@@ -350,9 +352,11 @@ export default function WholesaleModal({ isOpen, onClose }) {
       await wholesaleRegister(payload)
 
       // 2. Clear any existing normal user session before auto sign-in
+      if (normalUser) {
+        await normalLogout()
+      }
+      // Also clear existing wholesale session if any
       if (session?.user) {
-        localStorage.removeItem('cart_items')
-        if (typeof window !== 'undefined') window.dispatchEvent(new Event('cart_clear'))
         await signOut({ redirect: false })
       }
 
@@ -424,9 +428,11 @@ export default function WholesaleModal({ isOpen, onClose }) {
     setServerError('')
     try {
       // Clear any existing normal user session before wholesale login
+      if (normalUser) {
+        await normalLogout()
+      }
+      // Clear any existing wholesale session if any
       if (session?.user) {
-        localStorage.removeItem('cart_items')
-        if (typeof window !== 'undefined') window.dispatchEvent(new Event('cart_clear'))
         await signOut({ redirect: false })
       }
 
