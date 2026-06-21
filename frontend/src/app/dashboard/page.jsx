@@ -9,11 +9,11 @@ import { fetchAdminDashboardStats } from "@/app/dashboard/_lib/auth";
 import { ordersService, storesService, leftoverPacksService, offersService } from "@/app/dashboard/_lib/services";
 
 const STATUS_COLORS = {
-  pending:    { bg: "bg-amber-100",    text: "text-amber-700" },
-  processing: { bg: "bg-blue-100",      text: "text-blue-700" },
-  shipped:    { bg: "bg-indigo-100",  text: "text-indigo-700" },
-  delivered:  { bg: "bg-emerald-100",text: "text-emerald-700" },
-  cancelled:  { bg: "bg-red-100",        text: "text-red-700" },
+  pending: { bg: "bg-amber-100", text: "text-amber-700" },
+  processing: { bg: "bg-blue-100", text: "text-blue-700" },
+  shipped: { bg: "bg-indigo-100", text: "text-indigo-700" },
+  delivered: { bg: "bg-emerald-100", text: "text-emerald-700" },
+  cancelled: { bg: "bg-red-100", text: "text-red-700" },
 };
 
 const BAR_COLORS = {
@@ -43,7 +43,7 @@ function UserSegmentGrid({ stats, loading }) {
           User Demographics
         </h3>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 lg:divide-x divide-slate-100">
         {mainSegments.map((seg, i) => (
           <div key={seg.label} className="p-6 hover:bg-slate-50/50 transition-colors group flex flex-col justify-between">
@@ -56,45 +56,45 @@ function UserSegmentGrid({ stats, loading }) {
                 <p className="text-3xl font-black text-slate-800 tracking-tight">{Number(seg.value || 0).toLocaleString()}</p>
               </div>
             </div>
-            
+
             {seg.label === "Wholesale" && (
               <div className="mt-5 pt-4 border-t border-slate-100/80 grid grid-cols-2 gap-2">
                 <div className="bg-white rounded-lg border border-slate-100 p-2.5 flex flex-col justify-center items-center shadow-sm">
-                   <div className="flex items-center gap-1.5 mb-1 text-[10px] font-bold text-slate-500 uppercase">
-                     <BadgeCheck className="w-3 h-3 text-teal-500" />
-                     Approved
-                   </div>
-                   <span className="text-lg font-black text-slate-700">{Number(stats?.wholesale_approved || 0).toLocaleString()}</span>
+                  <div className="flex items-center gap-1.5 mb-1 text-[10px] font-bold text-slate-500 uppercase">
+                    <BadgeCheck className="w-3 h-3 text-teal-500" />
+                    Approved
+                  </div>
+                  <span className="text-lg font-black text-slate-700">{Number(stats?.wholesale_approved || 0).toLocaleString()}</span>
                 </div>
                 <div className="bg-white rounded-lg border border-slate-100 p-2.5 flex flex-col justify-center items-center shadow-sm">
-                   <div className="flex items-center gap-1.5 mb-1 text-[10px] font-bold text-slate-500 uppercase">
-                     <Clock className="w-3 h-3 text-amber-500" />
-                     Pending
-                   </div>
-                   <span className="text-lg font-black text-slate-700">{Number(stats?.wholesale_pending || 0).toLocaleString()}</span>
+                  <div className="flex items-center gap-1.5 mb-1 text-[10px] font-bold text-slate-500 uppercase">
+                    <Clock className="w-3 h-3 text-amber-500" />
+                    Pending
+                  </div>
+                  <span className="text-lg font-black text-slate-700">{Number(stats?.wholesale_pending || 0).toLocaleString()}</span>
                 </div>
               </div>
             )}
             {seg.label === "Customers" && (
-               <div className="mt-5 pt-4 border-t border-slate-100/80">
-                  <div className="bg-white rounded-lg border border-slate-100 p-3 flex items-center justify-between shadow-sm">
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase">
-                      <UserX className="w-3.5 h-3.5 text-slate-400" />
-                      Inactive Users
-                    </div>
-                    <span className="text-sm font-black text-slate-700">{Number(stats?.inactive_users || 0).toLocaleString()}</span>
+              <div className="mt-5 pt-4 border-t border-slate-100/80">
+                <div className="bg-white rounded-lg border border-slate-100 p-3 flex items-center justify-between shadow-sm">
+                  <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase">
+                    <UserX className="w-3.5 h-3.5 text-slate-400" />
+                    Inactive Users
                   </div>
-               </div>
+                  <span className="text-sm font-black text-slate-700">{Number(stats?.inactive_users || 0).toLocaleString()}</span>
+                </div>
+              </div>
             )}
             {seg.label === "Sellers" && (
-               <div className="mt-5 pt-4 border-t border-slate-100/80 opacity-0 pointer-events-none">
-                 <div className="p-3"/>
-               </div>
+              <div className="mt-5 pt-4 border-t border-slate-100/80 opacity-0 pointer-events-none">
+                <div className="p-3" />
+              </div>
             )}
             {seg.label === "Admins" && (
-               <div className="mt-5 pt-4 border-t border-slate-100/80 opacity-0 pointer-events-none">
-                 <div className="p-3"/>
-               </div>
+              <div className="mt-5 pt-4 border-t border-slate-100/80 opacity-0 pointer-events-none">
+                <div className="p-3" />
+              </div>
             )}
           </div>
         ))}
@@ -121,9 +121,9 @@ export default function DashboardHomePage() {
     { revalidateOnFocus: false }
   );
   const allStores = Array.isArray(storesRaw) ? storesRaw : (storesRaw?.results || []);
-  const activeStores   = allStores.filter(s => s.is_active);
+  const activeStores = allStores.filter(s => s.is_active);
   const inactiveStores = allStores.filter(s => !s.is_active);
-  const allOrders    = Array.isArray(ordersRaw) ? ordersRaw : (ordersRaw?.results || []);
+  const allOrders = Array.isArray(ordersRaw) ? ordersRaw : (ordersRaw?.results || []);
   const recentOrders = allOrders.slice(0, 6);
 
   const { data: leftoverPacksData } = useSWR(
@@ -146,9 +146,9 @@ export default function DashboardHomePage() {
 
   let soldLeftoverPacks = 0;
   allOrders.forEach(o => {
-     (o.items || []).forEach(item => {
-        if (item.leftover_pack) soldLeftoverPacks += Number(item.quantity || 1);
-     });
+    (o.items || []).forEach(item => {
+      if (item.leftover_pack) soldLeftoverPacks += Number(item.quantity || 1);
+    });
   });
 
   const dailyTrend = (() => {
@@ -160,10 +160,10 @@ export default function DashboardHomePage() {
       map[key] = { day: key, orders: 0, revenue: 0 };
     }
     allOrders.forEach(o => {
-      const d   = new Date(o.ordered_at || o.created_at);
+      const d = new Date(o.ordered_at || o.created_at);
       const key = `${d.getMonth() + 1}/${d.getDate()}`;
       if (map[key]) {
-        map[key].orders  += 1;
+        map[key].orders += 1;
         map[key].revenue += Number(o.total_amount || 0);
       }
     });
@@ -187,69 +187,69 @@ export default function DashboardHomePage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         {statsLoading
           ? Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-white border border-slate-100 rounded-xl p-5 h-28 animate-pulse shadow-sm" />
-            ))
+            <div key={i} className="bg-white border border-slate-100 rounded-xl p-5 h-28 animate-pulse shadow-sm" />
+          ))
           : <>
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                    <Users className="w-5 h-5" />
-                  </div>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Users</p>
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                  <Users className="w-5 h-5" />
                 </div>
-                <p className="text-2xl font-black text-slate-800">{Number(stats?.total_users || 0).toLocaleString()}</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Users</p>
               </div>
+              <p className="text-2xl font-black text-slate-800">{Number(stats?.total_users || 0).toLocaleString()}</p>
+            </div>
 
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
-                    <Package className="w-5 h-5" />
-                  </div>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Products</p>
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                  <Package className="w-5 h-5" />
                 </div>
-                <p className="text-2xl font-black text-slate-800">{Number(stats?.total_products || 0).toLocaleString()}</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Products</p>
               </div>
+              <p className="text-2xl font-black text-slate-800">{Number(stats?.total_products || 0).toLocaleString()}</p>
+            </div>
 
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-fuchsia-50 text-fuchsia-600 rounded-lg">
-                    <Tag className="w-5 h-5" />
-                  </div>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Offers</p>
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-fuchsia-50 text-fuchsia-600 rounded-lg">
+                  <Tag className="w-5 h-5" />
                 </div>
-                <p className="text-2xl font-black text-slate-800">{activeOffers.length.toLocaleString()}</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Offers</p>
               </div>
+              <p className="text-2xl font-black text-slate-800">{activeOffers.length.toLocaleString()}</p>
+            </div>
 
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
-                    <Archive className="w-5 h-5" />
-                  </div>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Leftover Packs</p>
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
+                  <Archive className="w-5 h-5" />
                 </div>
-                <p className="text-2xl font-black text-slate-800">{leftoverPacks.length.toLocaleString()}</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Leftover Packs</p>
               </div>
+              <p className="text-2xl font-black text-slate-800">{leftoverPacks.length.toLocaleString()}</p>
+            </div>
 
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-amber-50 text-amber-600 rounded-lg">
-                    <ShoppingCart className="w-5 h-5" />
-                  </div>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Orders</p>
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-amber-50 text-amber-600 rounded-lg">
+                  <ShoppingCart className="w-5 h-5" />
                 </div>
-                <p className="text-2xl font-black text-slate-800">{Number(stats?.total_orders || 0).toLocaleString()}</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Orders</p>
               </div>
+              <p className="text-2xl font-black text-slate-800">{Number(stats?.total_orders || 0).toLocaleString()}</p>
+            </div>
 
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-green-50 text-green-600 rounded-lg">
-                    <Euro className="w-5 h-5" />
-                  </div>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Revenue</p>
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-green-50 text-green-600 rounded-lg">
+                  <Euro className="w-5 h-5" />
                 </div>
-                <p className="text-2xl font-black text-green-600">€{Number(stats?.total_revenue || 0).toLocaleString()}</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Revenue</p>
               </div>
-            </>
+              <p className="text-2xl font-black text-green-600">€{Number(stats?.total_revenue || 0).toLocaleString()}</p>
+            </div>
+          </>
         }
       </div>
 
@@ -323,7 +323,7 @@ export default function DashboardHomePage() {
               <AreaChart data={dailyTrend} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"  stopColor="#4f46e5" stopOpacity={0.3} />
+                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3} />
                     <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
                   </linearGradient>
                 </defs>
@@ -349,18 +349,18 @@ export default function DashboardHomePage() {
             {statusCounts.length === 0
               ? <div className="flex items-center justify-center h-full text-sm font-medium text-slate-400">No orders yet</div>
               : <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={statusCounts} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                    <XAxis dataKey="status" tick={{ fontSize: 11, fill: '#64748b' }} stroke="#cbd5e1" axisLine={false} tickLine={false} dy={10} />
-                    <YAxis tick={{ fontSize: 11, fill: '#64748b' }} stroke="#cbd5e1" allowDecimals={false} axisLine={false} tickLine={false} dx={-10} />
-                    <Tooltip contentStyle={{ fontSize: "12px", borderRadius: "12px", border: "none", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }} cursor={{fill: '#f8fafc'}} />
-                    <Bar dataKey="count" name="Orders" radius={[6, 6, 0, 0]}>
-                      {statusCounts.map((e, i) => (
-                        <Cell key={i} fill={BAR_COLORS[e.status] || "#94a3b8"} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                <BarChart data={statusCounts} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <XAxis dataKey="status" tick={{ fontSize: 11, fill: '#64748b' }} stroke="#cbd5e1" axisLine={false} tickLine={false} dy={10} />
+                  <YAxis tick={{ fontSize: 11, fill: '#64748b' }} stroke="#cbd5e1" allowDecimals={false} axisLine={false} tickLine={false} dx={-10} />
+                  <Tooltip contentStyle={{ fontSize: "12px", borderRadius: "12px", border: "none", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }} cursor={{ fill: '#f8fafc' }} />
+                  <Bar dataKey="count" name="Orders" radius={[6, 6, 0, 0]}>
+                    {statusCounts.map((e, i) => (
+                      <Cell key={i} fill={BAR_COLORS[e.status] || "#94a3b8"} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             }
           </div>
         </div>
@@ -457,26 +457,26 @@ export default function DashboardHomePage() {
                   {recentOrders.length === 0
                     ? <tr><td colSpan={5} className="px-4 py-8 text-center text-slate-400 font-medium">No recent orders</td></tr>
                     : recentOrders.map(order => {
-                        const sc = STATUS_COLORS[order.status?.toLowerCase()] || { bg: "bg-slate-100", text: "text-slate-600" };
-                        let displayStatus = order.status_display || order.status;
-                        if (displayStatus === 'Pending Confirmation') displayStatus = 'Pending';
-                        
-                        return (
-                          <tr key={order.id || order.order_number} className="hover:bg-slate-50 transition-colors">
-                            <td className="px-4 py-2.5 font-bold text-indigo-600">#{order.order_number}</td>
-                            <td className="px-4 py-2.5 font-medium text-slate-700">{order.customer_name}</td>
-                            <td className="px-4 py-2.5 font-bold text-slate-800">€{Number(order.total_amount).toLocaleString()}</td>
-                            <td className="px-4 py-2.5">
-                              <span className={`inline-flex px-2.5 py-0.5 text-xs font-bold rounded-full ${sc.bg} ${sc.text}`}>
-                                {displayStatus}
-                              </span>
-                            </td>
-                            <td className="px-4 py-2.5 font-medium text-slate-500">
-                              {order.ordered_at ? new Date(order.ordered_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : "—"}
-                            </td>
-                          </tr>
-                        );
-                      })
+                      const sc = STATUS_COLORS[order.status?.toLowerCase()] || { bg: "bg-slate-100", text: "text-slate-600" };
+                      let displayStatus = order.status_display || order.status;
+                      if (displayStatus === 'Pending Confirmation') displayStatus = 'Pending';
+
+                      return (
+                        <tr key={order.id || order.order_number} className="hover:bg-slate-50 transition-colors">
+                          <td className="px-4 py-2.5 font-bold text-indigo-600">#{order.order_number}</td>
+                          <td className="px-4 py-2.5 font-medium text-slate-700">{order.customer_name}</td>
+                          <td className="px-4 py-2.5 font-bold text-slate-800">€{Number(order.total_amount).toLocaleString()}</td>
+                          <td className="px-4 py-2.5">
+                            <span className={`inline-flex px-2.5 py-0.5 text-xs font-bold rounded-full ${sc.bg} ${sc.text}`}>
+                              {displayStatus}
+                            </span>
+                          </td>
+                          <td className="px-4 py-2.5 font-medium text-slate-500">
+                            {order.ordered_at ? new Date(order.ordered_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : "—"}
+                          </td>
+                        </tr>
+                      );
+                    })
                   }
                 </tbody>
               </table>

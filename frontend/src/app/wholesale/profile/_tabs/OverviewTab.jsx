@@ -70,46 +70,38 @@ export default function OverviewTab({ profile, orders, setActiveTab }) {
       </div>
 
       {/* Top Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
-            <ShoppingCart size={24} />
+        <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center gap-1">
+          <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 mb-1">
+            <ShoppingCart size={20} />
           </div>
-          <div>
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Total Orders</p>
-            <p className="text-2xl font-bold text-gray-900">{totalOrders}</p>
-          </div>
+          <p className="text-[13px] font-semibold text-gray-500">Total Orders</p>
+          <p className="text-xl font-bold text-gray-900">{totalOrders}</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-green-50 text-green-500 flex items-center justify-center shrink-0">
-            <Euro size={24} />
+        <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center gap-1">
+          <div className="w-10 h-10 rounded-lg bg-green-50 text-green-500 flex items-center justify-center shrink-0 mb-1">
+            <Euro size={20} />
           </div>
-          <div>
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Total Spent</p>
-            <p className="text-2xl font-bold text-green-600">€{totalSpent.toLocaleString()}</p>
-          </div>
+          <p className="text-[13px] font-semibold text-gray-500">Total Spent</p>
+          <p className="text-xl font-bold text-green-600">€{totalSpent.toLocaleString()}</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center shrink-0">
-            <Clock size={24} />
+        <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center gap-1">
+          <div className="w-10 h-10 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center shrink-0 mb-1">
+            <Clock size={20} />
           </div>
-          <div>
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Pending Orders</p>
-            <p className="text-2xl font-bold text-gray-900">{pendingOrders}</p>
-          </div>
+          <p className="text-[13px] font-semibold text-gray-500">Pending</p>
+          <p className="text-xl font-bold text-gray-900">{pendingOrders}</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-500 flex items-center justify-center shrink-0">
-            <CheckCircle size={24} />
+        <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center gap-1">
+          <div className="w-10 h-10 rounded-lg bg-teal-50 text-teal-500 flex items-center justify-center shrink-0 mb-1">
+            <CheckCircle size={20} />
           </div>
-          <div>
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">Successful</p>
-            <p className="text-2xl font-bold text-gray-900">{completedOrders}</p>
-          </div>
+          <p className="text-[13px] font-semibold text-gray-500">Successful</p>
+          <p className="text-xl font-bold text-gray-900">{completedOrders}</p>
         </div>
 
       </div>

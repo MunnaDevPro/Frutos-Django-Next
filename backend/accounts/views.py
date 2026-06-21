@@ -1106,6 +1106,12 @@ class AdminSupportTicketListView(generics.ListAPIView):
         if status_param and status_param != 'all':
             qs = qs.filter(status=status_param)
         
+        user_type = self.request.query_params.get('user_type')
+        if user_type == 'wholesale':
+            qs = qs.filter(wholesale_user__isnull=False)
+        elif user_type == 'normal':
+            qs = qs.filter(wholesale_user__isnull=True)
+        
         search = self.request.query_params.get('search')
         if search:
             from django.db.models import Q

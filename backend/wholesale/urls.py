@@ -19,6 +19,7 @@ from .views import (
     WholesalePageContentViewSet,
     wholesale_page_content,
     WholesaleSupportTicketListCreateView,
+    WholesaleSupportTicketDetailView,
     WholesaleSupportTicketReplyView,
     WholesaleSupportTicketMessageDetailView,
     WholesaleSupportTicketTypingView,
@@ -60,6 +61,7 @@ urlpatterns = [
 
     # ─── Support Tickets ──────────────────────────────────────
     path('tickets/', WholesaleSupportTicketListCreateView.as_view(), name='tickets'),
+    path('tickets/<int:pk>/', WholesaleSupportTicketDetailView.as_view(), name='ticket-detail'),
     path('tickets/<int:ticket_id>/reply/', WholesaleSupportTicketReplyView.as_view(), name='tickets-reply'),
     path('tickets/<int:ticket_id>/messages/<int:msg_id>/', WholesaleSupportTicketMessageDetailView.as_view(), name='tickets-message'),
     path('tickets/<int:ticket_id>/typing/', WholesaleSupportTicketTypingView.as_view(), name='tickets-typing'),

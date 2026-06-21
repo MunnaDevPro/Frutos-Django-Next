@@ -371,6 +371,15 @@ class WholesaleSupportTicketListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         return SupportTicket.objects.filter(wholesale_user=self.request.user)
 
+class WholesaleSupportTicketDetailView(generics.RetrieveDestroyAPIView):
+    authentication_classes = [WholesaleJWTAuthentication]
+    permission_classes = [IsWholesaleUser]
+    serializer_class = SupportTicketSerializer
+
+    def get_queryset(self):
+        return SupportTicket.objects.filter(wholesale_user=self.request.user)
+
+
 
 class WholesaleSupportTicketReplyView(APIView):
     authentication_classes = [WholesaleJWTAuthentication]

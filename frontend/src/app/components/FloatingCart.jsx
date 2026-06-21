@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 export default function FloatingCart() {
-  const { totalItems, subtotal, setSidebarOpen } = useCart()
+  const { totalItems, subtotal, sidebarOpen, setSidebarOpen } = useCart()
   const pathname = usePathname()
   const [isBumping, setIsBumping] = useState(false)
 
@@ -38,7 +38,12 @@ export default function FloatingCart() {
           top: 50%;
           transform: translateY(-50%);
           z-index: 9990;
-          transition: transform 0.3s ease;
+          transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease;
+        }
+        .floating-cart-hidden {
+          transform: translateY(-50%) translateX(150px) !important;
+          opacity: 0;
+          pointer-events: none;
         }
         @media (max-width: 1023px) {
           .floating-cart-wrapper {
@@ -98,7 +103,7 @@ export default function FloatingCart() {
         }
       `}</style>
 
-      <div className={`floating-cart-wrapper ${isBumping ? 'bump-anim' : ''}`}>
+      <div className={`floating-cart-wrapper ${isBumping ? 'bump-anim' : ''} ${sidebarOpen ? 'floating-cart-hidden' : ''}`}>
         <div
           onClick={() => setSidebarOpen(true)}
           className="cart-container"

@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { toast } from 'react-hot-toast'
 import { createWholesaleDailyReport } from '@/lib/api'
+import { X, Calendar, DollarSign, CreditCard, Receipt, Store, ShoppingBag, FileText } from 'lucide-react'
 
 export default function DailyReportModal({ onClose, accessToken, onReportCreated }) {
   const [mounted, setMounted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const dateInputRef = useRef(null)
 
   const [formData, setFormData] = useState({
     cash: '',
@@ -44,88 +46,163 @@ export default function DailyReportModal({ onClose, accessToken, onReportCreated
     }
   }
 
+  const handleDateClick = () => {
+    if (dateInputRef.current && dateInputRef.current.showPicker) {
+      dateInputRef.current.showPicker();
+    }
+  }
+
   const modalContent = (
-    <div className="fixed inset-0 bg-black/50 z-[999] flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white rounded shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="px-5 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-          <h2 className="text-lg font-bold text-gray-800">Submit Daily Report</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    <div className="fixed inset-0 bg-slate-900/40 z-[999] flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[500px] overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+        
+        {/* Header */}
+        <div className="px-5 py-3 border-b border-slate-100 flex justify-between items-center bg-white">
+          <div>
+            <h2 className="text-lg font-bold text-slate-800">Submit Daily Report</h2>
+            <p className="text-[11px] text-slate-500 mt-0.5">Fill in the financials for today's wholesale operations.</p>
+          </div>
+          <button onClick={onClose} className="p-1.5 bg-slate-50 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all cursor-pointer">
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="px-5 py-4">
+        <form onSubmit={handleSubmit} className="px-5 py-4 bg-slate-50/50">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Money (cash) <span className="text-red-500">*</span></label>
-              <input 
-                type="number" step="0.01" name="cash" value={formData.cash} onChange={handleChange} required
-                className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-sm focus:ring-2 focus:ring-[#16a34a] focus:border-transparent outline-none transition-all"
-              />
-              <p className="text-[10px] text-gray-500 mt-0.5 leading-tight">Total cash received in hand today</p>
+            
+            {/* Cash */}
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wide">Money (cash) <span className="text-red-500">*</span></label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                  <DollarSign className="h-3.5 w-3.5 text-emerald-500" />
+                </div>
+                <input 
+                  type="number" step="0.01" name="cash" value={formData.cash} onChange={handleChange} required
+                  className="w-full pl-8 pr-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all shadow-sm placeholder:text-slate-300"
+                  placeholder="0.00"
+                />
+              </div>
+              <p className="text-[11px] text-slate-500">Total cash received in hand today</p>
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Bank <span className="text-red-500">*</span></label>
-              <input 
-                type="number" step="0.01" name="bank" value={formData.bank} onChange={handleChange} required
-                className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-sm focus:ring-2 focus:ring-[#16a34a] focus:border-transparent outline-none transition-all"
-              />
-              <p className="text-[10px] text-gray-500 mt-0.5 leading-tight">Total amount received in bank/card</p>
+
+            {/* Bank */}
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wide">Bank <span className="text-red-500">*</span></label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                  <CreditCard className="h-3.5 w-3.5 text-blue-500" />
+                </div>
+                <input 
+                  type="number" step="0.01" name="bank" value={formData.bank} onChange={handleChange} required
+                  className="w-full pl-8 pr-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-sm placeholder:text-slate-300"
+                  placeholder="0.00"
+                />
+              </div>
+              <p className="text-[11px] text-slate-500">Total amount received in bank/card</p>
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Expenses</label>
-              <input 
-                type="number" step="0.01" name="expenses" value={formData.expenses} onChange={handleChange}
-                className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-sm focus:ring-2 focus:ring-[#16a34a] focus:border-transparent outline-none transition-all"
-              />
-              <p className="text-[10px] text-gray-500 mt-0.5 leading-tight">Any daily shop expenses</p>
+
+            {/* Expenses */}
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wide">Expenses</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                  <Receipt className="h-3.5 w-3.5 text-rose-500" />
+                </div>
+                <input 
+                  type="number" step="0.01" name="expenses" value={formData.expenses} onChange={handleChange}
+                  className="w-full pl-8 pr-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all shadow-sm placeholder:text-slate-300"
+                  placeholder="0.00"
+                />
+              </div>
+              <p className="text-[11px] text-slate-500">Any daily shop expenses</p>
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Warehouse (store)</label>
-              <input 
-                type="number" step="0.01" name="store" value={formData.store} onChange={handleChange}
-                className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-sm focus:ring-2 focus:ring-[#16a34a] focus:border-transparent outline-none transition-all"
-              />
-              <p className="text-[10px] text-gray-500 mt-0.5 leading-tight">Stock/goods taken from warehouse</p>
+
+            {/* Warehouse */}
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wide">Warehouse (store)</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                  <Store className="h-3.5 w-3.5 text-indigo-500" />
+                </div>
+                <input 
+                  type="number" step="0.01" name="store" value={formData.store} onChange={handleChange}
+                  className="w-full pl-8 pr-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm placeholder:text-slate-300"
+                  placeholder="0.00"
+                />
+              </div>
+              <p className="text-[11px] text-slate-500">Stock/goods taken from warehouse</p>
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Purchase</label>
-              <input 
-                type="number" step="0.01" name="purchase" value={formData.purchase} onChange={handleChange}
-                className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-sm focus:ring-2 focus:ring-[#16a34a] focus:border-transparent outline-none transition-all"
-              />
-              <p className="text-[10px] text-gray-500 mt-0.5 leading-tight">Outside purchases made today</p>
+
+            {/* Purchase */}
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wide">Purchase</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                  <ShoppingBag className="h-3.5 w-3.5 text-amber-500" />
+                </div>
+                <input 
+                  type="number" step="0.01" name="purchase" value={formData.purchase} onChange={handleChange}
+                  className="w-full pl-8 pr-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all shadow-sm placeholder:text-slate-300"
+                  placeholder="0.00"
+                />
+              </div>
+              <p className="text-[11px] text-slate-500">Outside purchases made today</p>
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Date <span className="text-red-500">*</span></label>
-              <input 
-                type="date" name="date" value={formData.date} onChange={handleChange} required
-                className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-sm focus:ring-2 focus:ring-[#16a34a] focus:border-transparent outline-none transition-all"
-              />
-              <p className="text-[10px] text-gray-500 mt-0.5 leading-tight">Date of this report</p>
+
+            {/* Professional Date Field */}
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wide">Date <span className="text-red-500">*</span></label>
+              <div 
+                className="relative cursor-pointer group"
+                onClick={handleDateClick}
+              >
+                <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                  <Calendar className="h-3.5 w-3.5 text-[#00a884] group-hover:scale-110 transition-transform" />
+                </div>
+                <input 
+                  ref={dateInputRef}
+                  type="date" name="date" value={formData.date} onChange={handleChange} required
+                  className="w-full pl-8 pr-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-[#00a884]/20 focus:border-[#00a884] outline-none transition-all shadow-sm cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer text-slate-800"
+                />
+              </div>
+              <p className="text-[11px] text-slate-500">Click to select report date</p>
             </div>
-            <div className="sm:col-span-2 mt-1">
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Purchase Note</label>
-              <textarea 
-                name="purchase_note" rows="2" value={formData.purchase_note} onChange={handleChange}
-                className="w-full border border-gray-300 rounded px-2.5 py-1.5 text-sm focus:ring-2 focus:ring-[#16a34a] focus:border-transparent outline-none transition-all resize-none"
-              ></textarea>
-              <p className="text-[10px] text-gray-500 mt-0.5 leading-tight">Details of what was purchased (optional)</p>
+
+            {/* Purchase Note */}
+            <div className="sm:col-span-2 space-y-1 mt-1">
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wide">Purchase Note</label>
+              <div className="relative">
+                <div className="absolute top-2 left-2.5 pointer-events-none">
+                  <FileText className="h-3.5 w-3.5 text-slate-400" />
+                </div>
+                <textarea 
+                  name="purchase_note" rows="2" value={formData.purchase_note} onChange={handleChange}
+                  className="w-full pl-8 pr-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-[#00a884]/20 focus:border-[#00a884] outline-none transition-all shadow-sm resize-none placeholder:text-slate-300"
+                  placeholder="Details of what was purchased (optional)..."
+                ></textarea>
+              </div>
             </div>
+
           </div>
           
-          <div className="mt-5 flex justify-end gap-2 pt-4 border-t border-gray-100">
+          <div className="mt-5 flex justify-end gap-2 pt-4 border-t border-slate-200/60">
             <button 
               type="button" onClick={onClose}
-              className="px-4 py-1.5 text-sm font-semibold text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors cursor-pointer"
+              className="px-4 py-1.5 text-[13px] font-bold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-slate-800 hover:border-slate-300 transition-all cursor-pointer shadow-sm"
             >
               Cancel
             </button>
             <button 
               type="submit" disabled={submitting}
-              className="px-5 py-1.5 text-sm font-semibold text-white bg-[#085041] rounded hover:bg-[#064032] disabled:opacity-70 flex items-center gap-2 transition-colors shadow-sm cursor-pointer"
+              className="px-5 py-1.5 text-[13px] font-bold text-white bg-[#00a884] rounded-lg hover:bg-[#009070] hover:shadow hover:-translate-y-0.5 disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-none flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
             >
-              {submitting ? 'Submitting...' : 'Submit Report'}
+              {submitting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-1.5 h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                  Submitting...
+                </>
+              ) : 'Submit Report'}
             </button>
           </div>
         </form>

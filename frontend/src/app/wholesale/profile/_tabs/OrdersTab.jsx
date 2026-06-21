@@ -22,8 +22,9 @@ export default function OrdersTab({ orders, onDeleteOrder, setProfileActiveTab, 
       if (activeTab === 'ALL') return true
       const status = (order.status || '').toUpperCase()
       if (activeTab === 'PENDING') return status === 'PENDING'
-      if (activeTab === 'PROCESSING') return status === 'PROCESSING' || status === 'CONFIRMED' || status === 'OUT_FOR_DELIVERY'
-      if (activeTab === 'DELIVERED') return status === 'DELIVERED'
+      if (activeTab === 'PROCESSING') return status === 'PROCESSING' || status === 'CONFIRMED'
+      if (activeTab === 'SHIPPED') return status === 'SHIPPED' || status === 'OUT_FOR_DELIVERY'
+      if (activeTab === 'DELIVERED') return status === 'DELIVERED' || status === 'COMPLETED'
       if (activeTab === 'CANCELLED') return status === 'CANCELLED'
       return true
     })
@@ -58,6 +59,7 @@ export default function OrdersTab({ orders, onDeleteOrder, setProfileActiveTab, 
     const s = (status || '').toLowerCase()
     if (s === 'pending') return <span className="bg-amber-50 text-amber-600 border border-amber-200 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">Pending</span>
     if (s.includes('process') || s.includes('confirm')) return <span className="bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">Processing</span>
+    if (s === 'shipped' || s.includes('out_for_delivery')) return <span className="bg-indigo-50 text-indigo-600 border border-indigo-200 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">Shipped</span>
     if (s === 'delivered' || s === 'completed') return <span className="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">Delivered</span>
     if (s === 'cancelled') return <span className="bg-rose-50 text-rose-600 border border-rose-200 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">Cancelled</span>
     return <span className="bg-gray-50 text-gray-600 border border-gray-200 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">{status}</span>
@@ -69,28 +71,28 @@ export default function OrdersTab({ orders, onDeleteOrder, setProfileActiveTab, 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
         <button 
           onClick={() => setProfileActiveTab('order_line')}
-          className="bg-emerald-50 border border-emerald-200 text-emerald-700 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 p-3 sm:py-4 rounded-xl shadow-sm font-semibold text-[11px] sm:text-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md cursor-pointer"
+          className="bg-emerald-50 border border-emerald-200 text-emerald-700 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 p-3 sm:py-4 rounded-xl shadow-sm font-semibold text-[11px] sm:text-sm transition-colors hover:bg-emerald-100 cursor-pointer"
         >
           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
           <span className="text-center">CREATE ORDER</span>
         </button>
         <button 
           onClick={() => { setMainTab('TRACK YOUR ORDER'); setCurrentPage(1); }}
-          className={`${mainTab === 'TRACK YOUR ORDER' ? 'bg-indigo-100 border-indigo-300 shadow-md scale-100 sm:scale-105 z-10' : 'bg-indigo-50 border-indigo-100 hover:-translate-y-1 hover:shadow-md'} text-indigo-700 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 p-3 sm:py-4 rounded-xl shadow-sm font-semibold text-[11px] sm:text-sm transition-all duration-200 cursor-pointer`}
+          className={`${mainTab === 'TRACK YOUR ORDER' ? 'bg-indigo-100 border-indigo-300' : 'bg-indigo-50 border-indigo-100 hover:bg-indigo-100'} text-indigo-700 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 p-3 sm:py-4 rounded-xl shadow-sm font-semibold text-[11px] sm:text-sm transition-colors cursor-pointer`}
         >
           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
           <span className="text-center">TRACK ORDER</span>
         </button>
         <button 
           onClick={() => { setMainTab('PREVIOUS ORDER'); setCurrentPage(1); }}
-          className={`${mainTab === 'PREVIOUS ORDER' ? 'bg-blue-100 border-blue-300 shadow-md scale-100 sm:scale-105 z-10' : 'bg-blue-50 border-blue-100 hover:-translate-y-1 hover:shadow-md'} text-blue-700 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 p-3 sm:py-4 rounded-xl shadow-sm font-semibold text-[11px] sm:text-sm transition-all duration-200 cursor-pointer`}
+          className={`${mainTab === 'PREVIOUS ORDER' ? 'bg-blue-100 border-blue-300' : 'bg-blue-50 border-blue-100 hover:bg-blue-100'} text-blue-700 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 p-3 sm:py-4 rounded-xl shadow-sm font-semibold text-[11px] sm:text-sm transition-colors cursor-pointer`}
         >
           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           <span className="text-center">PREVIOUS ORDER</span>
         </button>
         <button 
           onClick={() => { setMainTab('DAILY REPORTS'); setCurrentPage(1); }}
-          className={`${mainTab === 'DAILY REPORTS' ? 'bg-rose-100 border-rose-300 shadow-md scale-100 sm:scale-105 z-10' : 'bg-rose-50 border-rose-100 hover:-translate-y-1 hover:shadow-md'} text-rose-700 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 p-3 sm:py-4 rounded-xl shadow-sm font-semibold text-[11px] sm:text-sm transition-all duration-200 cursor-pointer`}
+          className={`${mainTab === 'DAILY REPORTS' ? 'bg-rose-100 border-rose-300' : 'bg-rose-50 border-rose-100 hover:bg-rose-100'} text-rose-700 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 p-3 sm:py-4 rounded-xl shadow-sm font-semibold text-[11px] sm:text-sm transition-colors cursor-pointer`}
         >
           <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           <span className="text-center">DAILY REPORTS</span>
@@ -162,7 +164,7 @@ export default function OrdersTab({ orders, onDeleteOrder, setProfileActiveTab, 
             {mainTab === 'TRACK YOUR ORDER' ? 'Your latest order' : 'Your all orders'}
           </h2>
           <div className="flex gap-2 overflow-x-auto w-full lg:w-auto py-1 [&::-webkit-scrollbar]:hidden">
-            {['ALL', 'PENDING', 'PROCESSING', 'DELIVERED', 'CANCELLED'].map(tab => (
+            {['ALL', 'PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'].map(tab => (
               <button
                 key={tab}
                 onClick={() => { setActiveTab(tab); setCurrentPage(1); }}

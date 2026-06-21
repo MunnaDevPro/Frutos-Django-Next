@@ -588,7 +588,7 @@ export default function ProductDetailClient({ product: initialProduct, related }
       </section>
 
       {/* ── MOBILE PRODUCT HEADER ────────────────────────────────────────── */}
-      <header className="lg:hidden px-6 mb-8">
+      <header className="lg:hidden px-6 mb-6">
         <div className="flex items-center gap-3 mb-2">
           <span className="italic text-lg text-[#855000]"
             style={{ fontFamily: '"Newsreader", Georgia, serif' }}>
@@ -607,27 +607,8 @@ export default function ProductDetailClient({ product: initialProduct, related }
           <StarRating rating={product.rating} reviews={product.reviews} size={14} />
           {unitLabel && <span style={{ fontSize: '13px', color: '#6D7A73' }}>{unitLabel}</span>}
         </div>
-      </header>
 
-      {/* ── MOBILE UNIT + PRICE + QTY + CTA ─────────────────────────────── */}
-      <section className="lg:hidden px-6 mb-8">
-        <div className="bg-white rounded-3xl p-5 border border-[#BCCAC1]/20"
-          style={{ boxShadow: '0 2px 16px rgba(0,33,21,0.05)' }}>
-
-          {hasUnits && (
-            <div className="mb-4">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#6D7A73] mb-2">
-                Select Unit
-              </p>
-              <UnitSelector
-                unitOptions={unitOptions} hasUnits={hasUnits}
-                selectedUnitId={selectedUnitId} onChange={handleUnitChange}
-                fallbackUnit={product.unit}
-              />
-            </div>
-          )}
-
-          <div className="flex items-baseline gap-2 mb-1">
+        <div className="mt-5 flex items-baseline gap-2">
             <span className="text-3xl font-bold"
               style={{
                 color: isWholesalePrice ? '#7C3AED' : '#855000',
@@ -644,55 +625,49 @@ export default function ProductDetailClient({ product: initialProduct, related }
             {unitLabel && (
               <span className="text-sm text-[#6D7A73]">/ {unitLabel}</span>
             )}
-          </div>
-          {isWholesalePrice && (
-            <p className="text-xs font-bold text-purple-600 mb-3">
-              Wholesale price · Min. {product.minWholesaleQty} {product.wholesaleUnit || 'units'}
-            </p>
+        </div>
+        {isWholesalePrice && (
+          <p className="text-xs font-bold text-purple-600 mt-2">
+            Wholesale price · Min. {product.minWholesaleQty} {product.wholesaleUnit || 'units'}
+          </p>
+        )}
+      </header>
+
+      {/* ── MOBILE OPTIONS (UNIT & QTY) ─────────────────────────────── */}
+      <section className="lg:hidden px-6 mb-8">
+        <div className="bg-white rounded-[1.5rem] p-5 border border-[#BCCAC1]/30 shadow-sm flex flex-col gap-4">
+          {hasUnits && (
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#6D7A73] mb-2">
+                Select Unit
+              </p>
+              <UnitSelector
+                unitOptions={unitOptions} hasUnits={hasUnits}
+                selectedUnitId={selectedUnitId} onChange={handleUnitChange}
+                fallbackUnit={product.unit}
+              />
+            </div>
           )}
 
-          <div className="flex items-center gap-3 mt-4">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-[#6D7A73] w-16 shrink-0">
-              Qty
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#6D7A73] mb-2">
+              Quantity
             </p>
             <div className="flex items-center justify-between bg-[#F2FDEA] border border-[#BCCAC1]/40
-                            rounded-xl px-2 py-1 flex-1">
+                            rounded-xl px-2 py-1.5 w-full">
               <button onClick={() => setQty((q) => Math.max(minQty, q - 1))}
                 disabled={qty <= minQty}
-                className={`p-2 rounded-lg transition-colors ${qty <= minQty ? 'text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:bg-[#ddf0d0] text-[#00694C]'}`}>
-                <Minus size={16} />
+                className={`p-2 rounded-lg transition-colors ${qty <= minQty ? 'text-[#BCCAC1] cursor-not-allowed' : 'cursor-pointer hover:bg-[#ddf0d0] text-[#00694C]'}`}>
+                <Minus size={18} />
               </button>
               <span className="font-bold text-lg text-[#151E13]">{qty}</span>
               <button onClick={() => setQty((q) => (product.stock ? Math.min(product.stock, q + 1) : q + 1))}
                 disabled={product.stock && qty >= product.stock}
-                className={`p-2 rounded-lg transition-colors ${product.stock && qty >= product.stock ? 'text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:bg-[#ddf0d0] text-[#00694C]'}`}>
-                <Plus size={16} />
+                className={`p-2 rounded-lg transition-colors ${product.stock && qty >= product.stock ? 'text-[#BCCAC1] cursor-not-allowed' : 'cursor-pointer hover:bg-[#ddf0d0] text-[#00694C]'}`}>
+                <Plus size={18} />
               </button>
             </div>
           </div>
-
-          <div className="flex justify-between items-center mt-3 mb-4 px-1">
-            <span className="text-sm text-[#6D7A73]">Estimated Total</span>
-            <span className="font-bold text-xl text-[#151E13]">
-              €{(displayPrice * qty).toFixed(2)}
-            </span>
-          </div>
-
-          {product.inStock ? (
-            <button onClick={handleAddToCart}
-              className="w-full flex items-center justify-center gap-3 rounded-xl py-3 transition-all"
-              style={{
-                background: added ? '#085041' : 'linear-gradient(135deg,#00694C 0%,#008560 100%)',
-                color: 'white', fontSize: '15px', fontWeight: 700
-              }}>
-              {added ? <><Check size={18} /> Added!</> : <><ShoppingCart size={18} /> Add to Cart</>}
-            </button>
-          ) : (
-            <button disabled
-              className="w-full rounded-xl py-3 bg-gray-100 text-gray-400 cursor-not-allowed text-sm font-bold">
-              Out of Stock
-            </button>
-          )}
         </div>
       </section>
 
@@ -973,33 +948,40 @@ export default function ProductDetailClient({ product: initialProduct, related }
       </div>
 
       {/* ── MOBILE STICKY BOTTOM BAR ─────────────────────────────────────── */}
-      <div className="lg:hidden fixed bottom-0 left-0 w-full z-50 px-5 pb-8 pt-4
-                      bg-[#F2FDEA]/80 backdrop-blur-xl">
-        <div className="flex items-center gap-5 max-w-md mx-auto">
-          <div className="flex flex-col">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#855000]">
+      <div className="lg:hidden fixed bottom-0 left-0 w-full z-50 px-5 pb-5 pt-3
+                      bg-white/85 backdrop-blur-xl border-t border-[#BCCAC1]/20 shadow-[0_-8px_20px_rgba(0,0,0,0.04)]
+                      supports-[backdrop-filter]:bg-white/60">
+        <div className="flex items-center justify-between gap-4 max-w-md mx-auto">
+          <div className="flex flex-col min-w-[70px]">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#6D7A73]">
               Total
             </span>
-            <span className="text-2xl font-bold text-[#151E13]"
+            <span className="text-[22px] leading-none font-bold text-[#151E13]"
               style={{ fontFamily: '"Newsreader", Georgia, serif' }}>
               €{(displayPrice * qty).toFixed(2)}
             </span>
-            {unitLabel && (
-              <span className="text-xs text-[#6D7A73]">{qty} × {unitLabel}</span>
-            )}
           </div>
-          <button onClick={handleAddToCart}
-            className="flex-1 h-16 flex items-center justify-center gap-3 rounded-2xl
-                       transition-all active:scale-95"
-            style={{
-              background: added ? '#085041' : 'linear-gradient(135deg,#00694C 0%,#008560 100%)',
-              color: 'white', boxShadow: '0 24px 48px -12px rgba(0,33,21,0.25)'
-            }}>
-            {added
-              ? <><Check size={18} /><span className="font-bold uppercase tracking-widest text-sm">Added!</span></>
-              : <><ShoppingBag size={18} style={{ fill: 'white', opacity: 0.9 }} />
-                <span className="font-bold uppercase tracking-widest text-sm">Add to Cart</span></>
-            }
+          <button onClick={handleAddToCart} disabled={!product.inStock}
+            className={`flex-1 h-[48px] flex items-center justify-center gap-2.5 rounded-full
+                       transition-all active:scale-[0.98] overflow-hidden relative group ${!product.inStock ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : ''}`}
+            style={product.inStock ? {
+              background: added ? '#085041' : 'linear-gradient(135deg, #00694C 0%, #008560 100%)',
+              color: 'white', boxShadow: '0 4px 14px rgba(0,105,76,0.25)'
+            } : {}}>
+            {product.inStock ? (
+              <>
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                <div className="relative flex items-center gap-2.5">
+                  {added
+                    ? <><Check size={18} strokeWidth={2.5} /><span className="font-bold text-[14.5px]">Added!</span></>
+                    : <><ShoppingCart size={19} strokeWidth={2.2} className="text-white" />
+                      <span className="font-bold text-[14.5px]">Add to Cart</span></>
+                  }
+                </div>
+              </>
+            ) : (
+              <span className="font-bold text-[14.5px]">Out of Stock</span>
+            )}
           </button>
         </div>
       </div>

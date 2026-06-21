@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Plus, X, Upload, MessageSquare, Clock, CheckCircle2, AlertCircle, Loader2, ArrowLeft, Send, MoreVertical, ChevronDown, Smile, Paperclip, ZoomIn, Download, User, Tag, XCircle } from 'lucide-react'
+import { Plus, X, Upload, MessageSquare, Clock, CheckCircle2, AlertCircle, Loader2, ArrowLeft, Send, MoreVertical, ChevronDown, Smile, Paperclip, ZoomIn, Download, User, Tag, XCircle, Trash2 } from 'lucide-react'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api'
 
@@ -67,6 +67,7 @@ export default function WholesaleSupportTicketsTab({ accessToken }) {
   
   const [showForm, setShowForm] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [ticketToDelete, setTicketToDelete] = useState(null)
   
   const searchParams = useSearchParams()
   const urlTicketId = searchParams?.get('ticket_id')
@@ -128,6 +129,24 @@ export default function WholesaleSupportTicketsTab({ accessToken }) {
   useEffect(() => {
     fetchTickets()
   }, [fetchTickets, selectedTicketId])
+
+  const handleDeleteTicket = async () => {
+    if (!ticketToDelete) return;
+    try {
+      const res = await authFetch(`${API_BASE}/wholesale/tickets/${ticketToDelete}/`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Failed to delete ticket');
+      
+      setTicketToDelete(null);
+      if (selectedTicketId === ticketToDelete) {
+        setSelectedTicketId(null);
+      }
+      fetchTickets();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files)
@@ -229,9 +248,9 @@ export default function WholesaleSupportTicketsTab({ accessToken }) {
   // -- Chat Interface will be rendered as a modal at the bottom --
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Support Tickets</h2>
           <p className="text-sm text-gray-500 mt-1">Submit issues and track your support requests.</p>
@@ -239,7 +258,7 @@ export default function WholesaleSupportTicketsTab({ accessToken }) {
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-[#00694C] text-white text-sm font-medium rounded-lg hover:bg-[#00523b] transition-colors cursor-pointer"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-[#00694C] text-white text-sm font-medium rounded-lg hover:bg-[#00523b] transition-colors cursor-pointer w-full sm:w-auto shadow-sm"
           >
             <Plus className="w-4 h-4" />
             New Ticket
@@ -249,10 +268,10 @@ export default function WholesaleSupportTicketsTab({ accessToken }) {
 
       {/* New Ticket Form */}
       {showForm && (
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm animate-in fade-in slide-in-from-top-4">
+        <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-200 shadow-sm animate-in fade-in slide-in-from-top-4">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-800">Create New Ticket</h3>
-            <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600 cursor-pointer">
+            <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600 cursor-pointer bg-gray-50 hover:bg-gray-100 p-1.5 rounded-lg transition-colors">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -266,7 +285,7 @@ export default function WholesaleSupportTicketsTab({ accessToken }) {
                 value={subject}
                 onChange={e => setSubject(e.target.value)}
                 placeholder="Brief summary of your issue..."
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00694C] focus:border-transparent"
+                className="w-full p-2.5 sm:p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00694C]/20 focus:border-[#00694C] transition-all"
               />
             </div>
             
@@ -276,7 +295,7 @@ export default function WholesaleSupportTicketsTab({ accessToken }) {
                 <select
                   value={category}
                   onChange={e => setCategory(e.target.value)}
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00694C] focus:border-transparent cursor-pointer"
+                  className="w-full p-2.5 sm:p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00694C]/20 focus:border-[#00694C] transition-all cursor-pointer"
                 >
                   {CATEGORY_CHOICES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
@@ -286,7 +305,7 @@ export default function WholesaleSupportTicketsTab({ accessToken }) {
                 <select
                   value={priority}
                   onChange={e => setPriority(e.target.value)}
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00694C] focus:border-transparent cursor-pointer"
+                  className="w-full p-2.5 sm:p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00694C]/20 focus:border-[#00694C] transition-all cursor-pointer"
                 >
                   {PRIORITY_CHOICES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
@@ -301,22 +320,22 @@ export default function WholesaleSupportTicketsTab({ accessToken }) {
                 value={description}
                 onChange={e => setDescription(e.target.value)}
                 placeholder="Please describe your issue in detail..."
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00694C] focus:border-transparent resize-y"
+                className="w-full p-2.5 sm:p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#00694C]/20 focus:border-[#00694C] transition-all resize-y"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Screenshot / Images (Optional)</label>
-              <div className="flex flex-wrap gap-4 mb-4">
+              <div className="flex flex-wrap gap-3 sm:gap-4 mb-4">
                 {imagePreviews.map((preview, index) => (
-                  <div key={index} className="relative inline-block">
-                    <img src={preview} alt="Preview" className="h-32 w-auto object-contain border border-gray-200 rounded-lg bg-white" />
+                  <div key={index} className="relative inline-block group">
+                    <img src={preview} alt="Preview" className="h-24 sm:h-32 w-auto object-contain border border-gray-200 rounded-lg bg-white shadow-sm" />
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 cursor-pointer"
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 cursor-pointer shadow-md transition-transform hover:scale-110"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </button>
                   </div>
                 ))}
@@ -324,11 +343,11 @@ export default function WholesaleSupportTicketsTab({ accessToken }) {
               
               <div 
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors"
+                className="border-2 border-dashed border-gray-300 rounded-xl p-5 sm:p-6 flex flex-col items-center justify-center text-gray-500 hover:text-[#00694C] hover:border-[#00694C]/50 hover:bg-[#00694C]/5 cursor-pointer transition-all"
               >
-                <Upload className="w-6 h-6 mb-2 text-gray-400" />
-                <span className="text-sm">Click to upload images</span>
-                <span className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</span>
+                <Upload className="w-6 h-6 mb-2 text-gray-400 group-hover:text-[#00694C]" />
+                <span className="text-[13px] sm:text-sm font-medium">Click to upload images</span>
+                <span className="text-[11px] sm:text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</span>
               </div>
               
               <input
@@ -341,18 +360,18 @@ export default function WholesaleSupportTicketsTab({ accessToken }) {
               />
             </div>
 
-            <div className="flex justify-end pt-2 gap-3">
+            <div className="flex flex-col-reverse sm:flex-row justify-end pt-3 gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 border border-transparent hover:border-gray-200 rounded-lg transition-all cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex items-center gap-2 px-6 py-2.5 bg-[#00694C] text-white text-sm font-medium rounded-lg hover:bg-[#00523b] transition-colors disabled:opacity-50 cursor-pointer"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-[#00694C] text-white text-sm font-medium rounded-lg hover:bg-[#00523b] shadow-sm hover:shadow transition-all disabled:opacity-50 cursor-pointer"
               >
                 {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageSquare className="w-4 h-4" />}
                 Submit Ticket
@@ -364,56 +383,93 @@ export default function WholesaleSupportTicketsTab({ accessToken }) {
 
       {/* Tickets List */}
       {!showForm && tickets.length === 0 && (
-        <div className="bg-white rounded-xl border border-gray-100 p-10 flex flex-col items-center justify-center text-center">
-          <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-            <MessageSquare className="w-8 h-8 text-gray-300" />
+        <div className="bg-white rounded-xl border border-gray-100 p-8 sm:p-10 flex flex-col items-center justify-center text-center shadow-sm">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+            <MessageSquare className="w-7 h-7 sm:w-8 sm:h-8 text-gray-300" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900">No tickets yet</h3>
-          <p className="text-gray-500 mt-1 max-w-sm">If you need help with an order, your account, or a technical issue, open a support ticket.</p>
+          <h3 className="text-base sm:text-lg font-medium text-gray-900">No tickets yet</h3>
+          <p className="text-[13px] sm:text-sm text-gray-500 mt-1 max-w-sm">If you need help with an order, your account, or a technical issue, open a support ticket.</p>
         </div>
       )}
 
       {!showForm && tickets.length > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {tickets.map(ticket => (
             <div 
               key={ticket.id} 
               onClick={() => setSelectedTicketId(ticket.id)}
-              className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-[#00694C]/50 transition-colors cursor-pointer shadow-sm hover:shadow"
+              className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-[#00694C]/40 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md group"
             >
-              <div className="p-5">
-                <div className="flex flex-wrap gap-2 justify-between items-start mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-mono text-gray-400">#{ticket.id}</span>
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(ticket.status)}`}>
+              <div className="p-4 sm:p-5">
+                <div className="flex flex-wrap gap-3 justify-between items-start mb-2.5 sm:mb-3">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <span className="text-[13px] sm:text-sm font-bold text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded-md border border-gray-100">#{ticket.id}</span>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold uppercase tracking-wider ${getStatusBadge(ticket.status)}`}>
                       {getStatusIcon(ticket.status)}
                       {ticket.status.replace('_', ' ')}
                     </span>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                    <span className="px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold uppercase tracking-wider bg-gray-100 text-gray-600 border border-gray-200/60">
                       {ticket.category}
                     </span>
                   </div>
-                  <span className="text-xs text-gray-400 flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5" />
-                    {new Date(ticket.created_at).toLocaleDateString()}
-                  </span>
+                  
+                  <div className="flex items-center gap-2 shrink-0">
+                    {ticket.messages && ticket.messages.length > 0 && (
+                      <span className="text-[11px] sm:text-xs font-semibold text-[#00694C] flex items-center gap-1 bg-[#00694C]/5 px-2 py-1 rounded-md border border-[#00694C]/10">
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        {ticket.messages.length}
+                      </span>
+                    )}
+                    <span className="text-[11px] sm:text-xs text-gray-500 flex items-center gap-1 font-medium bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
+                      <Clock className="w-3.5 h-3.5 text-gray-400" />
+                      {new Date(ticket.created_at).toLocaleDateString()}
+                    </span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setTicketToDelete(ticket.id); }}
+                      className="text-gray-400 hover:text-red-600 p-1.5 rounded-md hover:bg-red-50 transition-colors cursor-pointer opacity-100 sm:opacity-0 group-hover:opacity-100 border border-transparent hover:border-red-100"
+                      title="Delete Ticket"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
                 
-                <h4 className="text-base font-semibold text-gray-900 mb-1">{ticket.subject}</h4>
-                <p className="text-sm text-gray-500 truncate max-w-3xl">
+                <h4 className="text-[15px] sm:text-base font-bold text-gray-900 mb-1 sm:mb-1.5 pr-2">{ticket.subject}</h4>
+                <p className="text-[13px] sm:text-sm text-gray-500 truncate max-w-full">
                   {ticket.description}
                 </p>
-                
-                {/* Unread indicator or last message info could go here */}
-                {ticket.messages && ticket.messages.length > 0 && (
-                  <p className="text-xs text-gray-400 mt-3 flex items-center gap-1">
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    {ticket.messages.length} replies
-                  </p>
-                )}
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal for Ticket */}
+      {ticketToDelete && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4" onClick={() => setTicketToDelete(null)}>
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl flex flex-col items-center" onClick={e => e.stopPropagation()}>
+            <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4">
+              <AlertCircle className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Delete Ticket?</h3>
+            <p className="text-slate-500 text-sm text-center mb-6">
+              This action cannot be undone. Are you sure you want to permanently delete this ticket and all its messages?
+            </p>
+            <div className="flex gap-3 w-full">
+              <button 
+                onClick={() => setTicketToDelete(null)}
+                className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-medium hover:bg-slate-50 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleDeleteTicket}
+                className="flex-1 py-2.5 rounded-xl bg-red-600 text-white font-medium hover:bg-red-700 shadow-sm transition-colors cursor-pointer"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
