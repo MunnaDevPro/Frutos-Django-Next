@@ -51,11 +51,12 @@ function normalizeProduct(p) {
 }
 
 //  Products 
-export async function getProducts({ category, search, inStock, accessToken } = {}) {
+export async function getProducts({ category, search, inStock, accessToken, limit = 100 } = {}) {
     const params = new URLSearchParams()
     if (category && category !== 'All') params.set('category', category)
     if (search) params.set('search', search)
     if (inStock !== undefined) params.set('in_stock', inStock)
+    if (limit) params.set('page_size', limit)
 
     const query = params.toString() ? `?${params}` : ''
     const path = `${PRODUCT_BASE}/${query}`.replace(/([^:]\/)\/+/g, "$1")

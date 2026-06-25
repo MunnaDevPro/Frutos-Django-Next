@@ -11,7 +11,7 @@ import api, { setTokens, clearTokens, setStoredUser, getStoredUser, decodeToken,
  * Returns { user, access, refresh } or throws.
  */
 export async function adminLogin(email, password) {
-  const data = await api.post("/api/auth/login/", { email, password });
+  const data = await api.post("/api/auth/login/", { email, password }, { skipAuth: true });
 
   const { access, refresh } = data;
   setTokens(access, refresh);

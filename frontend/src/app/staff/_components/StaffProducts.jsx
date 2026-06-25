@@ -11,7 +11,7 @@ import ProductForm from "@/app/dashboard/_components/ProductForm";
 import { useToastContext } from "@/app/dashboard/_components/Toaster";
 import {
   brandsService, colorsService, sizesService,
-  subcategoriesService, categoriesService, shopsService,
+  subcategoriesService, categoriesService, storesService,
 } from "@/app/dashboard/_lib/services";
 
 const columns = [
@@ -26,7 +26,7 @@ const columns = [
   { key: "price",          label: "Price",      render: (v) => `€${Number(v).toLocaleString()}` },
   { key: "discount_price", label: "Sale Price",  render: (v) => v ? `€${Number(v).toLocaleString()}` : "—" },
   { key: "stock",          label: "Stock" },
-  { key: "shop",           label: "Shop",       render: (v) => v?.name || "—" },
+  { key: "store",          label: "Store",      render: (v) => v?.name || "—" },
   { key: "category",       label: "Category",   render: (v) => v?.name || "—" },
   { key: "is_active",      label: "Status",     render: (v) => v ? "active" : "inactive", type: "status" },
 ];
@@ -45,20 +45,20 @@ export default function StaffProducts({ profile }) {
   const { data: sizesRaw }       = useSWR("ref-sizes",       () => sizesService.list({ page_size: 200 }),       { revalidateOnFocus: false });
   const { data: categoriesRaw }  = useSWR("ref-categories",  () => categoriesService.list({ page_size: 200 }),  { revalidateOnFocus: false });
   const { data: subcatsRaw }     = useSWR("ref-subcats",     () => subcategoriesService.list({ page_size: 200 }), { revalidateOnFocus: false });
-  const { data: shopsRaw }       = useSWR("ref-shops",       () => shopsService.list({ page_size: 200 }),       { revalidateOnFocus: false });
+  const { data: storesRaw }      = useSWR("ref-stores",      () => storesService.list({ page_size: 200 }),      { revalidateOnFocus: false });
 
   const brands       = brandsRaw?.results      || (Array.isArray(brandsRaw)      ? brandsRaw      : []);
   const colors       = colorsRaw?.results      || (Array.isArray(colorsRaw)      ? colorsRaw      : []);
   const sizes        = sizesRaw?.results       || (Array.isArray(sizesRaw)       ? sizesRaw       : []);
   const categories   = categoriesRaw?.results  || (Array.isArray(categoriesRaw)  ? categoriesRaw  : []);
   const subcategories= subcatsRaw?.results     || (Array.isArray(subcatsRaw)     ? subcatsRaw     : []);
-  const shops        = shopsRaw?.results       || (Array.isArray(shopsRaw)       ? shopsRaw       : []);
+  const stores       = storesRaw?.results      || (Array.isArray(storesRaw)      ? storesRaw      : []);
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editItem,   setEditItem]   = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
   
-  const formProps = { categories, brands, colors, sizes, subcategories, shops };
+  const formProps = { categories, brands, colors, sizes, subcategories, stores };
 
   const data = Array.isArray(rawData) ? rawData : (rawData?.results || []);
 
@@ -125,31 +125,30 @@ export default function StaffProducts({ profile }) {
             pageSize={20}
             searchable
             searchKeys={["name"]}
-            actions={(row) => {
-              if (!profile?.can_update_products && !profile?.can_delete_products) return undefined;
-              return (
-                <div className="flex justify-end gap-2">
-                  {profile?.can_update_products && (
-                    <button 
-                      onClick={() => setEditItem(row)} 
-                      className="p-2 bg-white border border-slate-200 text-slate-500 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 shadow-sm transition-all cursor-pointer" 
-                      title="Edit"
-                    >
-                      <Pencil size={15} />
-                    </button>
-                  )}
-                  {profile?.can_delete_products && (
-                    <button 
-                      onClick={() => setDeleteItem(row)} 
-                      className="p-2 bg-white border border-slate-200 text-slate-500 rounded-lg hover:bg-red-50 hover:text-red-600 hover:border-red-200 shadow-sm transition-all cursor-pointer" 
-                      title="Delete"
-                    >
-                      <Trash2 size={15} />
-                    </button>
-                  )}
-                </div>
-              );
-            }}
+            actions={(profile?.can_update_products || profile?.can_delete_products) ? ((row) => (
+              <div className="flex items-center justify-end gap-1">
+                {profile?.can_update_products && (
+                  <button 
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setEditItem(row)} 
+                    className="db-icon-btn" 
+                    title="Edit"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                )}
+                {profile?.can_delete_products && (
+                  <button 
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setDeleteItem(row)} 
+                    className="db-icon-btn danger" 
+                    title="Delete"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            )) : undefined}
           />
         )}
       </div>

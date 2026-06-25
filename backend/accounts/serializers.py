@@ -361,4 +361,4 @@ class AdminSupportTicketSerializer(SupportTicketSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def get_is_wholesale(self, obj):
-        return obj.wholesale_user is not None
+        return obj.wholesale_user is not None

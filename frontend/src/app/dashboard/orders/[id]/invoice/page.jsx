@@ -155,7 +155,7 @@ function A4Invoice({ order, items, subtotal, total, shipping, storeName, logoUrl
             <tr className="border-b-2 border-slate-200">
               <th className="py-2 text-left font-medium text-slate-500">#</th>
               <th className="py-2 text-left font-medium text-slate-500">Item</th>
-              <th className="py-2 text-left font-medium text-slate-500">Variant</th>
+              <th className="py-2 text-left font-medium text-slate-500">Size</th>
               <th className="py-2 text-center font-medium text-slate-500">Qty</th>
               <th className="py-2 text-right font-medium text-slate-500">Price</th>
               <th className="py-2 text-right font-medium text-slate-500">Amount</th>
@@ -166,7 +166,7 @@ function A4Invoice({ order, items, subtotal, total, shipping, storeName, logoUrl
               <tr key={i} className="border-b border-slate-100">
                 <td className="py-3 text-slate-400">{i + 1}</td>
                 <td className="py-3 text-slate-800">{item.product_name || `Product #${item.product}`}</td>
-                <td className="py-3 text-slate-500 text-xs">{[item.color_name, item.size_name].filter(Boolean).join(" / ") || "—"}</td>
+                <td className="py-3 text-slate-500 text-xs">{item.size_name || "—"}</td>
                 <td className="py-3 text-center text-slate-600">{item.quantity}</td>
                 <td className="py-3 text-right text-slate-600">€{Number(item.unit_price).toLocaleString()}</td>
                 <td className="py-3 text-right font-medium text-slate-800">€{(item.quantity * Number(item.unit_price)).toLocaleString()}</td>

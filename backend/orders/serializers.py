@@ -28,7 +28,7 @@ class OrderItemCreateSerializer(serializers.Serializer):
     item_type     = serializers.CharField(required=False, default='product')
     quantity      = serializers.IntegerField(min_value=1)
     color         = serializers.IntegerField(allow_null=True, required=False)
-    size          = serializers.IntegerField(allow_null=True, required=False)
+    size          = serializers.CharField(allow_null=True, required=False, allow_blank=True)
 
     def validate(self, data):
         item_type = data.get('item_type', 'product')
@@ -209,7 +209,12 @@ class OrderCreateSerializer(serializers.Serializer):
                 if item.get('color_id'):
                     color = Color.objects.filter(id=item['color_id']).first()
                 if item.get('size_id'):
-                    size = Size.objects.filter(id=item['size_id']).first()
+                    size_val = item['size_id']
+                    if isinstance(size_val, int) or str(size_val).isdigit():
+                        size = Size.objects.filter(id=size_val).first()
+                    elif isinstance(size_val, str) and size_val.strip():
+                        from products.models import Size
+                        size, _ = Size.objects.get_or_create(name=size_val.strip())
 
                 if item.get('item_type') == 'product':
                     product = item['product']
@@ -324,7 +329,7 @@ class OrderItemReadSerializer(serializers.ModelSerializer):
     product_name  = serializers.SerializerMethodField()
     product_image = serializers.SerializerMethodField()
     color_name    = serializers.CharField(source='color.name',     read_only=True)
-    size_name     = serializers.CharField(source='size.name',      read_only=True)
+    size_name     = serializers.SerializerMethodField()
     line_total    = serializers.SerializerMethodField()
 
     class Meta:
@@ -354,6 +359,16 @@ class OrderItemReadSerializer(serializers.ModelSerializer):
 
     def get_line_total(self, obj):
         return str(obj.quantity * obj.unit_price)
+
+    def get_size_name(self, obj):
+        if obj.size:
+            return obj.size.name
+        if obj.product and obj.product.unit:
+            unit_str = obj.product.unit.lower()
+            if unit_str.startswith('per '):
+                return unit_str[4:].strip()
+            return obj.product.unit
+        return None
 
 
 class OrderPaymentReadSerializer(serializers.ModelSerializer):

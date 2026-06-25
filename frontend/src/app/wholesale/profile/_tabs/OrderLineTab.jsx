@@ -22,7 +22,7 @@ export default function OrderLineTab({ accessToken }) {
   const [orderNumber] = useState(`ORD-${Math.floor(Math.random() * 10000)}`)
 
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 9
+  const itemsPerPage = 24
 
   // Reset page when category or search changes
   useEffect(() => {
@@ -221,7 +221,7 @@ export default function OrderLineTab({ accessToken }) {
             <div className="text-center text-gray-500 py-10">No products found.</div>
           ) : (
             <>
-              <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
+              <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
                 {paginatedProducts.map((product) => {
                   const qty = getQuantityInCart(product.id)
                   const isSelected = qty > 0
@@ -229,18 +229,20 @@ export default function OrderLineTab({ accessToken }) {
                   const stock = product.inStock || 0
                   const canAddMore = (qty + step) <= stock
                   return (
-                    <div key={product.id} className={`bg-white rounded-xl border transition-all duration-300 flex flex-row h-[88px] overflow-hidden group ${isSelected ? 'border-[#085041] shadow-sm ring-1 ring-[#085041]/10' : 'border-gray-200 shadow-sm hover:shadow hover:border-gray-300'}`}>
+                    <div key={product.id} className={`bg-white rounded-xl border transition-all duration-300 flex flex-row h-[72px] overflow-hidden group ${isSelected ? 'border-[#085041] shadow-sm ring-1 ring-[#085041]/10' : 'border-gray-200 shadow-sm hover:shadow hover:border-gray-300'}`}>
 
                       {/* Image Area (Left) */}
-                      <div className="relative w-[88px] h-full bg-[#f8faf9] shrink-0 border-r border-gray-100 flex items-center justify-center overflow-hidden">
+                      <div className="relative w-[72px] h-full bg-transparent shrink-0 flex items-center justify-center overflow-hidden">
                         {product.image_url || product.image ? (
-                          <Image
-                            src={product.image_url || product.image}
-                            alt={product.name || product.title}
-                            fill
-                            className="object-contain mix-blend-multiply p-2 transition-transform duration-300 group-hover:scale-105"
-                            sizes="88px"
-                          />
+                          <div className="relative w-[52px] h-[52px]">
+                            <Image
+                              src={product.image_url || product.image}
+                              alt={product.name || product.title}
+                              fill
+                              className="object-contain mix-blend-multiply rounded-md transition-transform duration-300 group-hover:scale-105"
+                              sizes="52px"
+                            />
+                          </div>
                         ) : (
                           <div className="text-[9px] text-[#085041]/50 font-medium">No Image</div>
                         )}
@@ -252,10 +254,7 @@ export default function OrderLineTab({ accessToken }) {
                       </div>
 
                       {/* Content Area (Middle) */}
-                      <div className="flex flex-col justify-center flex-1 min-w-0 pl-3 py-2">
-                        <div className="text-[9px] font-bold uppercase tracking-wider text-gray-400 mb-0.5 truncate">
-                          {typeof product.category === 'string' ? product.category : product.category?.name || 'Category'}
-                        </div>
+                      <div className="flex flex-col justify-center flex-1 min-w-0 pl-3 py-1">
                         <h4 className="font-semibold text-gray-800 text-[13px] leading-tight truncate mb-1 group-hover:text-[#085041]" title={product.name || product.title}>
                           {product.name || product.title}
                         </h4>

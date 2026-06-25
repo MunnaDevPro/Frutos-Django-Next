@@ -79,3 +79,19 @@ class StaffNotification(models.Model):
 
     def __str__(self):
         return f"Notif: {self.title} for {self.staff.user.name}"
+
+
+class Announcement(models.Model):
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_announcements')
+    target_all_stores = models.BooleanField(default=False)
+    target_stores = models.ManyToManyField('stores.Store', blank=True, related_name='announcements')
+    target_staff = models.ManyToManyField(StaffProfile, blank=True, related_name='announcements')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title

@@ -651,3 +651,10 @@ export const storesService = {
     /** Save availability */
     setAvailability: (pk, availability) => api.put(`/api/fulfillment/stores/${pk}/availability/`, { availability }),
 };
+
+export const announcementsService = {
+    list: () => api.get("/api/staff/announcements/"),
+    targets: () => api.get("/api/staff/announcements/targets/"),
+    create: (data) => api.post("/api/staff/announcements/", data),
+    delete: (id) => api.delete(`/api/staff/announcements/${id}/`),
+};

@@ -6,6 +6,7 @@ import { DashboardAuthProvider, useDashboardAuth } from "@/app/dashboard/_contex
 import { ToastProvider } from "@/app/dashboard/_components/Toaster";
 import Sidebar from "@/app/dashboard/_components/Sidebar";
 import Header from "@/app/dashboard/_components/Header";
+import AnnouncementListener from "@/app/dashboard/_components/AnnouncementListener";
 import "@/app/dashboard/dashboard.css";
 
 function DashboardShell({ children }) {
@@ -48,6 +49,7 @@ function DashboardShell({ children }) {
         )}
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
+      <AnnouncementListener />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import StaffProfile, StaffShift, StaffTask, StaffNotification
+from .models import StaffProfile, StaffShift, StaffTask, StaffNotification, Announcement
 from stores.models import Store
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
@@ -76,3 +76,34 @@ class CreateStaffSerializer(serializers.Serializer):
             photo=validated_data.get('photo')
         )
         return staff_profile
+
+class AnnouncementSerializer(serializers.ModelSerializer):
+    created_by_name = serializers.CharField(source='created_by.name', read_only=True)
+    target_stores_names = serializers.SerializerMethodField()
+    target_staff_names = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Announcement
+        fields = ['id', 'title', 'message', 'created_by', 'created_by_name', 'target_all_stores', 'target_stores', 'target_staff', 'created_at', 'target_stores_names', 'target_staff_names']
+
+    def get_target_stores_names(self, obj):
+        return [s.name for s in obj.target_stores.all()]
+
+    def get_target_staff_names(self, obj):
+        return [s.user.name for s in obj.target_staff.all()]
+
+class AnnouncementCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Announcement
+        fields = ['title', 'message', 'target_all_stores', 'target_stores', 'target_staff']
+
+class StoreStaffTreeSerializer(serializers.ModelSerializer):
+    staff_list = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Store
+        fields = ['id', 'name', 'staff_list']
+
+    def get_staff_list(self, obj):
+        staff = obj.staff.all()
+        return [{'id': s.id, 'name': s.user.name, 'role': s.role, 'photo': s.photo.url if s.photo else None} for s in staff]

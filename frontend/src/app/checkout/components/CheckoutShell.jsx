@@ -38,7 +38,7 @@ function normalizeCartItem(item) {
 
   const productId = rawId != null ? String(rawId) : null
   const quantity  = parseInt(item?.qty ?? item?.quantity ?? item?.count ?? 0, 10)
-  return { product: productId, item_type: 'product', quantity, color: item.color, size: item.size }
+  return { product: productId, item_type: 'product', quantity, color: item.color, size: item.size || item.unit }
 }
 
 export default function CheckoutShell({ deliveryDates, deliverySlots, initialUserData, deliveryConfig }) {

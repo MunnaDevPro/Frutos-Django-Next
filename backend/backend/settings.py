@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'utils',  # Utility functions
     'dashboard',  # Custom Admin Dashboard
     'staff',  # Staff Management and Dashboard
+    'livechat', # Live Chat for Admin and Staff
 ]
 
 MIDDLEWARE = [

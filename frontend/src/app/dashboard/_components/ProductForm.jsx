@@ -21,7 +21,7 @@ const labelCls = "block text-xs font-bold text-slate-500 uppercase tracking-wide
 
 export default function ProductForm({
   initialValues, onSubmit, submitLabel = "Save",
-  categories, brands, colors: propColors, sizes: propSizes, subcategories, shops,
+  categories, brands, colors: propColors, sizes: propSizes, subcategories, stores,
 }) {
   const [form, setForm] = useState({
     name: "", slug: "", description: "", nutritional_info: "",
@@ -30,10 +30,11 @@ export default function ProductForm({
     minimum_purchase: "", tax_rate: "",
     stock: "", is_active: "true",
     weight: "", length: "", width: "", height: "",
-    shop: "", brand: "", category: "", sub_category: "", shipping_category: "",
+    shop: "", stores: [], brand: "", category: "", sub_category: "", shipping_category: "",
     colors: [], sizes: [],
     ...initialValues,
     shop:              initialValues?.shop?.id               || initialValues?.shop               || "",
+    stores:            initialValues?.stores?.map(s => s.id || s) || [],
     brand:             initialValues?.brand?.id              || initialValues?.brand              || "",
     category:          initialValues?.category?.id           || initialValues?.category           || "",
     sub_category:      initialValues?.sub_category?.id       || initialValues?.sub_category       || "",
@@ -128,6 +129,7 @@ export default function ProductForm({
         width:                    form.width  || null,
         height:                   form.height || null,
         shop:                     form.shop              || null,
+        stores:                   form.stores            || [],
         brand:                    form.brand             || null,
         category:                 form.category          || null,
         sub_category:             form.sub_category      || null,
@@ -260,8 +262,8 @@ export default function ProductForm({
           <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
             <div>
               <label className={labelCls}>Store <span className="text-red-500">*</span></label>
-              <SearchableSelect required value={form.shop} onChange={v => handleChange("shop", v)}
-                placeholder="Select store..." options={shops.map(s => ({ value: s.id, label: s.name }))} />
+              <SearchableSelect isMulti={true} required value={form.stores} onChange={v => handleChange("stores", v)}
+                placeholder="Select store(s)..." options={stores.map(s => ({ value: s.id, label: s.name }))} />
             </div>
             <div>
               <label className={labelCls}>Category</label>

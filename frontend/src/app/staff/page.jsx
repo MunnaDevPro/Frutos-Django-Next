@@ -1,26 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useStaffAuth } from "./_context/StaffAuthContext";
 import useSWR from "swr";
 import api from "@/app/dashboard/_lib/api";
-import { Bell, Calendar, Euro, FileText, LogOut, MessageSquare, Settings, Clock, Menu, ArrowRight, Search, HelpCircle, ChevronLeft, ChevronRight, Ban, ShoppingCart, Package } from "lucide-react";
+import { Bell, Calendar, Euro, FileText, LogOut, MessageSquare, Settings, Clock, Menu, ArrowRight, Search, HelpCircle, ChevronLeft, ChevronRight, Ban, ShoppingCart, Package, Megaphone, X as XIcon } from "lucide-react";
 import StaffOrders from "./_components/StaffOrders";
 import StaffProducts from "./_components/StaffProducts";
+import StaffAnnouncements from "./_components/StaffAnnouncements";
+import StaffNotifications from "./_components/StaffNotifications";
 
 export default function StaffDashboardPage() {
   const { user, logout } = useStaffAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("MY_SHIFTS");
 
-  const { data: dashboardData, isLoading } = useSWR(
+  const { data: dashboardData, isLoading, mutate } = useSWR(
     "/api/staff/me/dashboard/",
     (url) => api.get(url),
     { refreshInterval: 3000 }
   );
 
+  useEffect(() => {
+    const handleNewAnnouncement = () => {
+      // Instantly trigger an SWR re-fetch for the dashboard data (including notifications)
+      mutate();
+    };
+    window.addEventListener("new_announcement", handleNewAnnouncement);
+    return () => window.removeEventListener("new_announcement", handleNewAnnouncement);
+  }, [mutate]);
+
   if (isLoading || !user) {
-    return <div className="min-h-screen bg-[#F1F6EB] flex items-center justify-center text-[#00694C] font-semibold">Loading...</div>;
+    return (
+      <div className="min-h-screen bg-[#F1F6EB] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative w-12 h-12">
+            <div
+              className="absolute inset-0 rounded-full border-4 animate-spin"
+              style={{
+                borderColor: 'rgba(0, 105, 76, 0.2)',
+                borderTopColor: '#00694C',
+                animationDuration: '0.75s',
+              }}
+            />
+          </div>
+          <p className="text-[#00694C] font-semibold text-sm animate-pulse">Loading portal...</p>
+        </div>
+      </div>
+    );
   }
 
   const { profile, shifts = [], notifications = [], tasks = [] } = dashboardData || {};
@@ -53,10 +80,9 @@ export default function StaffDashboardPage() {
       { id: "ORDERS", name: "ORDER LINE", icon: ShoppingCart, badge: 0 },
       { id: "PRODUCTS", name: "PRODUCTS", icon: Package, badge: 0 }
     ] : []),
-    { id: "NOTIFICATIONS", name: "NOTIFICATIONS", icon: Bell, badge: notifications?.length || 0 },
-    { id: "PRICE_LIST", name: "PRICE LIST", icon: Euro, badge: 0 },
+    { id: "NOTIFICATIONS", name: "NOTIFICATIONS", icon: Bell, badge: notifications?.filter(n => !n.is_read).length || 0 },
     { id: "REQUEST_DAY_OFF", name: "REQUEST DAY OFF", icon: FileText, badge: 0 },
-    { id: "MESSAGES", name: "MESSAGES", icon: MessageSquare, badge: 0 },
+    { id: "ANNOUNCEMENTS", name: "ANNOUNCEMENTS", icon: Megaphone, badge: 0 },
   ];
 
   const staffActions = [
@@ -150,9 +176,9 @@ export default function StaffDashboardPage() {
         <div className="md:hidden fixed inset-0 bg-black/40 z-50" onClick={() => setMobileMenuOpen(false)}>
           <div className="w-64 h-full bg-[#00694C] text-white p-6 flex flex-col" onClick={e => e.stopPropagation()}>
              <div className="p-6 pb-2">
-              <h2 className="font-serif font-bold text-xl tracking-tight mb-8">El Árbol Staff</h2>
+              <h2 className="font-serif font-bold text-xl tracking-tight mb-5">El Árbol Staff</h2>
               
-              <div className="flex items-center gap-3 mb-10">
+              <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full bg-[#004238] flex items-center justify-center overflow-hidden border border-white/10 shrink-0">
                   {profile?.photo ? (
                     <img src={profile.photo} alt={user?.name || "Staff"} className="w-full h-full object-cover" />
@@ -193,12 +219,6 @@ export default function StaffDashboardPage() {
                 );
               })}
             </nav>
-
-            <div className="p-4 mt-auto">
-              <button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#009b72] to-[#008A65] hover:from-[#008A65] hover:to-[#007A5A] text-white py-3 rounded-xl font-semibold text-sm transition-all duration-300 mb-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 cursor-pointer">
-                <Clock className="w-4 h-4" /> Clock In
-              </button>
-            </div>
           </div>
         </div>
       )}
@@ -206,9 +226,9 @@ export default function StaffDashboardPage() {
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 bg-[#00694C] text-white flex-col h-screen sticky top-0 shrink-0 shadow-2xl">
         <div className="p-6 pb-2">
-          <h2 className="font-serif font-bold text-xl tracking-tight mb-8">El Árbol Staff</h2>
+          <h2 className="font-serif font-bold text-xl tracking-tight mb-5">El Árbol Staff</h2>
           
-          <div className="flex items-center gap-3 mb-10">
+          <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-[#004238] flex items-center justify-center overflow-hidden border border-white/10 shrink-0">
               {profile?.photo ? (
                 <img src={profile.photo} alt={user?.name || "Staff"} className="w-full h-full object-cover" />
@@ -249,12 +269,6 @@ export default function StaffDashboardPage() {
             );
           })}
         </nav>
-
-        <div className="p-4 mt-auto">
-          <button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#009b72] to-[#008A65] hover:from-[#008A65] hover:to-[#007A5A] text-white py-3 rounded-xl font-semibold text-sm transition-all duration-300 mb-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 cursor-pointer">
-            <Clock className="w-4 h-4" /> Clock In
-          </button>
-        </div>
       </aside>
 
       {/* Main Content */}
@@ -289,6 +303,10 @@ export default function StaffDashboardPage() {
             <StaffOrders profile={profile} />
           ) : activeTab === "PRODUCTS" ? (
             <StaffProducts profile={profile} />
+          ) : activeTab === "ANNOUNCEMENTS" ? (
+            <StaffAnnouncements />
+          ) : activeTab === "NOTIFICATIONS" ? (
+            <StaffNotifications notifications={notifications} mutate={mutate} />
           ) : activeTab === "MY_SHIFTS" ? (
             <>
               <div className="flex justify-between items-end mb-6">
@@ -446,18 +464,36 @@ export default function StaffDashboardPage() {
                   </div>
                   <div className="space-y-3">
                     {notifications?.length > 0 ? notifications.map((n, i) => (
-                      <div key={n.id || i} className="bg-white rounded-xl p-5 shadow-sm flex gap-4 hover:shadow-md transition-shadow cursor-pointer">
-                         <div className="w-2 h-2 rounded-full bg-[#009b72] mt-1.5 shrink-0"></div>
+                      <div key={n.id || i} className="bg-white rounded-xl p-5 shadow-sm flex gap-4 hover:shadow-md transition-shadow relative group">
+                         <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${!n.is_read ? 'bg-[#009b72]' : 'bg-transparent'}`}></div>
                          <div className="flex-1">
                            <div className="flex justify-between items-start mb-1">
                              <h4 className="text-sm font-semibold text-[#004A3A] pr-4 leading-snug">{n.title}</h4>
                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mt-0.5">{formatTimeAgo(n.created_at)}</span>
                            </div>
-                           <p className="text-xs text-slate-500 font-medium">{n.message || n.msg}</p>
+                           <p className="text-xs text-slate-500 font-medium pr-6">{n.message || n.msg}</p>
                          </div>
+                         <button 
+                           onClick={async (e) => {
+                             e.stopPropagation();
+                             try {
+                               await api.delete(`/api/staff/me/notifications/${n.id}/`);
+                               mutate(prev => ({
+                                 ...prev,
+                                 notifications: prev.notifications.filter(notif => notif.id !== n.id)
+                               }), false);
+                             } catch (err) {
+                               console.error(err);
+                             }
+                           }}
+                           className="absolute top-4 right-3 text-slate-300 hover:text-red-500 hover:bg-red-50 p-1 rounded-md opacity-0 group-hover:opacity-100 transition-all"
+                           title="Remove notification"
+                         >
+                           <XIcon className="w-4 h-4" />
+                         </button>
                       </div>
                     )) : (
-                      <div className="text-sm text-slate-500 p-4 bg-white rounded-xl shadow-sm">No new notifications.</div>
+                      <div className="text-sm text-slate-500 p-4 bg-white rounded-xl shadow-sm border border-slate-100">No new notifications.</div>
                     )}
                   </div>
                 </div>

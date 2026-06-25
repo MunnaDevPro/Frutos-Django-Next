@@ -12,6 +12,7 @@ import CartSidebar          from '@/app/components/CartSidebar'
 import FloatingCart         from '@/app/components/FloatingCart'
 import Providers            from '@/app/providers'
 import SessionGuard         from '@/app/components/SessionGuard'
+import LiveChatWidget       from '@/app/components/livechat/LiveChatWidget'
 import { getSiteConfig }    from '@/lib/api_site_config'
 
 //  force-dynamic সরিয়ে দাও — tag revalidation-এর সাথে conflict করে
@@ -90,6 +91,7 @@ export default async function RootLayout({ children }) {
                 </main>
                 <FloatingCart />
                 <CartSidebar />
+                <LiveChatWidget />
               </CartProvider>
               <FooterWrapper config={siteConfig} />
             </WishlistProvider>

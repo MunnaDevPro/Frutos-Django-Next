@@ -8,11 +8,11 @@ import {
   Plus, Eye, Pencil, Trash2, X, Upload,
   Loader2, ChevronDown, ChevronUp, Image as ImageIcon,
 } from "lucide-react";
-import Container      from "@/app/dashboard/_components/Container";
-import DataTable      from "@/app/dashboard/_components/DataTable";
-import Modal          from "@/app/dashboard/_components/Modal";
-import ConfirmDialog  from "@/app/dashboard/_components/ConfirmDialog";
-import { useModel }   from "@/app/dashboard/_lib/useModel";
+import Container from "@/app/dashboard/_components/Container";
+import DataTable from "@/app/dashboard/_components/DataTable";
+import Modal from "@/app/dashboard/_components/Modal";
+import ConfirmDialog from "@/app/dashboard/_components/ConfirmDialog";
+import { useModel } from "@/app/dashboard/_lib/useModel";
 import SearchableSelect from "@/app/dashboard/_components/SearchableSelect";
 import {
   productsService, brandsService, colorsService,
@@ -20,25 +20,27 @@ import {
 } from "@/app/dashboard/_lib/services";
 import { useToastContext } from "@/app/dashboard/_components/Toaster";
 import useSWR from "swr";
-import api   from "@/app/dashboard/_lib/api";
+import api from "@/app/dashboard/_lib/api";
 
 const PAGE_SIZE = 20;
 
 const columns = [
-  { key: "thumbnail_url", label: "", sortable: false, render: (v) => v ? (
-    <img src={v} alt="" className="w-8 h-8 rounded object-cover" />
-  ) : (
-    <div className="w-8 h-8 rounded bg-slate-100 flex items-center justify-center">
-      <ImageIcon className="w-3.5 h-3.5 text-slate-400" />
-    </div>
-  )},
-  { key: "name",           label: "Name" },
-  { key: "price",          label: "Price",      render: (v) => `€${Number(v).toLocaleString()}` },
-  { key: "discount_price", label: "Sale Price",  render: (v) => v ? `€${Number(v).toLocaleString()}` : "—" },
-  { key: "stock",          label: "Stock" },
-  { key: "shop",           label: "Store",       render: (v) => v?.name || "—" },
-  { key: "category",       label: "Category",   render: (v) => v?.name || "—" },
-  { key: "is_active",      label: "Status",     render: (v) => v ? "active" : "inactive", type: "status" },
+  {
+    key: "thumbnail_url", label: "", sortable: false, render: (v) => v ? (
+      <img src={v} alt="" className="w-8 h-8 rounded object-cover" />
+    ) : (
+      <div className="w-8 h-8 rounded bg-slate-100 flex items-center justify-center">
+        <ImageIcon className="w-3.5 h-3.5 text-slate-400" />
+      </div>
+    )
+  },
+  { key: "name", label: "Name" },
+  { key: "price", label: "Price", render: (v) => `€${Number(v).toLocaleString()}` },
+  { key: "discount_price", label: "Sale Price", render: (v) => v ? `€${Number(v).toLocaleString()}` : "—" },
+  { key: "stock", label: "Stock" },
+  { key: "stores", label: "Stores", render: (v) => Array.isArray(v) && v.length > 0 ? v.map(s => s.name).join(", ") : "—" },
+  { key: "category", label: "Category", render: (v) => v?.name || "—" },
+  { key: "is_active", label: "Status", render: (v) => v ? "active" : "inactive", type: "status" },
 ];
 
 import ProductForm from "@/app/dashboard/_components/ProductForm";
@@ -46,7 +48,7 @@ import ProductForm from "@/app/dashboard/_components/ProductForm";
 // ── Product View ───────────────────────────────────────────────
 function ProductView({ item }) {
   if (!item) return null;
-  
+
   const InfoBlock = ({ label, value }) => (
     <div className="flex flex-col">
       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{label}</span>
@@ -54,7 +56,7 @@ function ProductView({ item }) {
     </div>
   );
 
-  const Section = ({ title, children, className="" }) => (
+  const Section = ({ title, children, className = "" }) => (
     <div className={`bg-white rounded-2xl border border-slate-100 p-5 shadow-sm ${className}`}>
       <h4 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4 flex items-center gap-2">
         {title}
@@ -64,9 +66,8 @@ function ProductView({ item }) {
   );
 
   const StatusBadge = ({ active }) => (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase ${
-      active ? "bg-emerald-50 text-emerald-600 border border-emerald-200" : "bg-rose-50 text-rose-600 border border-rose-200"
-    }`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase ${active ? "bg-emerald-50 text-emerald-600 border border-emerald-200" : "bg-rose-50 text-rose-600 border border-rose-200"
+      }`}>
       <span className={`w-1.5 h-1.5 rounded-full ${active ? "bg-emerald-500" : "bg-rose-500"}`}></span>
       {active ? "Active" : "Inactive"}
     </span>
@@ -111,7 +112,7 @@ function ProductView({ item }) {
               )}
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-5 border-t border-slate-100/80">
             <InfoBlock label="Stock" value={item.stock} />
             <InfoBlock label="Wholesale Price" value={item.wholesale_price ? `€${Number(item.wholesale_price).toLocaleString()}` : "—"} />
@@ -123,7 +124,7 @@ function ProductView({ item }) {
 
       {/* Two Column Layout for Details */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
+
         {/* Main Info Column */}
         <div className="md:col-span-2 space-y-6">
           <Section title="Product Details">
@@ -132,7 +133,7 @@ function ProductView({ item }) {
               <InfoBlock label="Origin Country" value={item.origin} />
               <InfoBlock label="Display Unit" value={item.unit} />
               <InfoBlock label="Wholesale Unit" value={item.wholesale_unit} />
-              <InfoBlock label="Store" value={item.shop?.name} />
+              <InfoBlock label="Stores" value={Array.isArray(item.stores) && item.stores.length > 0 ? item.stores.map(s => s.name).join(", ") : "—"} />
             </div>
           </Section>
 
@@ -158,7 +159,7 @@ function ProductView({ item }) {
               </div>
             </Section>
           )}
-          
+
           {item.additional_images?.length > 0 && (
             <Section title="Image Gallery">
               <div className="flex flex-wrap gap-4">
@@ -212,7 +213,7 @@ function ProductView({ item }) {
           <Section title="Logistics">
             <div className="space-y-5">
               <InfoBlock label="Shipping Category" value={item.shipping_category?.name} />
-              
+
               {(item.weight || item.length || item.width || item.height) ? (
                 <>
                   <InfoBlock label="Weight" value={item.weight ? `${item.weight} kg` : "—"} />
@@ -225,10 +226,10 @@ function ProductView({ item }) {
           </Section>
 
           <Section title="System Information">
-             <div className="space-y-4">
-                <InfoBlock label="Created On" value={item.created_at ? new Date(item.created_at).toLocaleDateString(undefined, {year: 'numeric', month: 'short', day: 'numeric'}) : "—"} />
-                <InfoBlock label="Last Updated" value={item.updated_at ? new Date(item.updated_at).toLocaleDateString(undefined, {year: 'numeric', month: 'short', day: 'numeric'}) : "—"} />
-             </div>
+            <div className="space-y-4">
+              <InfoBlock label="Created On" value={item.created_at ? new Date(item.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : "—"} />
+              <InfoBlock label="Last Updated" value={item.updated_at ? new Date(item.updated_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : "—"} />
+            </div>
           </Section>
         </div>
       </div>
@@ -242,40 +243,40 @@ export default function ProductsPage() {
   const { data, loading, totalCount, params, setSearch, setPage, create, update, remove } = useModel(productsService, {
     defaultParams: { page: 1, page_size: PAGE_SIZE },
     onSuccess: (msg) => toast.success(msg),
-    onError:   (err) => toast.error(err?.message || "Operation failed"),
+    onError: (err) => toast.error(err?.message || "Operation failed"),
   });
 
-  const { data: brandsRaw }      = useSWR("ref-brands",      () => brandsService.list({ page_size: 200 }),      { revalidateOnFocus: false });
-  const { data: colorsRaw }      = useSWR("ref-colors",      () => colorsService.list({ page_size: 200 }),      { revalidateOnFocus: false });
-  const { data: sizesRaw }       = useSWR("ref-sizes",       () => sizesService.list({ page_size: 200 }),       { revalidateOnFocus: false });
-  const { data: categoriesRaw }  = useSWR("ref-categories",  () => categoriesService.list({ page_size: 200 }),  { revalidateOnFocus: false });
-  const { data: subcatsRaw }     = useSWR("ref-subcats",     () => subcategoriesService.list({ page_size: 200 }), { revalidateOnFocus: false });
-  const { data: storesRaw }      = useSWR("ref-stores",      () => storesService.list(),       { revalidateOnFocus: false });
+  const { data: brandsRaw } = useSWR("ref-brands", () => brandsService.list({ page_size: 200 }), { revalidateOnFocus: false });
+  const { data: colorsRaw } = useSWR("ref-colors", () => colorsService.list({ page_size: 200 }), { revalidateOnFocus: false });
+  const { data: sizesRaw } = useSWR("ref-sizes", () => sizesService.list({ page_size: 200 }), { revalidateOnFocus: false });
+  const { data: categoriesRaw } = useSWR("ref-categories", () => categoriesService.list({ page_size: 200 }), { revalidateOnFocus: false });
+  const { data: subcatsRaw } = useSWR("ref-subcats", () => subcategoriesService.list({ page_size: 200 }), { revalidateOnFocus: false });
+  const { data: storesRaw } = useSWR("ref-stores", () => storesService.list(), { revalidateOnFocus: false });
 
-  const brands       = brandsRaw?.results      || (Array.isArray(brandsRaw)      ? brandsRaw      : []);
-  const colors       = colorsRaw?.results      || (Array.isArray(colorsRaw)      ? colorsRaw      : []);
-  const sizes        = sizesRaw?.results       || (Array.isArray(sizesRaw)       ? sizesRaw       : []);
-  const categories   = categoriesRaw?.results  || (Array.isArray(categoriesRaw)  ? categoriesRaw  : []);
-  const subcategories= subcatsRaw?.results     || (Array.isArray(subcatsRaw)     ? subcatsRaw     : []);
-  const stores       = storesRaw?.results      || (Array.isArray(storesRaw)      ? storesRaw      : []);
+  const brands = brandsRaw?.results || (Array.isArray(brandsRaw) ? brandsRaw : []);
+  const colors = colorsRaw?.results || (Array.isArray(colorsRaw) ? colorsRaw : []);
+  const sizes = sizesRaw?.results || (Array.isArray(sizesRaw) ? sizesRaw : []);
+  const categories = categoriesRaw?.results || (Array.isArray(categoriesRaw) ? categoriesRaw : []);
+  const subcategories = subcatsRaw?.results || (Array.isArray(subcatsRaw) ? subcatsRaw : []);
+  const stores = storesRaw?.results || (Array.isArray(storesRaw) ? storesRaw : []);
 
   const [createOpen, setCreateOpen] = useState(false);
-  const [editItem,   setEditItem]   = useState(null);
-  const [viewItem,   setViewItem]   = useState(null);
+  const [editItem, setEditItem] = useState(null);
+  const [viewItem, setViewItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
 
-  const handleCreate = async (payload) => { await create(payload);                          setCreateOpen(false); };
-  const handleEdit   = async (payload) => { await update(editItem.slug || editItem.id, payload); setEditItem(null);   };
-  const handleDelete = async ()        => { await remove(deleteItem.slug || deleteItem.id);  setDeleteItem(null);  };
+  const handleCreate = async (payload) => { await create(payload); setCreateOpen(false); };
+  const handleEdit = async (payload) => { await update(editItem.slug || editItem.id, payload); setEditItem(null); };
+  const handleDelete = async () => { await remove(deleteItem.slug || deleteItem.id); setDeleteItem(null); };
 
-  const formProps = { categories, brands, colors, sizes, subcategories, shops: stores };
+  const formProps = { categories, brands, colors, sizes, subcategories, stores };
 
   return (
     <Container
       title="Products"
       description="Manage your product catalog"
       actions={
-        <button style={{cursor: 'pointer'}} onClick={() => setCreateOpen(true)} className="db-btn-primary">
+        <button style={{ cursor: 'pointer' }} onClick={() => setCreateOpen(true)} className="db-btn-primary">
           <Plus size={15} /> Add Product
         </button>
       }
@@ -287,15 +288,15 @@ export default function ProductsPage() {
         loading={loading} searchable
         actions={(row) => (
           <div className="flex items-center justify-end gap-1">
-            <button style={{cursor: 'pointer'}} onClick={() => setViewItem(row)}
+            <button style={{ cursor: 'pointer' }} onClick={() => setViewItem(row)}
               className="db-icon-btn">
               <Eye className="w-3.5 h-3.5" />
             </button>
-            <button style={{cursor: 'pointer'}} onClick={() => setEditItem(row)}
+            <button style={{ cursor: 'pointer' }} onClick={() => setEditItem(row)}
               className="db-icon-btn">
               <Pencil className="w-3.5 h-3.5" />
             </button>
-            <button style={{cursor: 'pointer'}} onClick={() => setDeleteItem(row)}
+            <button style={{ cursor: 'pointer' }} onClick={() => setDeleteItem(row)}
               className="db-icon-btn danger">
               <Trash2 className="w-3.5 h-3.5" />
             </button>

@@ -314,7 +314,7 @@
           <tr>
             <th style="width:32px">#</th>
             <th>Item</th>
-            <th>Variant</th>
+            <th>Size</th>
             <th class="center" style="width:60px">Qty</th>
             <th class="right" style="width:100px">Unit Price</th>
             <th class="right" style="width:110px">Amount</th>
@@ -328,17 +328,19 @@
               <div class="product-name">{{ item.product.name|default:"—" }}</div>
             </td>
             <td>
-              {% with variant="" %}
-              {% if item.color and item.size %}
-              <span class="product-variant">{{ item.color.name }} / {{ item.size.name }}</span>
-              {% elif item.color %}
-              <span class="product-variant">{{ item.color.name }}</span>
-              {% elif item.size %}
+              {% if item.size %}
               <span class="product-variant">{{ item.size.name }}</span>
+              {% elif item.product and item.product.unit %}
+              <span class="product-variant">
+                  {% if "per " in item.product.unit|lower %}
+                      {{ item.product.unit|lower|cut:"per " }}
+                  {% else %}
+                      {{ item.product.unit }}
+                  {% endif %}
+              </span>
               {% else %}
               <span style="color:#d1d5db">—</span>
               {% endif %}
-              {% endwith %}
             </td>
             <td class="center">{{ item.quantity }}</td>
             <td class="right">৳{{ item.unit_price|floatformat:0 }}</td>

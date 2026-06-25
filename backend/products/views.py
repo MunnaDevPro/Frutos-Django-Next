@@ -83,12 +83,15 @@ class ProductViewSet(viewsets.ModelViewSet):
             'shipping_category__allowed_shipping_methods__shipping_tiers'
         ).order_by('-created_at')
         
-        if self.request.user and self.request.user.is_authenticated and (
-            # NOTE: STAFF users are explicitly excluded — they must not be treated as admin
-            getattr(self.request.user, 'user_type', '') == 'ADMIN' or
-            self.request.user.is_superuser
-        ):
-            return qs
+        if self.request.user and self.request.user.is_authenticated:
+            if getattr(self.request.user, 'user_type', '') == 'ADMIN' or self.request.user.is_superuser:
+                return qs
+            if getattr(self.request.user, 'user_type', '') == 'STAFF':
+                profile = getattr(self.request.user, 'staff_profile', None)
+                if profile and profile.store:
+                    return qs.filter(stores=profile.store)
+                return qs.none()
+                
         return qs.filter(is_active=True)
 
     def get_permissions(self):

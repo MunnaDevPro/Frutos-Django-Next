@@ -90,9 +90,13 @@ export default function StaffLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 px-4 bg-[#00694C] text-white text-sm font-medium rounded-xl hover:bg-[#00523b] disabled:opacity-50 transition-all mt-6 shadow-sm hover:shadow"
+            className="w-full py-2.5 px-4 bg-[#00694C] text-white text-sm font-medium rounded-xl hover:bg-[#00523b] disabled:opacity-50 transition-all mt-6 shadow-sm hover:shadow flex justify-center items-center h-[44px]"
           >
-            {loading ? "Signing in..." : "Sign in to Portal"}
+            {loading ? (
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              "Sign in to Portal"
+            )}
           </button>
         </form>
         

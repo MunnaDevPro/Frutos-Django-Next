@@ -52,6 +52,7 @@ urlpatterns = [
     # path('api/stores/', include('stores.urls')),  # Stores API
     path('api/fulfillment/', include('stores.urls')),
     path('api/staff/', include('staff.urls')),
+    path('api/livechat/', include('livechat.urls')),
 ]
 
 

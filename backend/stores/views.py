@@ -267,4 +267,4 @@ class DashboardLeftoverPackViewSet(viewsets.ModelViewSet):
             
         images = self.request.FILES.getlist('gallery_images')
         for image in images:
-            LeftoverPackImage.objects.create(pack=pack, image=image)
+            LeftoverPackImage.objects.create(pack=pack, image=image)

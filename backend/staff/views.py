@@ -3,11 +3,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
-from .models import StaffProfile, StaffShift, StaffTask, StaffNotification
+from django.db import models
+from .models import StaffProfile, StaffShift, StaffTask, StaffNotification, Announcement
 from .serializers import (
     StaffProfileSerializer, CreateStaffSerializer, StaffShiftSerializer, 
-    StaffTaskSerializer, StaffNotificationSerializer
+    StaffTaskSerializer, StaffNotificationSerializer,
+    AnnouncementSerializer, AnnouncementCreateSerializer, StoreStaffTreeSerializer
 )
+from stores.models import Store
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 import logging
 logger = logging.getLogger(__name__)
@@ -142,3 +147,92 @@ class MyStaffTaskUpdateView(generics.UpdateAPIView):
     
     def get_queryset(self):
         return StaffTask.objects.filter(staff__user=self.request.user)
+
+class MyStaffNotificationDetailView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsStaffUser]
+    serializer_class = StaffNotificationSerializer
+    
+    def get_queryset(self):
+        return StaffNotification.objects.filter(staff__user=self.request.user)
+
+# ==========================================
+# SHARED APIs (Announcements)
+# ==========================================
+
+class AnnouncementViewSet(viewsets.ModelViewSet):
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy', 'targets']:
+            return [IsAdminUser()]
+        return [permissions.IsAuthenticated()]
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return AnnouncementCreateSerializer
+        return AnnouncementSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_authenticated:
+            return Announcement.objects.none()
+            
+        user_type = getattr(user, 'user_type', '')
+        if user_type == 'ADMIN' or getattr(user, 'is_superuser', False):
+            return Announcement.objects.all().order_by('-created_at')
+            
+        # For staff, return targeted announcements
+        try:
+            staff_profile = user.staff_profile
+            return Announcement.objects.filter(
+                models.Q(target_all_stores=True) |
+                models.Q(target_stores=staff_profile.store) |
+                models.Q(target_staff=staff_profile)
+            ).distinct().order_by('-created_at')
+        except StaffProfile.DoesNotExist:
+            return Announcement.objects.none()
+
+    def perform_create(self, serializer):
+        announcement = serializer.save(created_by=self.request.user)
+        
+        # Create StaffNotification records
+        target_staff_set = set()
+        if announcement.target_all_stores:
+            for staff in StaffProfile.objects.all():
+                target_staff_set.add(staff)
+        else:
+            for store in announcement.target_stores.all():
+                for staff in store.staff.all():
+                    target_staff_set.add(staff)
+            for staff in announcement.target_staff.all():
+                target_staff_set.add(staff)
+                
+        notifications = []
+        for staff in target_staff_set:
+            notifications.append(StaffNotification(
+                staff=staff,
+                title=f"Announcement: {announcement.title}",
+                message=announcement.message
+            ))
+        if notifications:
+            StaffNotification.objects.bulk_create(notifications)
+
+        # Broadcast notification via Django Channels
+        channel_layer = get_channel_layer()
+        message_data = {
+            'type': 'send_announcement',
+            'announcement': AnnouncementSerializer(announcement).data
+        }
+        
+        if announcement.target_all_stores:
+            async_to_sync(channel_layer.group_send)('staff_all', message_data)
+        else:
+            for store in announcement.target_stores.all():
+                async_to_sync(channel_layer.group_send)(f'store_{store.id}', message_data)
+            
+            for staff in announcement.target_staff.all():
+                async_to_sync(channel_layer.group_send)(f'user_{staff.user.id}', message_data)
+
+    @action(detail=False, methods=['get'])
+    def targets(self, request):
+        stores = Store.objects.filter(is_active=True).prefetch_related('staff', 'staff__user')
+        serializer = StoreStaffTreeSerializer(stores, many=True)
+        return Response(serializer.data)

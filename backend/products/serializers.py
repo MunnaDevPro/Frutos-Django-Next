@@ -4,6 +4,12 @@ from django.db.models import Q
 from .models import *
 from shops.serializers import ShopSerializer
 from orders.models import OrderItem
+from stores.models import Store
+
+class ProductStoreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Store
+        fields = ['id', 'name', 'slug']
 
 class BrandSerializer(serializers.ModelSerializer):
     logo_url = serializers.SerializerMethodField()
@@ -143,6 +149,7 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     shop = ShopSerializer(read_only=True)
+    stores = ProductStoreSerializer(many=True, read_only=True)
     brand = BrandSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
     sub_category = SubCategorySerializer(read_only=True)
@@ -160,7 +167,7 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            'id', 'shop', 'brand', 'name', 'slug', 'description', 'category', 'sub_category', 'shipping_category',
+            'id', 'shop', 'stores', 'brand', 'name', 'slug', 'description', 'category', 'sub_category', 'shipping_category',
             'price', 'discount_price', 'wholesale_price', 'minimum_purchase', 'tax_rate', 'stock', 'is_active',
             'weight', 'length', 'width', 'height',  # Added physical properties for shipping
             'thumbnail_url', 'specifications', 'additional_images',
@@ -294,7 +301,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            'shop', 'brand', 'name', 'slug', 'description',
+            'shop', 'stores', 'brand', 'name', 'slug', 'description',
             'category', 'sub_category', 'shipping_category',
             'price', 'discount_price', 'wholesale_price',
             'minimum_purchase', 'tax_rate',
@@ -305,6 +312,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {
             'shop':                    {'required': False},
+            'stores':                  {'required': False, 'allow_empty': True},
             'brand':                   {'allow_null': True, 'required': False},
             'category':                {'allow_null': True, 'required': False},
             'sub_category':            {'allow_null': True, 'required': False},

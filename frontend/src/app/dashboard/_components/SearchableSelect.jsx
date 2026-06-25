@@ -13,13 +13,26 @@ export default function SearchableSelect({
   required = false,
   name,
   className = "",
+  isMulti = false,
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const containerRef = useRef(null);
   const searchRef = useRef(null);
 
-  const selected = options.find(o => String(o.value) === String(value));
+  // Helper to safely get selected options
+  const getSelectedOptions = () => {
+    if (isMulti) {
+      const vals = Array.isArray(value) ? value : [];
+      return options.filter(o => vals.some(v => String(v) === String(o.value)));
+    } else {
+      return options.filter(o => String(o.value) === String(value));
+    }
+  };
+
+  const selectedOptions = getSelectedOptions();
+  const selected = isMulti ? null : selectedOptions[0];
+
   const filtered = search
     ? options.filter(o => o.label?.toLowerCase().includes(search.toLowerCase()))
     : options;
@@ -50,13 +63,33 @@ export default function SearchableSelect({
   }, [open]);
 
   const handleSelect = (optValue) => {
-    onChange?.(optValue);
-    setOpen(false);
-    setSearch("");
+    if (isMulti) {
+      const currentVals = Array.isArray(value) ? value : [];
+      const isSelected = currentVals.some(v => String(v) === String(optValue));
+      if (isSelected) {
+        onChange?.(currentVals.filter(v => String(v) !== String(optValue)));
+      } else {
+        onChange?.([...currentVals, optValue]);
+      }
+    } else {
+      onChange?.(optValue);
+      setOpen(false);
+      setSearch("");
+    }
   };
 
   const toggleOpen = () => {
     if (!disabled) setOpen(o => !o);
+  };
+  
+  const displayLabel = () => {
+    if (isMulti) {
+      if (selectedOptions.length === 0) return placeholder;
+      if (selectedOptions.length === 1) return selectedOptions[0].label;
+      if (selectedOptions.length <= 2) return selectedOptions.map(o => o.label).join(", ");
+      return `${selectedOptions.length} selected`;
+    }
+    return selected ? selected.label : placeholder;
   };
 
   return (
@@ -76,7 +109,7 @@ export default function SearchableSelect({
           borderRadius: "10px",
           fontSize: "14px",
           background: "#ffffff",
-          color: selected ? "#1e293b" : "#94a3b8",
+          color: selectedOptions.length > 0 ? "#1e293b" : "#94a3b8",
           cursor: disabled ? "not-allowed" : "pointer",
           opacity: disabled ? 0.5 : 1,
           boxShadow: open ? "0 0 0 3px rgba(99,102,241,0.1)" : "none",
@@ -86,8 +119,8 @@ export default function SearchableSelect({
           fontFamily: "inherit",
         }}
       >
-        <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: selected ? "600" : "400" }}>
-          {selected ? selected.label : placeholder}
+        <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: selectedOptions.length > 0 ? "600" : "400" }}>
+          {displayLabel()}
         </span>
         <ChevronDown
           size={16}
@@ -105,7 +138,7 @@ export default function SearchableSelect({
           tabIndex={-1}
           required={required}
           name={name}
-          value={value ?? ""}
+          value={isMulti ? (Array.isArray(value) && value.length > 0 ? value.join(",") : "") : (value ?? "")}
           onChange={() => {}}
           aria-hidden="true"
           style={{ position: "absolute", bottom: 0, left: 0, width: "100%", opacity: 0, pointerEvents: "none", height: 0 }}
@@ -168,7 +201,14 @@ export default function SearchableSelect({
               </div>
             ) : (
               filtered.map(o => {
-                const isSelected = String(o.value) === String(value);
+                let isSelected = false;
+                if (isMulti) {
+                   const vals = Array.isArray(value) ? value : [];
+                   isSelected = vals.some(v => String(v) === String(o.value));
+                } else {
+                   isSelected = String(o.value) === String(value);
+                }
+                
                 return (
                   <button
                     key={o.value}

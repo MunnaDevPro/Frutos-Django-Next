@@ -973,11 +973,19 @@ class OrderViewSet(viewsets.ModelViewSet):
                         product = Product.objects.filter(name__icontains=item['product_name']).first()
                     
                     if product:
+                        # Map size string to Size object
+                        size_name = item.get('size')
+                        size_obj = None
+                        if size_name:
+                            from products.models import Size
+                            size_obj, _ = Size.objects.get_or_create(name=size_name)
+
                         OrderItem.objects.create(
                             order=order,
                             product=product,
                             quantity=item.get('quantity', 1),
-                            unit_price=item.get('unit_price', item.get('price', product.price))
+                            unit_price=item.get('unit_price', item.get('price', product.price)),
+                            size=size_obj
                         )
                 except Exception as e:
                     # If product not found, continue with other items

@@ -162,7 +162,7 @@ export class ApiError extends Error {
  * @returns {Promise<any>} parsed JSON (or Blob for downloads)
  */
 export async function adminFetch(path, options = {}) {
-    const { params, retries = 1, raw = false, ...fetchOpts } = options;
+    const { params, retries = 1, raw = false, skipAuth = false, ...fetchOpts } = options;
 
     // Build URL
     let url = `${API_BASE_URL}${path}`;
@@ -182,7 +182,7 @@ export async function adminFetch(path, options = {}) {
     fetchOpts.cache = "no-store";
 
     const token = getAccessToken();
-    if (token) headers["Authorization"] = `Bearer ${token}`;
+    if (token && !skipAuth) headers["Authorization"] = `Bearer ${token}`;
 
     // Don't set Content-Type for FormData (browser does it with boundary)
     if (!(fetchOpts.body instanceof FormData) && !headers["Content-Type"]) {
@@ -198,7 +198,7 @@ export async function adminFetch(path, options = {}) {
         const res = await fetch(url, {...fetchOpts, headers });
 
         // 401 → try token refresh once
-        if (res.status === 401 && attempt === 0) {
+        if (res.status === 401 && attempt === 0 && !skipAuth) {
             try {
                 const newToken = await refreshAccessToken();
                 headers["Authorization"] = `Bearer ${newToken}`;
