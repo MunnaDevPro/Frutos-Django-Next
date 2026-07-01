@@ -14,8 +14,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields[self.username_field] = serializers.EmailField()
-        self.fields['password'] = serializers.CharField()
+        self.fields[self.username_field] = serializers.CharField()
+        self.fields['password'] = serializers.CharField(required=False, allow_blank=True)
 
     @classmethod
     def get_token(cls, user):
@@ -29,27 +29,35 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
     def validate(self, attrs):
-        email = attrs.get('email')
+        identifier = attrs.get('email')
         password = attrs.get('password')
 
-        if email and password:
-            user = authenticate(request=self.context.get('request'),
-                              email=email, password=password)
+        if identifier:
+            from django.db.models import Q
+            user = None
+            
+            if not password:
+                # Passwordless login using staff_id
+                staff_query = User.objects.filter(staff_profile__staff_id=identifier, user_type='STAFF')
+                if staff_query.exists():
+                    user = staff_query.first()
+                else:
+                    raise serializers.ValidationError('Invalid Staff ID or password required.')
+            else:
+                resolved_email = identifier
+                user_query = User.objects.filter(Q(email=identifier) | Q(staff_profile__staff_id=identifier))
+                if user_query.exists():
+                    resolved_email = user_query.first().email
+                    
+                user = authenticate(request=self.context.get('request'), email=resolved_email, password=password)
             
             if not user:
-                raise serializers.ValidationError(
-                    'No active account found with the given credentials'
-                )
+                raise serializers.ValidationError('No active account found with the given credentials')
             
             if not user.is_active:
-                raise serializers.ValidationError(
-                    'User account is disabled.'
-                )
-
+                raise serializers.ValidationError('User account is disabled.')
         else:
-            raise serializers.ValidationError(
-                'Must include "email" and "password".'
-            )
+            raise serializers.ValidationError('Must include "email" (or Staff ID).')
 
         refresh = self.get_token(user)
 

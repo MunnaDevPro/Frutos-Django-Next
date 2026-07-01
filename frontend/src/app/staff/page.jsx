@@ -4,12 +4,14 @@ import { useState, useEffect } from "react";
 import { useStaffAuth } from "./_context/StaffAuthContext";
 import useSWR from "swr";
 import api from "@/app/dashboard/_lib/api";
-import { Bell, Calendar, Euro, FileText, LogOut, MessageSquare, Settings, Clock, Menu, ArrowRight, Search, HelpCircle, ChevronLeft, ChevronRight, Ban, ShoppingCart, Package, Megaphone, X as XIcon } from "lucide-react";
+import { Bell, Calendar, Euro, FileText, LogOut, MessageSquare, Settings, Clock, Menu, ArrowRight, Search, HelpCircle, ChevronLeft, ChevronRight, Ban, ShoppingCart, Package, Megaphone, X as XIcon, Store as StoreIcon } from "lucide-react";
 import StaffOrders from "./_components/StaffOrders";
 import StaffProducts from "./_components/StaffProducts";
 import StaffAnnouncements from "./_components/StaffAnnouncements";
 import StaffNotifications from "./_components/StaffNotifications";
 import StaffRequestDayOff from "./_components/StaffRequestDayOff";
+import StaffStoreInfo from "./_components/StaffStoreInfo";
+import StaffProfileSettings from "./_components/StaffProfileSettings";
 
 export default function StaffDashboardPage() {
   const { user, logout } = useStaffAuth();
@@ -84,6 +86,8 @@ export default function StaffDashboardPage() {
     { id: "NOTIFICATIONS", name: "NOTIFICATIONS", icon: Bell, badge: notifications?.filter(n => !n.is_read).length || 0 },
     { id: "REQUEST_DAY_OFF", name: "REQUEST DAY OFF", icon: FileText, badge: 0 },
     { id: "ANNOUNCEMENTS", name: "ANNOUNCEMENTS", icon: Megaphone, badge: 0 },
+    { id: "MY_STORE", name: "MY STORE", icon: StoreIcon, badge: 0 },
+    { id: "SETTINGS", name: "PROFILE SETTINGS", icon: Settings, badge: 0 },
   ];
 
   const staffActions = [
@@ -529,6 +533,10 @@ export default function StaffDashboardPage() {
             </>
           ) : activeTab === "REQUEST_DAY_OFF" ? (
             <StaffRequestDayOff />
+          ) : activeTab === "MY_STORE" ? (
+            <StaffStoreInfo storeSlug={profile?.store_slug} />
+          ) : activeTab === "SETTINGS" ? (
+            <StaffProfileSettings profile={profile} user={user} />
           ) : (
             <div className="bg-white rounded-xl p-8 text-center text-slate-500 shadow-sm mt-10">
               <h2 className="text-2xl font-serif text-[#004A3A] mb-2">Coming Soon</h2>

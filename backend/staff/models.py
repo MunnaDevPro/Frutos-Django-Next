@@ -3,6 +3,7 @@ from django.conf import settings
 
 class StaffProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='staff_profile')
+    staff_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
     role = models.CharField(max_length=100, help_text="e.g., Sales Associate, Packager")
     store = models.ForeignKey('stores.Store', on_delete=models.SET_NULL, null=True, blank=True, related_name='staff')
     phone = models.CharField(max_length=20, blank=True, null=True)
@@ -24,6 +25,18 @@ class StaffProfile(models.Model):
 
     # Photo for staff dashboard
     photo = models.ImageField(upload_to='staff_photos/', blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.staff_id:
+            import random
+            import string
+            # Generate a unique STF-<6 digits> ID
+            while True:
+                new_id = f"STF-{''.join(random.choices(string.digits, k=6))}"
+                if not StaffProfile.objects.filter(staff_id=new_id).exists():
+                    self.staff_id = new_id
+                    break
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.user.name} - {self.role}"

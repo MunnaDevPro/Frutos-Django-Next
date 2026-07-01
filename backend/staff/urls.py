@@ -13,6 +13,8 @@ urlpatterns = [
     
     # Staff APIs
     path('me/dashboard/', views.MyStaffDashboardView.as_view(), name='staff-dashboard'),
+    path('me/profile/', views.MyStaffProfileUpdateView.as_view(), name='staff-profile-update'),
+    path('me/colleagues/', views.MyStaffColleaguesView.as_view(), name='staff-colleagues-list'),
     path('me/tasks/', views.MyStaffTasksView.as_view(), name='staff-tasks-list'),
     path('me/tasks/<int:pk>/', views.MyStaffTaskUpdateView.as_view(), name='staff-task-update'),
     path('me/notifications/<int:pk>/', views.MyStaffNotificationDetailView.as_view(), name='staff-notification-detail'),

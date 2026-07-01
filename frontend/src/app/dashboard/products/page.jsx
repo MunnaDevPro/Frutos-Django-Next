@@ -57,13 +57,14 @@ function ProductView({ item }) {
   const InfoBlock = ({ label, value }) => (
     <div className="flex flex-col">
       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{label}</span>
-      <span className="text-sm font-semibold text-slate-800">{value ?? "—"}</span>
+      <span className="text-sm font-semibold text-slate-800">{value || "N/A"}</span>
     </div>
   );
 
-  const Section = ({ title, children, className = "" }) => (
+  const Section = ({ title, children, className = "", icon }) => (
     <div className={`bg-white rounded-2xl border border-slate-100 p-5 shadow-sm ${className}`}>
       <h4 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4 flex items-center gap-2">
+        {icon && <span className="text-indigo-500">{icon}</span>}
         {title}
       </h4>
       {children}
@@ -111,39 +112,57 @@ function ProductView({ item }) {
                 <span className="px-2 py-1 bg-white border border-slate-200 rounded-md shadow-sm text-amber-600 font-semibold">
                   ★ {item.rating ? `${Number(item.rating).toFixed(1)} (${item.review_count})` : "New"}
                 </span>
+                <span className="px-2 py-1 bg-white border border-slate-200 rounded-md shadow-sm text-slate-600 font-semibold">
+                  Stock: {item.stock || 0}
+                </span>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-3xl font-black text-indigo-600 tracking-tight">€{Number(item.price).toLocaleString()}</div>
-              {item.discount_price && (
-                <div className="text-sm font-bold text-slate-400 line-through mt-1">€{Number(item.discount_price).toLocaleString()}</div>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-5 border-t border-slate-100/80">
-            <InfoBlock label="Stock" value={item.stock} />
-            <InfoBlock label="Wholesale Price" value={item.wholesale_price ? `€${Number(item.wholesale_price).toLocaleString()}` : "—"} />
-            <InfoBlock label="Min Purchase" value={item.minimum_purchase || "—"} />
-            <InfoBlock label="Commission" value={item.affiliate_commission_rate ? `${item.affiliate_commission_rate}%` : "—"} />
           </div>
         </div>
       </div>
 
       {/* Two Column Layout for Details */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        {/* Retail Pricing Section */}
+        <Section title="Retail Information" className="bg-blue-50/30 border-blue-100">
+          <div className="grid grid-cols-2 gap-y-6 gap-x-4">
+            <InfoBlock label="Regular Price" value={`€${Number(item.price).toLocaleString()}`} />
+            <InfoBlock label="Sale Price" value={item.discount_price ? `€${Number(item.discount_price).toLocaleString()}` : "N/A"} />
+            <InfoBlock label="Display Unit" value={item.unit} />
+            <InfoBlock label="Tax Rate" value={item.tax_rate ? `${item.tax_rate}%` : "0%"} />
+          </div>
+        </Section>
 
-        {/* Main Info Column */}
+        {/* Wholesale Pricing Section */}
+        <Section title="Wholesale Information" className="bg-amber-50/30 border-amber-100">
+          <div className="grid grid-cols-2 gap-y-6 gap-x-4">
+            <InfoBlock label="Wholesale Price" value={item.wholesale_price ? `€${Number(item.wholesale_price).toLocaleString()}` : "N/A"} />
+            <InfoBlock label="Minimum Purchase" value={item.minimum_purchase || "N/A"} />
+            <InfoBlock label="Wholesale Unit" value={item.wholesale_unit} />
+            <InfoBlock label="Commission Rate" value={item.affiliate_commission_rate ? `${item.affiliate_commission_rate}%` : "N/A"} />
+          </div>
+        </Section>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
-          <Section title="Product Details">
+          <Section title="General Details">
             <div className="grid grid-cols-2 gap-y-6 gap-x-4">
               <InfoBlock label="Product Slug" value={item.slug} />
               <InfoBlock label="Origin Country" value={item.origin} />
-              <InfoBlock label="Display Unit" value={item.unit} />
-              <InfoBlock label="Wholesale Unit" value={item.wholesale_unit} />
-              <InfoBlock label="Stores" value={Array.isArray(item.stores) && item.stores.length > 0 ? item.stores.map(s => s.name).join(", ") : "—"} />
+              <InfoBlock label="Brand" value={item.brand?.name} />
+              <InfoBlock label="Sub Category" value={item.sub_category?.name} />
+              <InfoBlock label="Shop / Vendor" value={item.shop?.name} />
+              <InfoBlock label="Physical Stores" value={Array.isArray(item.stores) && item.stores.length > 0 ? item.stores.map(s => s.name).join(", ") : "None"} />
             </div>
           </Section>
+
+          {item.description && item.description.trim() !== "" && (
+             <Section title="Description">
+               <div className="prose prose-sm max-w-none text-slate-600" dangerouslySetInnerHTML={{ __html: item.description }} />
+             </Section>
+          )}
 
           {item.nutritional_info && (
             <Section title="Nutritional Information">
@@ -159,7 +178,7 @@ function ProductView({ item }) {
             <Section title="Specifications">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {item.specifications.map((s, i) => (
-                  <div key={i} className="flex flex-col bg-slate-50 p-3 rounded-lg border border-slate-100 hover:border-indigo-100 hover:bg-indigo-50/30 transition-colors">
+                  <div key={i} className="flex flex-col bg-slate-50 p-3 rounded-lg border border-slate-100">
                     <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{s.name}</span>
                     <span className="text-sm text-slate-800 font-semibold mt-0.5">{s.value}</span>
                   </div>
@@ -174,7 +193,6 @@ function ProductView({ item }) {
                 {item.additional_images.map((img, i) => (
                   <div key={i} className="relative group rounded-xl overflow-hidden border border-slate-200 shadow-sm">
                     <img src={img.image} alt="" className="w-24 h-24 object-cover transition-transform duration-300 group-hover:scale-110" />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                   </div>
                 ))}
               </div>
@@ -182,7 +200,6 @@ function ProductView({ item }) {
           )}
         </div>
 
-        {/* Side Info Column */}
         <div className="space-y-6">
           <Section title="Variants & Options">
             {(item.colors?.length > 0 || item.sizes?.length > 0) ? (
@@ -218,25 +235,20 @@ function ProductView({ item }) {
             )}
           </Section>
 
-          <Section title="Logistics">
+          <Section title="Logistics & Shipping">
             <div className="space-y-5">
               <InfoBlock label="Shipping Category" value={item.shipping_category?.name} />
-
-              {(item.weight || item.length || item.width || item.height) ? (
-                <>
-                  <InfoBlock label="Weight" value={item.weight ? `${item.weight} kg` : "—"} />
-                  <InfoBlock label="Dimensions (L×W×H)" value={[item.length, item.width, item.height].filter(Boolean).join(" × ") || "—"} />
-                </>
-              ) : (
-                <p className="text-xs text-slate-400 italic">No physical dimensions provided.</p>
-              )}
+              <InfoBlock label="Weight" value={item.weight ? `${item.weight} kg` : "N/A"} />
+              <InfoBlock label="Dimensions (L×W×H)" value={[item.length, item.width, item.height].filter(Boolean).length === 3 ? `${item.length} × ${item.width} × ${item.height} cm` : "N/A"} />
             </div>
           </Section>
 
           <Section title="System Information">
             <div className="space-y-4">
-              <InfoBlock label="Created On" value={item.created_at ? new Date(item.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : "—"} />
-              <InfoBlock label="Last Updated" value={item.updated_at ? new Date(item.updated_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : "—"} />
+              <InfoBlock label="Created On" value={item.created_at ? new Date(item.created_at).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : "N/A"} />
+              <InfoBlock label="Created By" value={item.created_by_name ? `${item.created_by_name} ${item.created_by_role ? `(${item.created_by_role})` : ''}` : "System"} />
+              <InfoBlock label="Last Updated" value={item.updated_at ? new Date(item.updated_at).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : "N/A"} />
+              <InfoBlock label="Updated By" value={item.updated_by_name ? `${item.updated_by_name} ${item.updated_by_role ? `(${item.updated_by_role})` : ''}` : "System"} />
             </div>
           </Section>
         </div>
@@ -299,6 +311,7 @@ export default function ProductsPage() {
         totalItems={totalCount} currentPage={params.page || 1} pageSize={PAGE_SIZE}
         onSearch={setSearch} onPageChange={p => setPage(p)}
         loading={loading} searchable
+        onRowClick={(row) => setViewItem(row)}
         extraFilters={
           <div className="flex gap-2 items-center">
             <CategoryFilter 
@@ -329,15 +342,15 @@ export default function ProductsPage() {
         }
         actions={(row) => (
           <div className="flex items-center justify-end gap-1">
-            <button style={{ cursor: 'pointer' }} onClick={() => setViewItem(row)}
+            <button style={{ cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); setViewItem(row); }}
               className="db-icon-btn">
               <Eye className="w-3.5 h-3.5" />
             </button>
-            <button style={{ cursor: 'pointer' }} onClick={() => setEditItem(row)}
+            <button style={{ cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); setEditItem(row); }}
               className="db-icon-btn">
               <Pencil className="w-3.5 h-3.5" />
             </button>
-            <button style={{ cursor: 'pointer' }} onClick={() => setDeleteItem(row)}
+            <button style={{ cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); setDeleteItem(row); }}
               className="db-icon-btn danger">
               <Trash2 className="w-3.5 h-3.5" />
             </button>

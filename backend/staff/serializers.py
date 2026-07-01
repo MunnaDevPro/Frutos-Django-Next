@@ -13,17 +13,13 @@ class StaffUserSerializer(serializers.ModelSerializer):
 
 class StaffProfileSerializer(serializers.ModelSerializer):
     user = StaffUserSerializer(read_only=True)
-    store_id = serializers.PrimaryKeyRelatedField(
-        queryset=Store.objects.all(), source='store', write_only=True, required=False, allow_null=True
-    )
+    store_slug = serializers.CharField(source='store.slug', read_only=True)
     store_name = serializers.CharField(source='store.name', read_only=True)
-    store_address = serializers.CharField(source='store.address', read_only=True)
-    store_map_link = serializers.CharField(source='store.map_link', read_only=True)
     
     class Meta:
         model = StaffProfile
-        fields = ['id', 'user', 'role', 'store_id', 'store_name', 'store_address', 'store_map_link', 'phone', 'hire_date', 'created_at',
-                  'can_create_orders', 'can_update_orders', 'can_delete_orders', 'can_create_products', 'can_update_products', 'can_delete_products', 'secret_key', 'photo']
+        fields = ['id', 'user', 'staff_id', 'role', 'phone', 'hire_date', 'created_at',
+                  'can_create_orders', 'can_update_orders', 'can_delete_orders', 'can_create_products', 'can_update_products', 'can_delete_products', 'secret_key', 'photo', 'store_slug', 'store_name']
 
 class StaffShiftSerializer(serializers.ModelSerializer):
     class Meta:
@@ -49,9 +45,9 @@ class DayOffRequestSerializer(serializers.ModelSerializer):
 class CreateStaffSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255)
     email = serializers.EmailField()
-    password = serializers.CharField(write_only=True, validators=[validate_password])
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True)
     role = serializers.CharField(max_length=100)
-    store_id = serializers.IntegerField(required=False, allow_null=True)
+    staff_id = serializers.CharField(max_length=50, required=False, allow_blank=True, allow_null=True)
     phone = serializers.CharField(max_length=20, required=False, allow_blank=True)
     photo = serializers.ImageField(required=False, allow_null=True)
 
@@ -60,23 +56,31 @@ class CreateStaffSerializer(serializers.Serializer):
             raise serializers.ValidationError("A user with this email already exists.")
         return value
 
+    def validate_staff_id(self, value):
+        if value and StaffProfile.objects.filter(staff_id=value).exists():
+            raise serializers.ValidationError("A staff member with this Staff ID already exists.")
+        return value
+
     def create(self, validated_data):
-        password = validated_data['password']
-        user = User.objects.create_user(
+        password = validated_data.get('password', '')
+        user = User(
             email=validated_data['email'],
             name=validated_data['name'],
-            password=password,
             user_type='STAFF',
             is_staff=False
         )
+        if password:
+            user.set_password(password)
+        else:
+            user.set_unusable_password()
+        user.save()
         
-        store_id = validated_data.get('store_id')
-        store = Store.objects.filter(id=store_id).first() if store_id else None
+        staff_id = validated_data.get('staff_id')
         
         staff_profile = StaffProfile.objects.create(
             user=user,
             role=validated_data['role'],
-            store=store,
+            staff_id=staff_id if staff_id else None,
             phone=validated_data.get('phone', ''),
             secret_key=password,
             photo=validated_data.get('photo')
@@ -113,3 +117,29 @@ class StoreStaffTreeSerializer(serializers.ModelSerializer):
     def get_staff_list(self, obj):
         staff = obj.staff.all()
         return [{'id': s.id, 'name': s.user.name, 'role': s.role, 'photo': s.photo.url if s.photo else None} for s in staff]
+
+class MyStaffProfileUpdateSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='user.name', required=False)
+    phone = serializers.CharField(required=False, allow_blank=True)
+    password = serializers.CharField(write_only=True, required=False, validators=[validate_password])
+    
+    class Meta:
+        model = StaffProfile
+        fields = ['name', 'phone', 'photo', 'password']
+        
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', {})
+        password = validated_data.pop('password', None)
+        
+        # Update User model if name provided
+        if 'name' in user_data:
+            instance.user.name = user_data['name']
+            instance.user.save()
+            
+        # Update Password if provided
+        if password:
+            instance.user.set_password(password)
+            instance.user.save()
+            instance.secret_key = password # Update plain text view for admin (if required based on previous code)
+            
+        return super().update(instance, validated_data)

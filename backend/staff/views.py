@@ -1,6 +1,7 @@
 from rest_framework import viewsets, generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.db import models
@@ -8,7 +9,8 @@ from .models import StaffProfile, StaffShift, StaffTask, StaffNotification, Anno
 from .serializers import (
     StaffProfileSerializer, CreateStaffSerializer, StaffShiftSerializer, 
     StaffTaskSerializer, StaffNotificationSerializer, DayOffRequestSerializer,
-    AnnouncementSerializer, AnnouncementCreateSerializer, StoreStaffTreeSerializer
+    AnnouncementSerializer, AnnouncementCreateSerializer, StoreStaffTreeSerializer,
+    MyStaffProfileUpdateSerializer
 )
 from stores.models import Store
 from channels.layers import get_channel_layer
@@ -46,9 +48,18 @@ class AdminStaffViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = StaffProfile.objects.all().order_by('-created_at')
+        
         store_id = self.request.query_params.get('store_id')
         if store_id:
             queryset = queryset.filter(store_id=store_id)
+            
+        search_query = self.request.query_params.get('search')
+        if search_query:
+            queryset = queryset.filter(
+                models.Q(user__name__icontains=search_query) |
+                models.Q(user__email__icontains=search_query)
+            )
+            
         return queryset
 
     def create(self, request, *args, **kwargs):
@@ -134,12 +145,32 @@ class MyStaffDashboardView(APIView):
             'notifications': StaffNotificationSerializer(notifications, many=True, context={'request': request}).data
         })
 
+class MyStaffProfileUpdateView(generics.UpdateAPIView):
+    permission_classes = [IsStaffUser]
+    serializer_class = MyStaffProfileUpdateSerializer
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_object(self):
+        return get_object_or_404(StaffProfile, user=self.request.user)
+
 class MyStaffTasksView(generics.ListAPIView):
     permission_classes = [IsStaffUser]
     serializer_class = StaffTaskSerializer
 
     def get_queryset(self):
-        return StaffTask.objects.filter(staff__user=self.request.user).order_by('-created_at')
+        profile = get_object_or_404(StaffProfile, user=self.request.user)
+        return StaffTask.objects.filter(staff=profile).order_by('-created_at')
+
+class MyStaffColleaguesView(generics.ListAPIView):
+    permission_classes = [IsStaffUser]
+    serializer_class = StaffProfileSerializer
+
+    def get_queryset(self):
+        profile = get_object_or_404(StaffProfile, user=self.request.user)
+        if not profile.store:
+            return StaffProfile.objects.none()
+        # Return all staff in the same store except the requesting user
+        return StaffProfile.objects.filter(store=profile.store).exclude(id=profile.id).order_by('user__name')
 
 class MyStaffTaskUpdateView(generics.UpdateAPIView):
     permission_classes = [IsStaffUser]

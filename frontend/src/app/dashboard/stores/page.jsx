@@ -20,7 +20,7 @@ const FEATURE_OPTIONS = [
 ]
 
 const EMPTY_STORE = {
-  name: '', short_name: '', address: '', city: '', full_address: '',
+  name: '', short_name: '', store_code: '', address: '', city: '', full_address: '',
   phone: '', open_time: '08:00', close_time: '21:00',
   map_link: '', provenance: '', is_active: true, order: 0,
   features: [], availability: [], leftover_packs: [],
@@ -368,6 +368,7 @@ function StoreFormModal({ store, onClose, onSave }) {
     features: store?.features || [],
     availability: store?.availability || [],
     leftover_packs: store?.leftover_packs || [],
+    store_code: store?.storeCode || store?.store_code || '',
     open_time: store?.openTime || store?.open_time || '08:00',
     close_time: store?.closeTime || store?.close_time || '21:00',
     map_link: store?.mapLink || store?.map_link || '',
@@ -390,7 +391,7 @@ function StoreFormModal({ store, onClose, onSave }) {
     setError('')
     try {
       const fd = new FormData()
-      const fields = ['name', 'short_name', 'address', 'city', 'full_address',
+      const fields = ['name', 'short_name', 'store_code', 'address', 'city', 'full_address',
         'phone', 'open_time', 'close_time', 'map_link', 'provenance', 'order']
       fields.forEach(k => fd.append(k, form[k] ?? ''))
       fd.append('is_active', form.is_active ? 'true' : 'false')
@@ -471,9 +472,10 @@ function StoreFormModal({ store, onClose, onSave }) {
             {section === 'basic' && (
               <>
                 <ImageUpload label="Store Banner Image" value={image} preview={store?.image} onChange={setImage} />
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px' }}>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'14px' }}>
                   <Input label="Store Name" value={form.name} onChange={e => set('name', e.target.value)} placeholder="El-Arbol Grafton Street" required />
                   <Input label="Short Name" value={form.short_name} onChange={e => set('short_name', e.target.value)} placeholder="Grafton St" required />
+                  <Input label="Store ID" value={form.store_code} onChange={e => set('store_code', e.target.value)} placeholder="STR-001" required />
                 </div>
                 <Input label="Address" value={form.address} onChange={e => set('address', e.target.value)} placeholder="15 Grafton Street" required />
                 <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px' }}>
@@ -606,15 +608,133 @@ function DeleteConfirm({ store, onClose, onConfirm, loading }) {
   )
 }
 
+// ─── View Store Modal ─────────────────────────────────────────────────────────
+
+function ViewStoreModal({ store, onClose }) {
+  return (
+    <div style={{ position:'fixed', inset:0, zIndex:50, display:'flex', alignItems:'center', justifyContent:'center', padding:'16px', background:'rgba(15,23,42,0.3)', backdropFilter:'blur(4px)' }}>
+      <div style={{ background:'#ffffff', border:'1px solid #f1f5f9', borderRadius:'20px', width:'100%', maxWidth:'640px', maxHeight:'90vh', display:'flex', flexDirection:'column', boxShadow:'0 20px 60px rgba(0,0,0,0.15)', animation:'db-modal-in 0.2s ease' }}>
+        
+        {/* Header */}
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'24px', borderBottom:'1px solid #f1f5f9', flexShrink:0 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:'16px' }}>
+            {store.image ? (
+              <img src={store.image} alt={store.name} style={{ width:'48px', height:'48px', borderRadius:'12px', objectFit:'cover', border:'1px solid #f1f5f9' }} />
+            ) : (
+              <div style={{ width:'48px', height:'48px', borderRadius:'12px', background:'#f0fdf4', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <Store size={20} style={{ color:'#16a34a' }} />
+              </div>
+            )}
+            <div>
+              <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+                <h2 style={{ fontSize:'18px', fontWeight:'800', color:'#1e293b', margin:0 }}>{store.name}</h2>
+                {(store.storeCode || store.store_code) && (
+                  <span style={{ padding:'2px 8px', background:'#f1f5f9', border:'1px solid #e2e8f0', borderRadius:'6px', fontSize:'11px', color:'#64748b', fontWeight:'700' }}>
+                    ID: {store.storeCode || store.store_code}
+                  </span>
+                )}
+                <Badge active={store.is_active} />
+              </div>
+              <p style={{ fontSize:'13px', color:'#64748b', margin:'4px 0 0 0' }}>{store.fullAddress || store.full_address || store.address}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="db-modal-close"><X size={16} /></button>
+        </div>
+
+        {/* Body */}
+        <div style={{ flex:1, overflowY:'auto', padding:'24px', display:'flex', flexDirection:'column', gap:'24px' }}>
+          
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'20px' }}>
+            {/* Info */}
+            <div style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:'8px', color:'#475569', fontSize:'13px' }}>
+                <Phone size={15} style={{ color:'#94a3b8' }} />
+                <span style={{ fontWeight:'600' }}>{store.phone || 'No phone'}</span>
+              </div>
+              <div style={{ display:'flex', alignItems:'center', gap:'8px', color:'#475569', fontSize:'13px' }}>
+                <Clock size={15} style={{ color:'#94a3b8' }} />
+                <span style={{ fontWeight:'600' }}>{store.openTime || store.open_time} - {store.closeTime || store.close_time}</span>
+              </div>
+              {store.map_link && (
+                <div style={{ display:'flex', alignItems:'center', gap:'8px', color:'#475569', fontSize:'13px' }}>
+                  <MapPin size={15} style={{ color:'#94a3b8' }} />
+                  <a href={store.map_link} target="_blank" rel="noreferrer" style={{ fontWeight:'600', color:'#0ea5e9', textDecoration:'none' }}>View on Maps</a>
+                </div>
+              )}
+            </div>
+
+            {/* Features */}
+            <div>
+              <p style={{ fontSize:'12px', fontWeight:'700', color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:'8px', marginTop:0 }}>Features</p>
+              <div style={{ display:'flex', flexWrap:'wrap', gap:'6px' }}>
+                {(store.features || []).map(f => (
+                  <span key={f} style={{ padding:'4px 10px', background:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:'8px', fontSize:'12px', color:'#475569', fontWeight:'600', textTransform:'capitalize' }}>
+                    {f}
+                  </span>
+                ))}
+                {(!store.features || store.features.length === 0) && <span style={{ fontSize:'12px', color:'#94a3b8' }}>None</span>}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ height:'1px', background:'#f1f5f9' }} />
+
+          {/* Availability */}
+          <div>
+            <p style={{ fontSize:'12px', fontWeight:'700', color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:'12px', marginTop:0 }}>Today's Availability</p>
+            {(store.availability && store.availability.length > 0) ? (
+              <div style={{ display:'flex', flexWrap:'wrap', gap:'10px' }}>
+                {store.availability.map((item, i) => (
+                  <div key={i} style={{ display:'flex', alignItems:'center', gap:'8px', padding:'6px 12px', background:'#f0fdf4', border:'1px solid #dcfce7', borderRadius:'10px', color:'#166534', fontSize:'13px', fontWeight:'600' }}>
+                    <DynamicIcon name={item.icon} size={14} />
+                    {item.category}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ fontSize:'13px', color:'#94a3b8', margin:0, fontStyle:'italic' }}>No availability data provided.</p>
+            )}
+          </div>
+
+          {/* Leftover Packs */}
+          <div>
+            <p style={{ fontSize:'12px', fontWeight:'700', color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:'12px', marginTop:0 }}>Leftover Packs</p>
+            {(store.leftover_packs && store.leftover_packs.length > 0) ? (
+              <div style={{ display:'grid', gap:'10px' }}>
+                {store.leftover_packs.map((pack, i) => (
+                  <div key={i} style={{ display:'flex', alignItems:'center', gap:'12px', padding:'12px', background:'#f8fafc', border:'1px solid #f1f5f9', borderRadius:'12px' }}>
+                    {pack.image && (
+                      <img src={pack.image} style={{ width:'48px', height:'48px', borderRadius:'10px', objectFit:'cover', flexShrink:0 }} alt={pack.name} />
+                    )}
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <p style={{ fontSize:'14px', fontWeight:'700', color:'#1e293b', margin:0, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{pack.name}</p>
+                      <p style={{ fontSize:'12px', color:'#94a3b8', margin:'2px 0 0 0', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{pack.description}</p>
+                    </div>
+                    <span style={{ fontSize:'14px', fontWeight:'800', color:'#16a34a' }}>€{pack.price}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ fontSize:'13px', color:'#94a3b8', margin:0, fontStyle:'italic' }}>No leftover packs available.</p>
+            )}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Store Row ────────────────────────────────────────────────────────────────
 
-function StoreRow({ store, onEdit, onDelete, onToggle }) {
+function StoreRow({ store, onEdit, onDelete, onToggle, onView }) {
   const [hovered, setHovered] = useState(false)
   return (
     <tr
+      onClick={() => onView(store)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{ borderBottom:'1px solid #f8fafc', background: hovered ? '#f8fafc' : '#ffffff', transition:'background 0.1s' }}>
+      style={{ borderBottom:'1px solid #f8fafc', background: hovered ? '#f8fafc' : '#ffffff', transition:'background 0.1s', cursor: 'pointer' }}>
       <td style={{ padding:'14px 16px' }}>
         <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
           {store.image ? (
@@ -625,7 +745,14 @@ function StoreRow({ store, onEdit, onDelete, onToggle }) {
             </div>
           )}
           <div>
-            <p style={{ fontSize:'13px', fontWeight:'700', color:'#1e293b', margin:0 }}>{store.name}</p>
+            <div style={{ display:'flex', alignItems:'center', gap:'6px' }}>
+              <p style={{ fontSize:'13px', fontWeight:'700', color:'#1e293b', margin:0 }}>{store.name}</p>
+              {(store.storeCode || store.store_code) && (
+                <span style={{ padding:'2px 6px', background:'#f1f5f9', borderRadius:'4px', fontSize:'10px', color:'#64748b', fontWeight:'700', border:'1px solid #e2e8f0' }}>
+                  {store.storeCode || store.store_code}
+                </span>
+              )}
+            </div>
             <p style={{ fontSize:'11px', color:'#94a3b8', margin:'2px 0 0 0' }}>{store.shortName || store.short_name}</p>
           </div>
         </div>
@@ -661,13 +788,13 @@ function StoreRow({ store, onEdit, onDelete, onToggle }) {
       </td>
       <td style={{ padding:'14px 16px' }}>
         <div style={{ display:'flex', alignItems:'center', gap:'4px', opacity: hovered ? 1 : 0, transition:'opacity 0.15s' }}>
-          <button onClick={() => onToggle(store)} className="db-icon-btn" title={store.is_active ? 'Deactivate' : 'Activate'}>
+          <button onClick={(e) => { e.stopPropagation(); onToggle(store); }} className="db-icon-btn" title={store.is_active ? 'Deactivate' : 'Activate'}>
             {store.is_active ? <EyeOff size={13} /> : <Eye size={13} />}
           </button>
-          <button onClick={() => onEdit(store)} className="db-icon-btn" title="Edit">
+          <button onClick={(e) => { e.stopPropagation(); onEdit(store); }} className="db-icon-btn" title="Edit">
             <Edit2 size={13} />
           </button>
-          <button onClick={() => onDelete(store)} className="db-icon-btn danger" title="Delete">
+          <button onClick={(e) => { e.stopPropagation(); onDelete(store); }} className="db-icon-btn danger" title="Delete">
             <Trash2 size={13} />
           </button>
         </div>
@@ -685,6 +812,7 @@ export default function StoresPage() {
   const [search, setSearch] = useState('')
   const [filterActive, setFilterActive] = useState('all')
   const [editStore, setEditStore] = useState(null)
+  const [viewStore, setViewStore] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [deleteStore, setDeleteStore] = useState(null)
   const [deleting, setDeleting] = useState(false)
@@ -708,7 +836,8 @@ export default function StoresPage() {
   const filtered = stores.filter(s => {
     const matchSearch = !search ||
       s.name?.toLowerCase().includes(search.toLowerCase()) ||
-      s.city?.toLowerCase().includes(search.toLowerCase())
+      s.city?.toLowerCase().includes(search.toLowerCase()) ||
+      (s.storeCode || s.store_code)?.toLowerCase().includes(search.toLowerCase())
     const matchStatus = filterActive === 'all' ||
       (filterActive === 'active' && s.is_active) ||
       (filterActive === 'inactive' && !s.is_active)
@@ -854,7 +983,7 @@ export default function StoresPage() {
             </thead>
             <tbody>
               {filtered.map(store => (
-                <StoreRow key={store.id} store={store} onEdit={handleEdit} onDelete={setDeleteStore} onToggle={handleToggle} />
+                <StoreRow key={store.id} store={store} onEdit={handleEdit} onDelete={setDeleteStore} onToggle={handleToggle} onView={setViewStore} />
               ))}
             </tbody>
           </table>
@@ -862,6 +991,9 @@ export default function StoresPage() {
       </div>
 
       {/* Modals */}
+      {viewStore && (
+        <ViewStoreModal store={viewStore} onClose={() => setViewStore(null)} />
+      )}
       {showForm && (
         <StoreFormModal store={editStore} onClose={handleClose} onSave={handleSaved} />
       )}

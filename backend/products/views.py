@@ -179,7 +179,7 @@ class ProductViewSet(viewsets.ModelViewSet):
             if 'shop' not in serializer.validated_data:
                 from rest_framework.exceptions import ValidationError
                 raise ValidationError({"shop": "Please select a shop for this product."})
-            serializer.save()
+            serializer.save(created_by=user, updated_by=user)
             return
 
         # ── STAFF: check StaffProfile permission ──────────────────────────
@@ -191,12 +191,12 @@ class ProductViewSet(viewsets.ModelViewSet):
             if profile is None or not profile.can_create_products:
                 raise PermissionDenied("You do not have permission to create products.")
             # Staff with permission — they don't own a shop, so just save without shop
-            serializer.save()
+            serializer.save(created_by=user, updated_by=user)
             return
 
         # ── VENDOR / SELLER: must have a shop ─────────────────────────────
         if user.shops.exists():
-            serializer.save(shop=user.shops.first())
+            serializer.save(shop=user.shops.first(), created_by=user, updated_by=user)
         else:
             from rest_framework.exceptions import ValidationError
             raise ValidationError("You do not have a shop to add products to.")
@@ -206,6 +206,13 @@ class ProductViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         product = serializer.instance
+        
+        # Auto-assign product to staff's store
+        if getattr(request.user, 'user_type', '') == 'STAFF':
+            profile = getattr(request.user, 'staff_profile', None)
+            if profile and profile.store:
+                product.stores.add(profile.store)
+                
         # Handle specification JSON (sent as JSON string in FormData)
         specs_json = request.data.get('specifications_json')
         if specs_json:
@@ -267,7 +274,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        serializer.save(updated_by=user)
 
         product = serializer.instance
 

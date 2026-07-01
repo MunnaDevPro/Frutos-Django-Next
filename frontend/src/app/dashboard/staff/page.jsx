@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Plus, Eye, Trash2, Edit, Store as StoreIcon, Shield } from "lucide-react";
+import { Plus, Eye, Trash2, Edit, Store as StoreIcon, Shield, User, UserPlus, Mail, Lock, Briefcase, Phone, Image as ImageIcon, Calendar } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Container from "@/app/dashboard/_components/Container";
@@ -46,6 +46,7 @@ export default function StaffPage() {
   
   const [createOpen, setCreateOpen] = useState(false);
   const [deleteItem, setDeleteItem] = useState(null);
+  const [viewStaff, setViewStaff] = useState(null);
   const [editItem, setEditItem] = useState(null);
   const [permissionsItem, setPermissionsItem] = useState(null);
 
@@ -230,35 +231,291 @@ export default function StaffPage() {
         pageSize={PAGE_SIZE}
         onPageChange={setPage}
         loading={isLoading}
+        searchable
+        searchKeys={["name", "email", "phone", "staff_id"]}
+        onSearch={(q) => { setSearch(q); setPage(1); }}
+        onRowClick={(row) => router.push(`/dashboard/staff/${row.id}`)}
         actions={(row) => (
           <div className="flex items-center justify-end gap-1">
-            <button onClick={() => router.push(`/dashboard/staff/${row.id}`)} className="db-icon-btn" title="View Shifts & Tasks">
+            <button onClick={(e) => { e.stopPropagation(); setViewStaff(row); }} className="db-icon-btn" title="View Profile">
               <Eye size={14} />
             </button>
-            <button onClick={() => setPermissionsItem(row)} className="db-icon-btn" style={{ color: '#2563eb', background: '#eff6ff' }} title="Permissions">
+            <button onClick={(e) => { e.stopPropagation(); setPermissionsItem(row); }} className="db-icon-btn" style={{ color: '#2563eb', background: '#eff6ff' }} title="Permissions">
               <Shield size={14} />
             </button>
-            <button onClick={() => setEditItem(row)} className="db-icon-btn" title="Edit Staff Details">
+            <button onClick={(e) => { e.stopPropagation(); setEditItem(row); }} className="db-icon-btn" title="Edit Staff Details">
               <Edit size={14} />
             </button>
-            <button onClick={() => setDeleteItem(row)} className="db-icon-btn danger" title="Delete">
+            <button onClick={(e) => { e.stopPropagation(); setDeleteItem(row); }} className="db-icon-btn danger" title="Delete">
               <Trash2 size={14} />
             </button>
           </div>
         )}
       />
 
-      <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Add New Staff">
-        <FormModal fields={createFields} onSubmit={handleCreate} submitLabel="Create Staff" />
+      
+      <Modal open={createOpen} onClose={() => setCreateOpen(false)} title={
+        <div className="flex items-center gap-2.5 text-emerald-700">
+          <UserPlus size={18} className="text-emerald-500" />
+          <span>Add New Staff</span>
+        </div>
+      } maxWidth="max-w-2xl">
+        <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.target); handleCreate(Object.fromEntries(fd)); }} className="flex flex-col">
+          <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-7 bg-slate-50/50">
+            {/* Full Name */}
+            <div className="space-y-2.5">
+              <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Full Name *</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <User className="h-4 w-4 text-slate-400" />
+                </div>
+                <input required name="name" className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all" placeholder="John Doe" />
+              </div>
+            </div>
+
+            {/* Email */}
+            <div className="space-y-2.5">
+              <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Email Address *</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-4 w-4 text-slate-400" />
+                </div>
+                <input required name="email" type="email" className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all" placeholder="staff@example.com" />
+              </div>
+            </div>
+
+            {/* Role */}
+            <div className="space-y-2.5">
+              <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Role *</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Briefcase className="h-4 w-4 text-slate-400" />
+                </div>
+                <input required name="role" className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all" placeholder="e.g. Sales Associate" />
+              </div>
+            </div>
+
+            {/* Staff ID */}
+            <div className="space-y-2.5">
+              <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Staff ID</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Shield className="h-4 w-4 text-slate-400" />
+                </div>
+                <input name="staff_id" className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all" placeholder="Auto-generated if left blank" />
+              </div>
+            </div>
+
+            {/* Phone */}
+            <div className="space-y-2.5">
+              <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Phone Number</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Phone className="h-4 w-4 text-slate-400" />
+                </div>
+                <input name="phone" className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all" placeholder="Optional" />
+              </div>
+            </div>
+
+            {/* Profile Photo */}
+            <div className="space-y-2.5">
+              <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Profile Photo</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <ImageIcon className="h-4 w-4 text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                </div>
+                <input type="file" name="photo" accept="image/*" className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer file:cursor-pointer text-slate-500" />
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-5 bg-slate-100/50 border-t border-slate-100 flex justify-end gap-3 rounded-b-2xl">
+            <button type="button" onClick={() => setCreateOpen(false)} className="px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer">Cancel</button>
+            <button type="submit" className="px-4 py-2 text-sm font-bold bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors flex items-center gap-2 cursor-pointer">
+              <Plus size={16} /> Create Staff Member
+            </button>
+          </div>
+        </form>
       </Modal>
 
-      <Modal open={!!editItem} onClose={() => setEditItem(null)} title="Update Staff">
-        <FormModal 
-          fields={updateFields} 
-          initialValues={getInitialValues(editItem)} 
-          onSubmit={handleUpdate} 
-          submitLabel="Update Staff" 
-        />
+      <Modal open={!!editItem} onClose={() => setEditItem(null)} title={
+        <div className="flex items-center gap-2.5 text-emerald-700">
+          <User size={18} className="text-emerald-500" />
+          <span>Update Staff</span>
+        </div>
+      } maxWidth="max-w-2xl">
+        {editItem && (
+          <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.target); handleUpdate(Object.fromEntries(fd)); }} className="flex flex-col">
+            <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-7 bg-slate-50/50">
+              {/* Full Name */}
+              <div className="space-y-2.5">
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Full Name *</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="h-4 w-4 text-slate-400" />
+                  </div>
+                  <input required name="name" defaultValue={editItem.user?.name} className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all" placeholder="John Doe" />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="space-y-2.5">
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Email Address *</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-4 w-4 text-slate-400" />
+                  </div>
+                  <input required name="email" type="email" defaultValue={editItem.user?.email} className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all" placeholder="staff@example.com" />
+                </div>
+              </div>
+
+              {/* Role */}
+              <div className="space-y-2.5">
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Role *</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Briefcase className="h-4 w-4 text-slate-400" />
+                  </div>
+                  <input required name="role" defaultValue={editItem.role} className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all" placeholder="e.g. Sales Associate" />
+                </div>
+              </div>
+
+              {/* Staff ID */}
+              <div className="space-y-2.5">
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Staff ID</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                    <Shield className="h-4 w-4 text-slate-400" />
+                  </div>
+                  <input name="staff_id" defaultValue={editItem.staff_id || ""} className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all" placeholder="Enter Staff ID" />
+                </div>
+              </div>
+
+              {/* Phone */}
+              <div className="space-y-2.5">
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Phone Number</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Phone className="h-4 w-4 text-slate-400" />
+                  </div>
+                  <input name="phone" defaultValue={editItem.phone} className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all" placeholder="Optional" />
+                </div>
+              </div>
+
+              {/* Profile Photo */}
+              <div className="space-y-2.5">
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Profile Photo</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <ImageIcon className="h-4 w-4 text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                  </div>
+                  <input type="file" name="photo" accept="image/*" className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer file:cursor-pointer text-slate-500" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-5 bg-slate-100/50 border-t border-slate-100 flex justify-end gap-3 rounded-b-2xl">
+              <button type="button" onClick={() => setEditItem(null)} className="px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer">Cancel</button>
+              <button type="submit" className="px-4 py-2 text-sm font-bold bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors flex items-center gap-2 cursor-pointer">
+                <Edit size={16} /> Update Staff
+              </button>
+            </div>
+          </form>
+        )}
+      </Modal>
+
+      <Modal open={!!viewStaff} onClose={() => setViewStaff(null)} title={
+        <div className="flex items-center gap-2.5 text-[#00694C]">
+          <User size={20} className="text-[#00694C]" />
+          <span className="font-bold text-lg">Staff Profile</span>
+        </div>
+      } maxWidth="max-w-2xl">
+        {viewStaff && (
+          <div className="flex flex-col">
+            {/* Header / Profile Info */}
+            <div className="flex items-center gap-5 p-2 pt-4">
+              <div className="w-16 h-16 rounded-full overflow-hidden border border-slate-200 shrink-0 bg-slate-100">
+                {viewStaff.photo ? (
+                  <img src={viewStaff.photo} alt={viewStaff.user?.name || "Staff"} className="w-full h-full object-cover" />
+                ) : (
+                  <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(viewStaff.user?.name || viewStaff.user?.email || 'S')}&background=0f172a&color=fff&size=128&bold=true`} alt="Default" className="w-full h-full object-cover" />
+                )}
+              </div>
+              <div className="flex flex-col">
+                <h2 className="text-xl font-bold text-slate-800">{viewStaff.user?.name}</h2>
+                <div className="flex items-center gap-2 text-slate-500 text-sm mt-0.5">
+                  <Mail size={14} /> {viewStaff.user?.email}
+                </div>
+                <div className="mt-2">
+                  <span className="inline-flex px-2 py-1 text-xs font-bold rounded-md bg-[#00694C]/10 text-[#00694C]">
+                    {viewStaff.role || "Staff"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <hr className="my-6 border-slate-100" />
+
+            {/* Details Grid */}
+            <div className="grid grid-cols-2 gap-y-6 gap-x-4 px-2">
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Staff ID</p>
+                <p className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                  <Shield size={14} className="text-slate-400" />
+                  {viewStaff.staff_id || <span className="text-slate-400 italic font-normal">Not Assigned</span>}
+                </p>
+              </div>
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Phone Number</p>
+                <p className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                  <Phone size={14} className="text-slate-400" />
+                  {viewStaff.phone || <span className="text-slate-400 italic font-normal">Not provided</span>}
+                </p>
+              </div>
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Hire Date</p>
+                <p className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                  <Calendar size={14} className="text-slate-400" />
+                  {viewStaff.hire_date ? new Date(viewStaff.hire_date).toLocaleDateString() : <span className="text-slate-400 italic font-normal">Unknown</span>}
+                </p>
+              </div>
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">System ID</p>
+                <p className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                  <StoreIcon size={14} className="text-slate-400" />
+                  #{viewStaff.id}
+                </p>
+              </div>
+            </div>
+
+            <hr className="my-6 border-slate-100" />
+
+            {/* Permissions */}
+            <div className="px-2">
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Active Permissions</p>
+              <div className="flex flex-wrap gap-2">
+                {viewStaff.can_create_orders && <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded bg-slate-100 text-slate-700"><Shield size={12} className="text-emerald-500" /> Create Orders</span>}
+                {viewStaff.can_update_orders && <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded bg-slate-100 text-slate-700"><Shield size={12} className="text-emerald-500" /> Update Orders</span>}
+                {viewStaff.can_delete_orders && <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded bg-slate-100 text-slate-700"><Shield size={12} className="text-rose-500" /> Delete Orders</span>}
+                {viewStaff.can_create_products && <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded bg-slate-100 text-slate-700"><Shield size={12} className="text-indigo-500" /> Create Products</span>}
+                {viewStaff.can_update_products && <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded bg-slate-100 text-slate-700"><Shield size={12} className="text-indigo-500" /> Update Products</span>}
+                {viewStaff.can_delete_products && <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded bg-slate-100 text-slate-700"><Shield size={12} className="text-rose-500" /> Delete Products</span>}
+                {!(viewStaff.can_create_orders || viewStaff.can_update_orders || viewStaff.can_delete_orders || viewStaff.can_create_products || viewStaff.can_update_products || viewStaff.can_delete_products) && (
+                  <span className="text-sm italic text-slate-400">No special permissions assigned.</span>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-8 flex justify-end gap-3 px-2">
+              <button type="button" onClick={() => setViewStaff(null)} className="px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer shadow-sm">
+                Close
+              </button>
+              <button type="button" onClick={() => { setViewStaff(null); router.push(`/dashboard/staff/${viewStaff.id}`); }} className="px-4 py-2 text-sm font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors flex items-center gap-2 cursor-pointer shadow-sm">
+                <Calendar size={16} /> Manage Shifts & Tasks
+              </button>
+            </div>
+          </div>
+        )}
       </Modal>
 
       <ConfirmDialog

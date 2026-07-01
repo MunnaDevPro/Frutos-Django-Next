@@ -244,6 +244,8 @@ class Product(models.Model):
     sizes = models.ManyToManyField(Size, blank=True, related_name='products')
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_products')
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='updated_products')
 
     class Meta:
         ordering = ['-created_at']  # Order by newest first

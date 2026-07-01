@@ -285,15 +285,30 @@ export default function StaffDetailsPage() {
 
       </div>
 
-      <Modal open={shiftOpen} onClose={() => { setShiftOpen(false); setEditShift(null); }} title={editShift ? "Edit Shift" : "Add Shift"}>
+      <Modal open={shiftOpen} onClose={() => { setShiftOpen(false); setEditShift(null); }} title={
+        <div className="flex items-center gap-2.5 text-emerald-700">
+          <Calendar size={18} className="text-emerald-500" />
+          <span>{editShift ? "Edit Shift" : "Add Shift"}</span>
+        </div>
+      }>
         <FormModal fields={shiftFields} initialValues={editShift || {}} onSubmit={handleSaveShift} submitLabel={editShift ? "Update Shift" : "Save Shift"} />
       </Modal>
 
-      <Modal open={taskOpen} onClose={() => { setTaskOpen(false); setEditTask(null); }} title={editTask ? "Edit Task" : "Add Task"}>
+      <Modal open={taskOpen} onClose={() => { setTaskOpen(false); setEditTask(null); }} title={
+        <div className="flex items-center gap-2.5 text-emerald-700">
+          <ClipboardList size={18} className="text-emerald-500" />
+          <span>{editTask ? "Edit Task" : "Add Task"}</span>
+        </div>
+      }>
         <FormModal fields={taskFields} initialValues={editTask || {}} onSubmit={handleSaveTask} submitLabel={editTask ? "Update Task" : "Save Task"} />
       </Modal>
 
-      <Modal open={offDayOpen} onClose={() => { setOffDayOpen(false); setEditOffDay(null); }} title={editOffDay ? "Edit Off Day" : "Add Off Day"}>
+      <Modal open={offDayOpen} onClose={() => { setOffDayOpen(false); setEditOffDay(null); }} title={
+        <div className="flex items-center gap-2.5 text-emerald-700">
+          <Ban size={18} className="text-emerald-500" />
+          <span>{editOffDay ? "Edit Off Day" : "Add Off Day"}</span>
+        </div>
+      }>
         <FormModal fields={offDayFields} initialValues={editOffDay || {}} onSubmit={handleSaveOffDay} submitLabel={editOffDay ? "Update Off Day" : "Save Off Day"} />
       </Modal>
 
