@@ -320,7 +320,7 @@ export default function DashboardHomePage() {
             <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-full">Analytics</span>
           </div>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <AreaChart data={dailyTrend} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
@@ -349,7 +349,7 @@ export default function DashboardHomePage() {
           <div className="h-64">
             {statusCounts.length === 0
               ? <div className="flex items-center justify-center h-full text-sm font-medium text-slate-400">No orders yet</div>
-              : <ResponsiveContainer width="100%" height="100%">
+              : <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <BarChart data={statusCounts} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                   <XAxis dataKey="status" tick={{ fontSize: 11, fill: '#64748b' }} stroke="#cbd5e1" axisLine={false} tickLine={false} dy={10} />

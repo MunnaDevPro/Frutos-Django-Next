@@ -166,7 +166,7 @@
 //         <ChartCard title="Monthly Revenue (à§³)">
 //           <div className="h-56">
 //             {monthlyData.length > 0 ? (
-//               <ResponsiveContainer width="100%" height="100%">
+//               <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
 //                 <AreaChart data={monthlyData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
 //                   <defs>
 //                     <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
@@ -190,7 +190,7 @@
 //         <ChartCard title="Monthly Order Volume">
 //           <div className="h-56">
 //             {monthlyData.length > 0 ? (
-//               <ResponsiveContainer width="100%" height="100%">
+//               <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
 //                 <BarChart data={monthlyData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
 //                   <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
 //                   <XAxis dataKey="month" tick={{ fontSize: 11 }} stroke="#9ca3af" />
@@ -210,7 +210,7 @@
 //       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 //         <ChartCard title="Last 14 Days â€” Daily Orders" className="lg:col-span-1">
 //           <div className="h-48">
-//             <ResponsiveContainer width="100%" height="100%">
+//             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
 //               <AreaChart data={dailyData} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
 //                 <defs>
 //                   <linearGradient id="dayGrad" x1="0" y1="0" x2="0" y2="1">
@@ -231,7 +231,7 @@
 //         <ChartCard title="Orders by Status">
 //           <div className="h-36">
 //             {statusBreakdown.length > 0 ? (
-//               <ResponsiveContainer width="100%" height="100%">
+//               <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
 //                 <PieChart>
 //                   <Pie data={statusBreakdown} cx="50%" cy="50%" innerRadius={35} outerRadius={58} dataKey="value" stroke="none">
 //                     {statusBreakdown.map((entry, i) => (
@@ -258,7 +258,7 @@
 //         <ChartCard title="Payment Status">
 //           <div className="h-36">
 //             {paymentBreakdown.length > 0 ? (
-//               <ResponsiveContainer width="100%" height="100%">
+//               <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
 //                 <PieChart>
 //                   <Pie data={paymentBreakdown} cx="50%" cy="50%" innerRadius={35} outerRadius={58} dataKey="value" stroke="none">
 //                     {paymentBreakdown.map((entry, i) => (
@@ -630,7 +630,7 @@ export default function AnalyticsPage() {
         <ChartCard title="Monthly Revenue (€)">
           <div className="h-56">
             {monthlyData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <AreaChart data={monthlyData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
@@ -654,7 +654,7 @@ export default function AnalyticsPage() {
         <ChartCard title="Monthly Order Volume">
           <div className="h-56">
             {monthlyData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <BarChart data={monthlyData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} stroke="#9ca3af" />
@@ -674,7 +674,7 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <ChartCard title="Last 14 Days â€” Daily Orders" className="lg:col-span-1">
           <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <AreaChart data={dailyData} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
                 <defs>
                   <linearGradient id="dayGrad" x1="0" y1="0" x2="0" y2="1">
@@ -695,7 +695,7 @@ export default function AnalyticsPage() {
         <ChartCard title="Orders by Status">
           <div className="h-36">
             {statusBreakdown.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <PieChart>
                   <Pie data={statusBreakdown} cx="50%" cy="50%" innerRadius={35} outerRadius={58} dataKey="value" stroke="none">
                     {statusBreakdown.map((entry, i) => (
@@ -722,7 +722,7 @@ export default function AnalyticsPage() {
         <ChartCard title="Payment Status">
           <div className="h-36">
             {paymentBreakdown.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <PieChart>
                   <Pie data={paymentBreakdown} cx="50%" cy="50%" innerRadius={35} outerRadius={58} dataKey="value" stroke="none">
                     {paymentBreakdown.map((entry, i) => (
@@ -790,7 +790,7 @@ export default function AnalyticsPage() {
         <ChartCard title="Store Features Distribution">
           <div className="h-36">
             {featureBreakdown.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <BarChart data={featureBreakdown} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
                   <XAxis dataKey="name" tick={{ fontSize: 9 }} stroke="#9ca3af" />
@@ -970,7 +970,7 @@ export default function AnalyticsPage() {
             <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Pack Units by Store</h4>
             <div className="h-48 w-full">
               {leftoverPacksByStore.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <BarChart data={leftoverPacksByStore} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                     <XAxis dataKey="store" tick={{ fontSize: 10 }} stroke="#9ca3af" axisLine={false} tickLine={false} />
