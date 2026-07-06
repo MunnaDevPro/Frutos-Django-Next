@@ -5,6 +5,33 @@ import useSWR from "swr";
 import api from "@/app/dashboard/_lib/api";
 import { Loader2, Users, Store, ChevronDown, ChevronUp } from "lucide-react";
 
+function FormattedHours({ hours, large = false }) {
+  if (!hours || hours <= 0) {
+    return <>0<span className={large ? "text-xs font-semibold text-slate-400 ml-0.5" : "font-normal text-slate-400 ml-0.5"}>min</span></>;
+  }
+  const totalMinutes = Math.round(hours * 60);
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  
+  const unitClass = large ? "text-xs font-semibold text-slate-400 ml-0.5" : "font-normal text-slate-400 ml-0.5";
+  const spacingClass = "mr-1";
+  
+  return (
+    <>
+      {h > 0 && (
+        <>
+          {h}<span className={`${unitClass} ${m > 0 ? spacingClass : ''}`}>h</span>
+        </>
+      )}
+      {m > 0 && (
+        <>
+          {m}<span className={unitClass}>min</span>
+        </>
+      )}
+    </>
+  );
+}
+
 function RankBadge({ rank }) {
   if (rank === 1) {
     return <div className="w-8 h-8 rounded-full bg-[#00694C]/10 text-[#00694C] flex items-center justify-center font-bold text-sm shadow-sm border border-[#00694C]/20">1</div>;
@@ -71,7 +98,7 @@ function StaffCard({ staff, rank }) {
         {/* Stats */}
         <div className="text-right shrink-0 flex flex-col items-end">
           <div className="text-xl font-bold text-slate-800 leading-none mb-1">
-            {staff.total_hours.toFixed(1)}<span className="text-xs font-semibold text-slate-400 ml-0.5">h</span>
+            <FormattedHours hours={staff.total_hours} large />
           </div>
           <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{staff.total_shifts} shift{staff.total_shifts !== 1 ? "s" : ""}</div>
         </div>
@@ -97,7 +124,9 @@ function StaffCard({ staff, rank }) {
               <div key={name} className="group">
                 <div className="flex justify-between mb-1.5">
                   <span className="text-xs font-semibold text-slate-600 group-hover:text-[#00694C] transition-colors truncate">{name}</span>
-                  <span className="text-xs font-medium text-slate-500">{stat.hours.toFixed(1)}h</span>
+                  <span className="text-xs font-medium text-slate-500">
+                    <FormattedHours hours={stat.hours} />
+                  </span>
                 </div>
                 <div className="w-full bg-slate-200/70 rounded-full h-1.5 overflow-hidden">
                   <div

@@ -119,6 +119,53 @@ class AdminStaffTaskViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(staff_id=staff_id)
         return queryset
 
+    def perform_create(self, serializer):
+        task = serializer.save()
+        try:
+            StaffNotification.objects.create(
+                staff=task.staff,
+                title="New Task Assigned",
+                message=f"You have been assigned a new task: {task.title}"
+            )
+        except Exception as e:
+            logger.error(f"Error creating staff notification for task: {e}")
+
+class AdminLiveLocationsView(APIView):
+    """GET /api/staff/admin/live-locations/ — returns stores with their currently active staff"""
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        from stores.models import Store
+        from datetime import date
+        today = date.today()
+        
+        stores = Store.objects.filter(is_active=True)
+        active_shifts = StaffShift.objects.filter(date=today, status='IN_PROGRESS').select_related('staff__user')
+        
+        store_data = []
+        for store in stores:
+            store_shifts = [s for s in active_shifts if s.store_id == store.id]
+            staff_list = []
+            for s in store_shifts:
+                staff_list.append({
+                    'id': s.staff.id,
+                    'name': s.staff.user.name or s.staff.user.email,
+                    'role': s.staff.role,
+                    'photo': s.staff.photo.url if s.staff.photo else None,
+                    'start_time': str(s.start_time) if s.start_time else None,
+                })
+            
+            store_data.append({
+                'id': store.id,
+                'name': store.name,
+                'address': store.address,
+                'lat': store.lat,
+                'lng': store.lng,
+                'active_staff': staff_list,
+            })
+            
+        return Response({'stores': store_data})
+
 # ==========================================
 # STAFF APIs
 # ==========================================
@@ -273,12 +320,53 @@ class StoreStaffListView(generics.ListAPIView):
         store_id = self.kwargs.get('store_id')
         return StaffProfile.objects.filter(store_id=store_id).order_by('user__name')
 
+class MyStaffTasksView(generics.ListAPIView):
+    permission_classes = [IsStaffUser]
+    serializer_class = StaffTaskSerializer
+
+    def get_queryset(self):
+        queryset = StaffTask.objects.filter(staff__user=self.request.user).order_by('-created_at')
+        date_filter = self.request.query_params.get('date')
+        if date_filter:
+            queryset = queryset.filter(created_at__date=date_filter)
+        return queryset
+
 class MyStaffTaskUpdateView(generics.UpdateAPIView):
     permission_classes = [IsStaffUser]
     serializer_class = StaffTaskSerializer
     
     def get_queryset(self):
         return StaffTask.objects.filter(staff__user=self.request.user)
+
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        old_status = instance.status
+        updated_task = serializer.save()
+
+        if old_status != 'COMPLETED' and updated_task.status == 'COMPLETED':
+            from users.models import Notification
+            try:
+                from datetime import date
+                from django.utils import timezone
+                
+                updated_task.completed_at = timezone.now()
+                updated_task.save(update_fields=['completed_at'])
+
+                today = date.today()
+                active_shift = StaffShift.objects.filter(staff=updated_task.staff, date=today, status='IN_PROGRESS').first()
+                store_name = active_shift.store.name if active_shift and active_shift.store else (updated_task.staff.store.name if updated_task.staff.store else "Unknown Store")
+
+                # Format time for message (e.g. "10:30 AM")
+                completed_time = updated_task.completed_at.strftime("%I:%M %p")
+
+                Notification.objects.create(
+                    type='TASK_COMPLETED',
+                    title=f"Task Completed: {updated_task.title}",
+                    message=f"Staff member {updated_task.staff.user.name} has completed the task at store: {store_name} at {completed_time}.",
+                    actor=self.request.user
+                )
+            except Exception as e:
+                logger.error(f"Error creating admin notification for task completion: {e}")
 
 class MyStaffNotificationDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsStaffUser]

@@ -1053,6 +1053,38 @@ class AdminDashboardStatsView(APIView):
         except Exception:
             total_wholesale = wholesale_pending = wholesale_approved = 0
 
+        # Staff performance
+        try:
+            from staff.models import StaffProfile
+            from django.db.models import Count, Q
+            
+            total_staff = StaffProfile.objects.count()
+            
+            # Top 3 staff based on completed tasks
+            top_staff_qs = StaffProfile.objects.annotate(
+                completed_tasks=Count('tasks', filter=Q(tasks__status='COMPLETED'))
+            ).order_by('-completed_tasks')[:3]
+            
+            top_staff = []
+            for staff in top_staff_qs:
+                photo_url = None
+                if staff.photo and staff.photo.name:
+                    photo_url = request.build_absolute_uri(staff.photo.url)
+                elif hasattr(staff.user, 'avatar') and staff.user.avatar and staff.user.avatar.name:
+                    photo_url = request.build_absolute_uri(staff.user.avatar.url)
+                
+                top_staff.append({
+                    'id': staff.staff_id,
+                    'name': staff.user.name,
+                    'role': staff.role,
+                    'photo': photo_url,
+                    'completed_tasks': staff.completed_tasks,
+                })
+        except Exception as e:
+            total_staff = 0
+            top_staff = []
+            print("Error fetching staff:", e)
+
         return Response({
             'statistics': {
                 # Top stats
@@ -1071,6 +1103,9 @@ class AdminDashboardStatsView(APIView):
                 'wholesale_approved':   wholesale_approved,
                 # Orders
                 'pending_orders': pending_orders,
+                # Staff
+                'total_staff': total_staff,
+                'top_staff': top_staff,
             }
         })
 

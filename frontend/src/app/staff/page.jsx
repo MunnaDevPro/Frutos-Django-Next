@@ -15,6 +15,7 @@ import StaffProfileSettings from "./_components/StaffProfileSettings";
 import StaffAttendanceView from "./_components/StaffAttendanceView";
 import StaffAttendanceTab from "./_components/StaffAttendanceTab";
 import StaffHistoryTab from "./_components/StaffHistoryTab";
+import StaffTaskHistoryTab from "./_components/StaffTaskHistoryTab";
 import StaffStoreSession from "./_components/StaffStoreSession";
 
 export default function StaffDashboardPage() {
@@ -31,6 +32,7 @@ export default function StaffDashboardPage() {
   const [selectedViewStore, setSelectedViewStore] = useState(null);
   const [sessionStartTime, setSessionStartTime] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [expandedTaskIds, setExpandedTaskIds] = useState({});
 
   const { data: dashboardData, isLoading, mutate } = useSWR(
     "/api/staff/me/dashboard/",
@@ -121,6 +123,16 @@ export default function StaffDashboardPage() {
     }
   };
 
+  const handleCompleteTask = async (taskId) => {
+    try {
+      await api.patch(`/api/staff/me/tasks/${taskId}/`, { status: 'COMPLETED', progress_percentage: 100 });
+      mutate();
+    } catch (err) {
+      console.error("Failed to complete task", err);
+      alert("Failed to complete task");
+    }
+  };
+
   const getWeekDates = () => {
     const today = new Date();
     
@@ -159,6 +171,7 @@ export default function StaffDashboardPage() {
     { id: "REQUEST_DAY_OFF",name: "REQUEST DAY OFF", icon: FileText,       badge: 0 },
     { id: "ANNOUNCEMENTS",  name: "ANNOUNCEMENTS",   icon: Megaphone,      badge: 0 },
     { id: "ATTENDANCE",     name: "ATTENDANCE",      icon: ClipboardCheck, badge: 0 },
+    { id: "TASK_HISTORY",   name: "TASKS",           icon: ClipboardCheck, badge: 0 },
     { id: "HISTORY",        name: "WORK HISTORY",    icon: History,        badge: 0 },
     // Dynamic store tab — appears only when a store is selected
     ...(selectedViewStore ? [
@@ -461,6 +474,8 @@ export default function StaffDashboardPage() {
                 setActiveTab("STORE_SESSION");
               }}
             />
+          ) : activeTab === "TASK_HISTORY" ? (
+            <StaffTaskHistoryTab />
           ) : activeTab === "HISTORY" ? (
             <StaffHistoryTab shifts={shifts} />
           ) : activeTab === "STORE_SESSION" && selectedViewStore ? (
@@ -484,7 +499,7 @@ export default function StaffDashboardPage() {
           ) : activeTab === "ANNOUNCEMENTS" ? (
             <StaffAnnouncements />
           ) : activeTab === "NOTIFICATIONS" ? (
-            <StaffNotifications notifications={notifications} mutate={mutate} />
+            <StaffNotifications notifications={notifications} mutate={mutate} setActiveTab={setActiveTab} />
           ) : activeTab === "MY_SHIFTS" ? (
             <>
               <div className="flex justify-between items-end mb-6">
@@ -604,26 +619,69 @@ export default function StaffDashboardPage() {
               {/* My Tasks */}
               <div className="mb-12">
                 <div className="flex justify-between items-end mb-6">
-                  <h2 className="text-xl font-serif text-[#004A3A] font-medium tracking-tight">My Tasks</h2>
+                  <div>
+                    <h2 className="text-xl font-serif text-[#004A3A] font-medium tracking-tight">My Tasks</h2>
+                    <p className="text-xs text-slate-500 mt-1">Showing latest 3 tasks</p>
+                  </div>
+                  {tasks?.length > 3 && (
+                    <button 
+                      onClick={() => setActiveTab('TASK_HISTORY')}
+                      className="text-xs font-bold text-[#00694C] hover:underline cursor-pointer flex items-center gap-1"
+                    >
+                      View All <ArrowRight className="w-3 h-3" />
+                    </button>
+                  )}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {tasks?.length > 0 ? tasks.map((task, i) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
+                  {tasks?.length > 0 ? tasks.slice(0, 3).map((task, i) => (
                     <div key={task.id || i} className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-shadow">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold text-[#004A3A] leading-tight pr-2">{task.title}</h3>
+                        <div>
+                          <h3 className="font-semibold text-[#004A3A] leading-tight pr-2">{task.title}</h3>
+                          <div className="text-[9px] text-slate-400 mt-1 uppercase tracking-wider font-semibold">
+                            Assigned: {new Date(task.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                          </div>
+                          {task.status === 'COMPLETED' && task.completed_at && (
+                            <div className="text-[9px] text-[#009b72] mt-0.5 uppercase tracking-wider font-semibold">
+                              Completed: {new Date(task.completed_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                            </div>
+                          )}
+                        </div>
                         <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 ${task.status === 'COMPLETED' ? 'bg-[#D9EFE5] text-[#00694C]' : task.status === 'IN_PROGRESS' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-600'}`}>
                           {task.status?.replace('_', ' ')}
                         </span>
                       </div>
-                      {task.description && <p className="text-xs text-slate-500 mb-4 flex-1 font-medium">{task.description}</p>}
+                      {task.description && (
+                        <div className="mb-4 flex-1">
+                          <p className={`text-xs text-slate-500 font-medium ${expandedTaskIds[task.id || i] ? '' : 'line-clamp-3'}`}>
+                            {task.description}
+                          </p>
+                          {task.description.length > 120 && (
+                            <button
+                              onClick={() => setExpandedTaskIds(prev => ({ ...prev, [task.id || i]: !prev[task.id || i] }))}
+                              className="text-[10px] font-bold text-[#00694C] hover:opacity-80 mt-1.5 focus:outline-none flex items-center gap-1 cursor-pointer transition-opacity"
+                            >
+                              {expandedTaskIds[task.id || i] ? 'Show Less' : 'Read More'}
+                            </button>
+                          )}
+                        </div>
+                      )}
                       <div className="mt-auto pt-3">
                         <div className="flex justify-between text-[10px] font-bold text-slate-400 mb-1.5 tracking-wider">
                           <span>PROGRESS</span>
                           <span className={task.progress_percentage === 100 ? 'text-[#00694C]' : ''}>{task.progress_percentage || 0}%</span>
                         </div>
-                        <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                        <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden mb-3">
                           <div className={`h-1.5 rounded-full ${task.progress_percentage === 100 ? 'bg-[#009b72]' : 'bg-[#E88C30]'}`} style={{ width: `${task.progress_percentage || 0}%` }}></div>
                         </div>
+                        {task.status !== 'COMPLETED' && (
+                          <button
+                            onClick={() => handleCompleteTask(task.id)}
+                            className="w-full py-2 mt-2 bg-[#00694C] hover:bg-[#004A3A] text-white text-[11px] font-bold rounded-lg transition-colors cursor-pointer uppercase tracking-wider shadow-sm"
+                          >
+                            Mark as Complete
+                          </button>
+                        )}
                       </div>
                     </div>
                   )) : (

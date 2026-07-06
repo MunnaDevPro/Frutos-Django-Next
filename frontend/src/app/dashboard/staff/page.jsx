@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Plus, Eye, Trash2, Edit, Store as StoreIcon, Shield, User, UserPlus, Mail, Lock, Briefcase, Phone, Image as ImageIcon, Calendar, Trophy, BarChart2, FileText } from "lucide-react";
+import { Plus, Eye, Trash2, Edit, Store as StoreIcon, Shield, User, UserPlus, Mail, Lock, Briefcase, Phone, Image as ImageIcon, Calendar, Trophy, BarChart2, FileText, Map as MapIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Container from "@/app/dashboard/_components/Container";
@@ -15,6 +15,7 @@ import api from "@/app/dashboard/_lib/api";
 import StaffRankingTab from "./_components/StaffRankingTab";
 import StaffAttendanceTab from "./_components/StaffAttendanceTab";
 import AdminDayOffRequestsTab from "./_components/AdminDayOffRequestsTab";
+import AdminLiveStaffMap from "./_components/AdminLiveStaffMap";
 import { useSearchParams } from "next/navigation";
 const PAGE_SIZE = 20;
 
@@ -171,6 +172,10 @@ export default function StaffPage() {
           className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer ${activeTab === "leave_requests" ? "bg-white text-[#00694C] shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>
           <FileText className="w-4 h-4" /> Leave Requests
         </button>
+        <button onClick={() => setActiveTab("live_map")}
+          className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer ${activeTab === "live_map" ? "bg-white text-[#00694C] shadow-sm" : "text-slate-500 hover:text-slate-700"}`}>
+          <MapIcon className="w-4 h-4" /> Live Map
+        </button>
       </div>
 
       {activeTab === "leave_requests" ? (
@@ -179,6 +184,8 @@ export default function StaffPage() {
         <StaffRankingTab stores={stores} />
       ) : activeTab === "attendance" ? (
         <StaffAttendanceTab stores={stores} />
+      ) : activeTab === "live_map" ? (
+        <AdminLiveStaffMap />
       ) : (
         <>
       <div className="flex justify-end mb-4">

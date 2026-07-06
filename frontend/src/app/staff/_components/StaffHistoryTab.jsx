@@ -275,6 +275,7 @@ export default function StaffHistoryTab() {
                     if (date) setHistoryFilter('date');
                     else setHistoryFilter('all');
                   }} 
+                  align="right"
                 />
               </div>
             </div>

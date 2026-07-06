@@ -41,21 +41,43 @@ export default function RequestDaysPage() {
   };
 
   const columns = [
-    { key: "id", label: "ID" },
+    { 
+      key: "photo", 
+      label: "Photo",
+      render: (v, row) => (
+        <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex-shrink-0 flex items-center justify-center shadow-sm mx-auto my-1">
+          {row.staff_photo ? (
+            <img src={row.staff_photo} alt={row.staff_name || "Staff"} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-sm font-bold text-slate-500">
+              {(row.staff_name || `S`).charAt(0).toUpperCase()}
+            </span>
+          )}
+        </div>
+      )
+    },
     { 
       key: "staff", 
-      label: "Staff Name", 
+      label: "Staff Member", 
       render: (v, row) => (
-        <span className="font-medium text-slate-700">{row.staff?.user?.name || `Staff #${row.staff}`}</span>
+        <div className="flex flex-col items-center justify-center py-1">
+          <span className="font-bold text-slate-800 text-center">{row.staff_name || `Staff #${row.staff}`}</span>
+          <span className="text-[11px] text-slate-500 font-medium tracking-wide text-center mt-0.5">ID: {row.staff_custom_id || `#${row.staff}`} • {row.staff_role || 'Staff'}</span>
+        </div>
       )
     },
     { 
       key: "date", 
-      label: "Date", 
-      render: (v) => (
-        <div className="flex items-center gap-1.5 text-slate-600">
-          <Calendar className="w-4 h-4" />
-          {new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+      label: "Requested Date Off", 
+      render: (v, row) => (
+        <div className="flex flex-col items-center justify-center py-1">
+          <div className="flex items-center justify-center gap-1.5 text-slate-800 font-semibold text-sm">
+            <CalendarDays className="w-4 h-4 text-[#00694C]" />
+            {new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+          </div>
+          <div className="text-[11px] text-slate-400 mt-0.5 font-medium text-center">
+            Submitted: {new Date(row.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+          </div>
         </div>
       )
     },
@@ -64,11 +86,11 @@ export default function RequestDaysPage() {
       label: "Status", 
       render: (v) => {
         if (v === "APPROVED") {
-          return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700"><Check className="w-3 h-3" /> Approved</span>;
+          return <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60 shadow-sm"><Check className="w-3.5 h-3.5" /> Approved</span>;
         } else if (v === "REJECTED") {
-          return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700"><X className="w-3 h-3" /> Rejected</span>;
+          return <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200/60 shadow-sm"><X className="w-3.5 h-3.5" /> Rejected</span>;
         } else {
-          return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700"><Clock className="w-3 h-3" /> Pending</span>;
+          return <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/60 shadow-sm"><Clock className="w-3.5 h-3.5" /> Pending</span>;
         }
       } 
     },
@@ -77,12 +99,14 @@ export default function RequestDaysPage() {
       label: "Actions",
       render: (v, row) => {
         return (
-          <button
-            onClick={() => setViewRequest(row)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 text-slate-600 hover:bg-[#00694C] hover:text-white border border-slate-200 transition-colors text-sm font-medium"
-          >
-            <Eye className="w-4 h-4" /> View
-          </button>
+          <div className="flex items-center justify-center">
+            <button
+              onClick={() => setViewRequest(row)}
+              className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 text-slate-600 hover:bg-[#00694C] hover:text-white border border-slate-200 transition-colors text-sm font-medium mx-auto cursor-pointer"
+            >
+              <Eye className="w-4 h-4" /> View
+            </button>
+          </div>
         );
       }
     }
@@ -152,7 +176,7 @@ export default function RequestDaysPage() {
               
               <p className="mb-6">
                 <strong>To:</strong> Management & Administration<br />
-                <strong>From:</strong> {viewRequest.staff?.user?.name || `Staff #${viewRequest.staff}`}<br />
+                <strong>From:</strong> {viewRequest.staff_name || `Staff #${viewRequest.staff}`}<br />
                 <strong>Subject: Request for Day Off on {new Date(viewRequest.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</strong>
               </p>
               
@@ -173,7 +197,7 @@ export default function RequestDaysPage() {
               
               <p>
                 Sincerely,<br />
-                <strong>{viewRequest.staff?.user?.name || `Staff #${viewRequest.staff}`}</strong>
+                <strong>{viewRequest.staff_name || `Staff #${viewRequest.staff}`}</strong>
               </p>
             </div>
 

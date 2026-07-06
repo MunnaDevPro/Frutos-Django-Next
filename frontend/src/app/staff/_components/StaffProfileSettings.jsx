@@ -21,8 +21,10 @@ export default function StaffProfileSettings({ profile, user }) {
     const formData = new FormData(e.target);
     const password = formData.get("password");
     if (!password) formData.delete("password");
+    const photo = formData.get("photo");
+    if (photo && photo.size === 0) formData.delete("photo");
     try {
-      await api.patch("/api/staff/me/profile/", formData, { headers: { "Content-Type": "multipart/form-data" } });
+      await api.patch("/api/staff/me/profile/", formData);
       setSuccess(true);
       successToast("Profile updated successfully");
       if (fetchUser) await fetchUser();

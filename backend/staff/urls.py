@@ -12,6 +12,7 @@ urlpatterns = [
     # Admin APIs
     path('', include(router.urls)),
     path('admin/shift-stats/', views.AdminStaffShiftStatsView.as_view(), name='admin-shift-stats'),
+    path('admin/live-locations/', views.AdminLiveLocationsView.as_view(), name='admin-live-locations'),
 
     # Staff APIs
     path('me/dashboard/', views.MyStaffDashboardView.as_view(), name='staff-dashboard'),

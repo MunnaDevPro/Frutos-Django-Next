@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Trash2, Calendar, ClipboardList, Edit, Ban, MapPin, ChevronLeft } from "lucide-react";
+import { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Plus, Trash2, Calendar, ClipboardList, Edit, Ban, MapPin, ChevronLeft, ChevronDown, Store as StoreIcon } from "lucide-react";
 import Container from "@/app/dashboard/_components/Container";
 import DataTable from "@/app/dashboard/_components/DataTable";
 import Modal from "@/app/dashboard/_components/Modal";
 import FormModal from "@/app/dashboard/_components/FormModal";
 import ConfirmDialog from "@/app/dashboard/_components/ConfirmDialog";
 import { useToastContext } from "@/app/dashboard/_components/Toaster";
+import DatePickerModal from "@/app/dashboard/_components/DatePickerModal";
 import useSWR from "swr";
 import api from "@/app/dashboard/_lib/api";
 import { useParams, useRouter } from "next/navigation";
@@ -29,6 +31,13 @@ export default function StaffDetailsPage() {
   const [deleteTask, setDeleteTask] = useState(null);
   const [deleteShift, setDeleteShift] = useState(null);
   const [deleteOffDay, setDeleteOffDay] = useState(null);
+  const [shiftStartDate, setShiftStartDate] = useState("");
+  const [shiftEndDate, setShiftEndDate] = useState("");
+  const [shiftStoreName, setShiftStoreName] = useState("");
+  const [pickerOpenFor, setPickerOpenFor] = useState(null); // "START" or "END"
+  const [storeFilterOpen, setStoreFilterOpen] = useState(false);
+  const [taskStatusFilter, setTaskStatusFilter] = useState("ALL");
+  const [attendanceFilter, setAttendanceFilter] = useState("ALL");
 
   const { data: staffProfile, isLoading: isStaffLoading } = useSWR(
     staffId ? `/api/staff/admin/employees/${staffId}/` : null,
@@ -45,10 +54,53 @@ export default function StaffDetailsPage() {
     (url) => api.get(url)
   );
 
+  const { data: storesRaw } = useSWR(
+    "/api/stores/",
+    (url) => api.get(url)
+  );
+
   const allShifts = shiftsRaw?.results || (Array.isArray(shiftsRaw) ? shiftsRaw : []);
   const shifts = allShifts.filter(s => s.status !== 'DAY_OFF');
-  const offDays = allShifts.filter(s => s.status === 'DAY_OFF');
+  const allStoresList = storesRaw?.results || (Array.isArray(storesRaw) ? storesRaw : []);
+  
+  const uniqueStores = useMemo(() => {
+    const stores = shifts.map(s => s.store_name).filter(Boolean);
+    return [...new Set(stores)].sort();
+  }, [shifts]);
+
+  const filteredShifts = shifts.filter(s => {
+    if (shiftStartDate && s.date < shiftStartDate) return false;
+    if (shiftEndDate && s.date > shiftEndDate) return false;
+    if (shiftStoreName && s.store_name !== shiftStoreName) return false;
+    return true;
+  });
+
+  const filteredAttendance = allShifts.filter(s => {
+    if (attendanceFilter === "ALL") return true;
+    if (attendanceFilter === "ABSENT") return s.status === 'ABSENT';
+    if (attendanceFilter === "DAY_OFF") return s.status === 'DAY_OFF';
+    if (attendanceFilter === "WORKED") return s.status !== 'ABSENT' && s.status !== 'DAY_OFF';
+    return true;
+  }).sort((a, b) => new Date(b.date) - new Date(a.date));
+
   const tasks = tasksRaw?.results || (Array.isArray(tasksRaw) ? tasksRaw : []);
+  const filteredTasks = tasks.filter(t => taskStatusFilter === "ALL" || t.status === taskStatusFilter);
+
+  const formatTime = (timeStr) => {
+    if (!timeStr) return "";
+    const [h, m] = timeStr.split(':');
+    let hours = parseInt(h, 10);
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    return `${hours.toString().padStart(2, '0')}:${m} ${ampm}`;
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr + "T00:00:00");
+    return date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+  };
 
   const handleSaveShift = async (values) => {
     try {
@@ -86,19 +138,20 @@ export default function StaffDetailsPage() {
 
   const handleSaveOffDay = async (values) => {
     try {
-      const payload = { ...values, status: 'DAY_OFF', staff: staffId };
+      const payload = { ...values, staff: staffId };
+      if (!payload.status) payload.status = 'DAY_OFF';
       if (editOffDay) {
         await api.patch(`/api/staff/admin/shifts/${editOffDay.id}/`, payload);
-        toast.success("Off Day updated");
+        toast.success("Record updated");
       } else {
         await api.post("/api/staff/admin/shifts/", payload);
-        toast.success("Off Day added");
+        toast.success("Record added");
       }
       setOffDayOpen(false);
       setEditOffDay(null);
       mutateShifts();
     } catch (err) {
-      toast.error(err?.message || "Failed to save off day");
+      toast.error(err?.message || "Failed to save record");
     }
   };
 
@@ -164,8 +217,13 @@ export default function StaffDetailsPage() {
   ];
 
   const shiftColumns = [
-    { key: "date", label: "Date" },
-    { key: "time", label: "Time", render: (_, row) => row.start_time && row.end_time ? `${row.start_time.slice(0,5)} - ${row.end_time.slice(0,5)}` : (row.start_time ? `${row.start_time.slice(0,5)} - In Progress` : "—") },
+    { key: "date", label: "Date", render: (v) => <span className="font-medium text-slate-700">{formatDate(v)}</span> },
+    { key: "time", label: "Time", render: (_, row) => row.start_time && row.end_time ? (
+        <span className="font-medium text-slate-700">{formatTime(row.start_time)} - {formatTime(row.end_time)}</span>
+      ) : (row.start_time ? (
+        <span className="font-medium text-blue-600">{formatTime(row.start_time)} - In Progress</span>
+      ) : <span className="text-slate-400">—</span>) 
+    },
     { key: "location", label: "Location", render: (_, row) => row.store_name ? (
       <div className="flex flex-col items-center text-center">
         <span className="font-semibold text-slate-800">{row.store_name}</span>
@@ -198,11 +256,45 @@ export default function StaffDetailsPage() {
 
   const offDayFields = [
     { key: "date", label: "Date", required: true, type: "date" },
+    { key: "status", label: "Status", required: true, type: "select", options: [
+      { value: "DAY_OFF", label: "Req. Off (Admin Approved)" },
+      { value: "ABSENT", label: "Absent" },
+    ]},
   ];
 
   const offDayColumns = [
-    { key: "date", label: "Date" },
-    { key: "status", label: "Status", render: () => <span className="px-2 py-0.5 text-xs rounded-full bg-slate-100 text-slate-600">DAY OFF</span> },
+    { key: "date", label: "Date", align: "left", render: (v) => <span className="font-semibold text-slate-700">{formatDate(v)}</span> },
+    { key: "time", label: "Time", align: "left", render: (_, row) => row.start_time && row.end_time ? (
+        <span className="font-medium text-slate-700 text-[13px]">{formatTime(row.start_time)} - {formatTime(row.end_time)}</span>
+      ) : (row.start_time ? (
+        <span className="font-medium text-blue-600 text-[13px]">{formatTime(row.start_time)} - In Progress</span>
+      ) : <span className="text-slate-400">—</span>) 
+    },
+    { key: "location", label: "Store", align: "left", render: (_, row) => row.store_name ? (
+      <div className="flex flex-col items-start">
+        <span className="font-semibold text-slate-800 text-[13px]">{row.store_name}</span>
+        {row.store_location && (
+          row.store_map_link ? (
+            <a href={row.store_map_link} target="_blank" rel="noopener noreferrer" className="text-[11px] text-blue-600 hover:text-blue-800 hover:underline mt-0.5 flex items-center gap-1 w-fit transition-colors">
+              <MapPin className="w-3 h-3 shrink-0" /> <span className="truncate max-w-[150px]">{row.store_location}</span>
+            </a>
+          ) : (
+            <span className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1 w-fit">
+              <MapPin className="w-3 h-3 text-slate-400 shrink-0" /> <span className="truncate max-w-[150px]">{row.store_location}</span>
+            </span>
+          )
+        )}
+      </div>
+    ) : <span className="text-slate-400 italic text-xs">Unassigned</span> },
+    { key: "status", label: "Status", align: "left", render: (v, row) => {
+        if (row.status === 'ABSENT') {
+           return <span className="inline-flex px-2.5 py-1 text-[11px] font-bold tracking-wide rounded-full bg-red-50 text-red-600 border border-red-200 shadow-sm">ABSENT</span>;
+        }
+        if (row.status === 'DAY_OFF') {
+           return <span className="inline-flex px-2.5 py-1 text-[11px] font-bold tracking-wide rounded-full bg-orange-50 text-orange-600 border border-orange-200 shadow-sm">REQ. OFF (APPROVED)</span>;
+        }
+        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold tracking-wide rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-sm"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>WORKED</span>;
+    }},
   ];
 
   const activeShift = shifts.find(s => s.status === 'IN_PROGRESS');
@@ -246,7 +338,7 @@ export default function StaffDetailsPage() {
           </div>
           <div className="relative z-10 sm:text-right bg-white/10 px-4 py-2.5 rounded-lg border border-white/10 backdrop-blur-sm w-full sm:w-auto flex sm:block justify-between items-center">
             <div className="text-white/60 text-[10px] font-bold uppercase tracking-widest mb-0.5">Checked In</div>
-            <div className="text-lg font-bold font-mono text-white">{activeShift.start_time?.slice(0,5) || "--:--"}</div>
+            <div className="text-lg font-bold font-mono text-white">{activeShift.start_time ? formatTime(activeShift.start_time) : "--:--"}</div>
           </div>
         </div>
       )}
@@ -269,7 +361,7 @@ export default function StaffDetailsPage() {
           onClick={() => setActiveTab("OFF_DAYS")}
           className={`px-5 py-3 font-semibold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer ${activeTab === "OFF_DAYS" ? 'border-[#00694C] text-[#00694C]' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'}`}
         >
-          <Ban size={16} /> Off Days
+          <Ban size={16} /> Attendance & Leaves
         </button>
       </div>
 
@@ -280,18 +372,115 @@ export default function StaffDetailsPage() {
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
               <h3 className="font-bold text-slate-800 flex items-center gap-2"><Calendar size={18} className="text-[#00694C]" /> Shift Schedule</h3>
-              <button onClick={() => { setEditShift(null); setShiftOpen(true); }} className="text-xs bg-[#00694C] text-white px-3.5 py-1.5 rounded-md hover:bg-[#085041] font-semibold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer">
-                <Plus size={14} /> Add Shift
-              </button>
             </div>
             <div className="p-0">
               <DataTable 
                 columns={shiftColumns} 
-                data={shifts} 
+                data={filteredShifts} 
+                searchable={false}
+                extraFilters={
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <div 
+                        onClick={() => setStoreFilterOpen(!storeFilterOpen)}
+                        className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 shadow-sm hover:border-[#00694C]/50 transition-colors px-3 py-2 cursor-pointer w-[160px]"
+                      >
+                        <MapPin size={14} className="text-slate-400 shrink-0" />
+                        <span className={`text-xs font-medium truncate flex-1 ${shiftStoreName ? 'text-slate-700' : 'text-slate-400'}`}>
+                          {shiftStoreName || "All Stores"}
+                        </span>
+                        <ChevronDown size={14} className={`text-slate-400 shrink-0 transition-transform ${storeFilterOpen ? 'rotate-180' : ''}`} />
+                      </div>
+
+                      <AnimatePresence>
+                        {storeFilterOpen && (
+                          <>
+                            <div className="fixed inset-0 z-40" onClick={() => setStoreFilterOpen(false)}></div>
+                            <motion.div 
+                              initial={{ opacity: 0, y: 5 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 5 }}
+                              transition={{ duration: 0.15 }}
+                              className="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-100 rounded-xl shadow-xl z-50 py-2 overflow-hidden"
+                            >
+                              <button 
+                                onClick={() => { setShiftStoreName(""); setStoreFilterOpen(false); }}
+                                className={`w-full text-left px-4 py-2 text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer flex items-center gap-2 ${!shiftStoreName ? 'text-[#00694C] bg-emerald-50/50' : 'text-slate-600'}`}
+                              >
+                                <div className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center border border-slate-200">
+                                  <MapPin size={12} className="text-slate-400" />
+                                </div>
+                                All Stores
+                              </button>
+                              {uniqueStores.map(storeName => {
+                                const storeObj = allStoresList.find(s => s.name === storeName);
+                                return (
+                                  <button 
+                                    key={storeName}
+                                    onClick={() => { setShiftStoreName(storeName); setStoreFilterOpen(false); }}
+                                    className={`w-full text-left px-4 py-2 text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer flex items-center gap-2 ${shiftStoreName === storeName ? 'text-[#00694C] bg-emerald-50/50' : 'text-slate-600'}`}
+                                  >
+                                    <div className="w-6 h-6 rounded bg-slate-100 overflow-hidden flex items-center justify-center border border-slate-200 shrink-0">
+                                      {storeObj?.image ? (
+                                        <img src={storeObj.image} alt={storeName} className="w-full h-full object-cover" />
+                                      ) : (
+                                        <StoreIcon size={12} className="text-slate-400" />
+                                      )}
+                                    </div>
+                                    {storeName}
+                                  </button>
+                                );
+                              })}
+                            </motion.div>
+                          </>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    <div className="relative flex items-center">
+                      <div className="flex items-center bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden hover:border-[#00694C]/50 transition-colors">
+                        <div className="px-3 py-2 bg-slate-50 border-r border-slate-200 text-slate-400 flex items-center justify-center">
+                          <Calendar size={14} />
+                        </div>
+                        <button 
+                          onClick={() => setPickerOpenFor("START")}
+                          className={`px-3 py-2 text-xs font-medium focus:outline-none cursor-pointer w-[100px] text-left transition-colors hover:bg-slate-50 ${shiftStartDate ? 'text-slate-700' : 'text-slate-400'}`}
+                        >
+                          {shiftStartDate ? formatDate(shiftStartDate) : "Start Date"}
+                        </button>
+                        <span className="text-slate-200 text-xs font-medium px-1">|</span>
+                        <button 
+                          onClick={() => setPickerOpenFor("END")}
+                          className={`px-3 py-2 text-xs font-medium focus:outline-none cursor-pointer w-[100px] text-left transition-colors hover:bg-slate-50 ${shiftEndDate ? 'text-slate-700' : 'text-slate-400'}`}
+                        >
+                          {shiftEndDate ? formatDate(shiftEndDate) : "End Date"}
+                        </button>
+                      </div>
+                      <DatePickerModal 
+                        isOpen={pickerOpenFor !== null} 
+                        onClose={() => setPickerOpenFor(null)} 
+                        selectedDate={pickerOpenFor === "START" ? shiftStartDate : shiftEndDate} 
+                        onSelectDate={(date) => {
+                          if (pickerOpenFor === "START") setShiftStartDate(date);
+                          else if (pickerOpenFor === "END") setShiftEndDate(date);
+                        }} 
+                      />
+                    </div>
+                    {(shiftStartDate || shiftEndDate || shiftStoreName) && (
+                      <button onClick={() => { setShiftStartDate(""); setShiftEndDate(""); setShiftStoreName(""); }} className="text-xs text-slate-500 hover:text-red-600 font-medium px-3 py-2 bg-white hover:bg-red-50 rounded-lg transition-colors border border-slate-200 hover:border-red-200 shadow-sm flex items-center gap-1 cursor-pointer">
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                }
                 actions={(row) => (
-                  <div className="flex justify-end gap-2">
-                    <button onClick={() => { setEditShift(row); setShiftOpen(true); }} className="db-icon-btn" title="Edit"><Edit size={14} /></button>
-                    <button onClick={() => setDeleteShift(row)} className="db-icon-btn danger" title="Delete"><Trash2 size={14} /></button>
+                  <div className="flex justify-end gap-1.5">
+                    <button onClick={() => { setEditShift(row); setShiftOpen(true); }} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 cursor-pointer" title="Edit">
+                      <Edit size={16} strokeWidth={2.5} />
+                    </button>
+                    <button onClick={() => setDeleteShift(row)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 cursor-pointer" title="Delete">
+                      <Trash2 size={16} strokeWidth={2.5} />
+                    </button>
                   </div>
                 )}
               />
@@ -311,11 +500,34 @@ export default function StaffDetailsPage() {
             <div className="p-0">
               <DataTable 
                 columns={taskColumns} 
-                data={tasks} 
+                data={filteredTasks}
+                searchable={true}
+                searchKeys={["title"]}
+                extraFilters={
+                  <div className="flex bg-slate-200/50 p-1 rounded-xl border border-slate-200">
+                    {['ALL', 'PENDING', 'IN_PROGRESS', 'COMPLETED'].map(status => (
+                      <button
+                        key={status}
+                        onClick={() => setTaskStatusFilter(status)}
+                        className={`px-3.5 py-1.5 text-[11px] font-bold rounded-lg transition-all tracking-wide cursor-pointer ${
+                          taskStatusFilter === status 
+                            ? 'bg-white text-[#00694C] shadow-sm border border-slate-100' 
+                            : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 border border-transparent'
+                        }`}
+                      >
+                        {status === 'ALL' ? 'ALL STATUS' : status.replace('_', ' ')}
+                      </button>
+                    ))}
+                  </div>
+                }
                 actions={(row) => (
-                  <div className="flex justify-end gap-2">
-                    <button onClick={() => { setEditTask(row); setTaskOpen(true); }} className="db-icon-btn" title="Edit"><Edit size={14} /></button>
-                    <button onClick={() => setDeleteTask(row)} className="db-icon-btn danger" title="Delete"><Trash2 size={14} /></button>
+                  <div className="flex justify-end gap-1.5">
+                    <button onClick={() => { setEditTask(row); setTaskOpen(true); }} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 cursor-pointer" title="Edit">
+                      <Edit size={16} strokeWidth={2.5} />
+                    </button>
+                    <button onClick={() => setDeleteTask(row)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 cursor-pointer" title="Delete">
+                      <Trash2 size={16} strokeWidth={2.5} />
+                    </button>
                   </div>
                 )}
               />
@@ -323,23 +535,49 @@ export default function StaffDetailsPage() {
           </div>
         )}
 
-        {/* Off Days Section */}
+        {/* Attendance & Leaves Section */}
         {activeTab === "OFF_DAYS" && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
-              <h3 className="font-bold text-slate-800 flex items-center gap-2"><Ban size={18} className="text-red-500" /> Scheduled Off Days</h3>
+              <h3 className="font-bold text-slate-800 flex items-center gap-2"><Ban size={18} className="text-[#00694C]" /> Attendance & Leaves</h3>
               <button onClick={() => { setEditOffDay(null); setOffDayOpen(true); }} className="text-xs bg-[#00694C] text-white px-3.5 py-1.5 rounded-md hover:bg-[#085041] font-semibold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer">
-                <Plus size={14} /> Add Off Day
+                <Plus size={14} /> Add Record
               </button>
+            </div>
+            <div className="px-5 py-3 border-b border-slate-100 bg-slate-50/50 flex flex-wrap gap-2 items-center">
+              <span className="text-xs font-semibold text-slate-500 mr-2 uppercase tracking-wider">Filter by:</span>
+              {[
+                { id: "ALL", label: "All Records" },
+                { id: "WORKED", label: "Worked" },
+                { id: "ABSENT", label: "Absent" },
+                { id: "DAY_OFF", label: "Req. Off (Approved)" },
+              ].map(filter => (
+                <button
+                  key={filter.id}
+                  onClick={() => setAttendanceFilter(filter.id)}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all tracking-wide cursor-pointer border shadow-sm ${
+                    attendanceFilter === filter.id 
+                      ? 'bg-white text-[#00694C] border-slate-200 ring-1 ring-slate-100' 
+                      : 'bg-transparent text-slate-500 border-transparent hover:bg-slate-200/50 hover:text-slate-700'
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
             </div>
             <div className="p-0">
               <DataTable 
                 columns={offDayColumns} 
-                data={offDays} 
+                data={filteredAttendance} 
+                searchable={false}
                 actions={(row) => (
-                  <div className="flex justify-end gap-2">
-                    <button onClick={() => { setEditOffDay(row); setOffDayOpen(true); }} className="db-icon-btn" title="Edit"><Edit size={14} /></button>
-                    <button onClick={() => setDeleteOffDay(row)} className="db-icon-btn danger" title="Delete"><Trash2 size={14} /></button>
+                  <div className="flex justify-end gap-1.5">
+                    <button onClick={() => { setEditOffDay(row); setOffDayOpen(true); }} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 cursor-pointer" title="Edit">
+                      <Edit size={16} strokeWidth={2.5} />
+                    </button>
+                    <button onClick={() => setDeleteOffDay(row)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 cursor-pointer" title="Delete">
+                      <Trash2 size={16} strokeWidth={2.5} />
+                    </button>
                   </div>
                 )}
               />
@@ -370,15 +608,15 @@ export default function StaffDetailsPage() {
       <Modal open={offDayOpen} onClose={() => { setOffDayOpen(false); setEditOffDay(null); }} title={
         <div className="flex items-center gap-2.5 text-emerald-700">
           <Ban size={18} className="text-emerald-500" />
-          <span>{editOffDay ? "Edit Off Day" : "Add Off Day"}</span>
+          <span>{editOffDay ? "Edit Record" : "Add Record"}</span>
         </div>
       }>
-        <FormModal fields={offDayFields} initialValues={editOffDay || {}} onSubmit={handleSaveOffDay} submitLabel={editOffDay ? "Update Off Day" : "Save Off Day"} />
+        <FormModal fields={offDayFields} initialValues={editOffDay || {}} onSubmit={handleSaveOffDay} submitLabel={editOffDay ? "Update Record" : "Save Record"} />
       </Modal>
 
       <ConfirmDialog open={!!deleteShift} onClose={() => setDeleteShift(null)} onConfirm={handleDeleteShift} title="Delete Shift" message="Are you sure you want to delete this shift?" />
       <ConfirmDialog open={!!deleteTask} onClose={() => setDeleteTask(null)} onConfirm={handleDeleteTask} title="Delete Task" message="Are you sure you want to delete this task?" />
-      <ConfirmDialog open={!!deleteOffDay} onClose={() => setDeleteOffDay(null)} onConfirm={handleDeleteOffDay} title="Delete Off Day" message="Are you sure you want to delete this off day?" />
+      <ConfirmDialog open={!!deleteOffDay} onClose={() => setDeleteOffDay(null)} onConfirm={handleDeleteOffDay} title="Delete Record" message="Are you sure you want to delete this attendance record?" />
 
     </Container>
   );
