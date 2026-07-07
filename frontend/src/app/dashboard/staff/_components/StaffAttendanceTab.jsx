@@ -3,8 +3,9 @@
 import { useState, useMemo, useRef } from "react";
 import useSWR from "swr";
 import api from "@/app/dashboard/_lib/api";
-import { Loader2, Users, Store, Clock, Calendar, ChevronRight, ChevronLeft, X, AlertCircle, CalendarClock, CalendarOff, CheckCircle2, Printer } from "lucide-react";
+import { Loader2, Users, Store, Clock, Calendar, ChevronRight, ChevronLeft, X, AlertCircle, CalendarClock, CalendarOff, CheckCircle2, Printer, Trash2 } from "lucide-react";
 import DatePickerModal from "@/app/dashboard/_components/DatePickerModal";
+import ConfirmDialog from "@/app/dashboard/_components/ConfirmDialog";
 
 // Helper for photo URL
 const getPhotoUrl = (url) => {
@@ -30,8 +31,10 @@ export default function StaffAttendanceTab({ stores }) {
   const [historyFilter, setHistoryFilter] = useState("all"); // 'all', 'month', 'week', 'today', 'date'
   const [selectedDate, setSelectedDate] = useState("");
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [shiftToDelete, setShiftToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const { data, isLoading } = useSWR(
+  const { data, isLoading, mutate } = useSWR(
     "/api/staff/admin/shift-stats/",
     (url) => api.get(url),
     { revalidateOnFocus: false }
@@ -90,7 +93,34 @@ export default function StaffAttendanceTab({ stores }) {
   const periodHours = filteredShifts.reduce((acc, curr) => curr.status === 'COMPLETED' || curr.status === 'IN_PROGRESS' ? acc + (curr.hours || 0) : acc, 0);
   const totalDays = new Set(filteredShifts.filter(s => s.status === 'COMPLETED' || s.status === 'IN_PROGRESS').map(s => s.date)).size;
 
-  const getStatusBadge = (status) => {
+  const handleDeleteShift = (shiftId) => {
+    setShiftToDelete(shiftId);
+  };
+
+  const executeDeleteShift = async () => {
+    if (!shiftToDelete || isDeleting) return;
+    setIsDeleting(true);
+    try {
+      await api.delete(`/api/staff/admin/shifts/${shiftToDelete}/`);
+      if (mutate) {
+        await mutate();
+      }
+    } catch (err) {
+      console.error("Failed to delete attendance record:", err);
+    } finally {
+      setIsDeleting(false);
+      setShiftToDelete(null);
+    }
+  };
+
+  const getStatusBadge = (shift) => {
+    const status = shift.status;
+    const isPastDate = new Date(shift.date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0);
+    
+    if (status === 'IN_PROGRESS' && isPastDate) {
+      return <span className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-amber-600 bg-amber-50 px-2 py-1 rounded-md"><AlertCircle className="w-3 h-3" /> Missing Out</span>;
+    }
+
     switch(status) {
       case 'COMPLETED':
         return <span className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md"><CheckCircle2 className="w-3 h-3" /> Completed</span>;
@@ -269,13 +299,13 @@ export default function StaffAttendanceTab({ stores }) {
                     <div>
                       <div className="font-bold text-slate-800 print:text-black print:text-[11px] flex items-center gap-2">
                         {shift.store_name}
-                        {getStatusBadge(shift.status)}
+                        {getStatusBadge(shift)}
                       </div>
                       <div className="text-xs font-medium text-slate-500 mt-1.5 flex items-center gap-2 print:mt-0.5 print:text-[10px] print:text-slate-600">
                         {shift.status !== 'ABSENT' && shift.status !== 'DAY_OFF' ? (
                           <>
                             <Clock className="w-3.5 h-3.5 print:hidden" />
-                            {shift.start_time ? shift.start_time.substring(0,5) : '--:--'} - {shift.end_time ? shift.end_time.substring(0,5) : 'Present'}
+                            {shift.start_time ? shift.start_time.substring(0,5) : '--:--'} - {shift.end_time ? shift.end_time.substring(0,5) : (new Date(shift.date).setHours(0,0,0,0) < new Date().setHours(0,0,0,0) ? <span className="text-amber-500 font-bold">Missing Out</span> : 'Present')}
                           </>
                         ) : (
                           <span className="text-slate-400">No time recorded</span>
@@ -285,14 +315,24 @@ export default function StaffAttendanceTab({ stores }) {
                   </div>
 
                   <div className="sm:text-right bg-slate-50 sm:bg-transparent p-2 sm:p-0 rounded-lg print:bg-transparent print:p-0">
-                    {(shift.status === 'COMPLETED' || shift.status === 'IN_PROGRESS') ? (
-                      <>
-                        <div className="text-lg font-bold text-slate-800 print:text-[11px] print:text-black">{formatHours(shift.hours)}</div>
-                        <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider print:hidden">Logged</div>
-                      </>
-                    ) : (
-                      <div className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-1 print:text-[11px] print:text-black">--</div>
-                    )}
+                    <div className="flex flex-col sm:items-end">
+                      {(shift.status === 'COMPLETED' || shift.status === 'IN_PROGRESS') ? (
+                        <>
+                          <div className="text-lg font-bold text-slate-800 print:text-[11px] print:text-black">{formatHours(shift.hours)}</div>
+                          <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider print:hidden">Logged</div>
+                        </>
+                      ) : (
+                        <div className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-1 print:text-[11px] print:text-black mb-2">--</div>
+                      )}
+                      
+                      <button
+                        onClick={() => handleDeleteShift(shift.id)}
+                        className="mt-3 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold tracking-widest text-red-500 hover:text-red-600 bg-white hover:bg-red-50 border border-slate-200 hover:border-red-200 transition-all cursor-pointer group print:hidden shadow-sm"
+                        title="Remove Attendance"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> <span className="sm:hidden lg:inline">REMOVE</span>
+                      </button>
+                    </div>
                   </div>
 
                 </div>
@@ -390,6 +430,15 @@ export default function StaffAttendanceTab({ stores }) {
         </div>
       )}
     </div>
+      <ConfirmDialog
+        open={!!shiftToDelete}
+        onClose={() => setShiftToDelete(null)}
+        onConfirm={executeDeleteShift}
+        title="Remove Attendance Record"
+        message="Are you sure you want to delete this shift? This action cannot be undone and will affect total worked hours."
+        confirmLabel="Remove"
+        destructive={true}
+      />
     </>
   );
 }

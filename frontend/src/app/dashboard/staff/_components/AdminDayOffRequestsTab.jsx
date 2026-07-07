@@ -11,11 +11,12 @@ import { useToastContext } from "@/app/dashboard/_components/Toaster";
 export default function AdminDayOffRequestsTab() {
   const toast = useToastContext();
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
   const [viewRequest, setViewRequest] = useState(null);
   const [updatingStatus, setUpdatingStatus] = useState(null);
 
   const { data: rawData, isLoading, error, mutate } = useSWR(
-    `/api/staff/admin/day-off-requests/?page=${page}`,
+    `/api/staff/admin/day-off-requests/?page=${page}${search ? `&search=${encodeURIComponent(search)}` : ''}`,
     (url) => api.get(url)
   );
 
@@ -99,6 +100,8 @@ export default function AdminDayOffRequestsTab() {
         onPageChange={setPage}
         loading={isLoading}
         onRowClick={(row) => setViewRequest(row)}
+        serverSide={true}
+        onSearch={(val) => { setSearch(val); setPage(1); }}
       />
 
       <Modal open={!!viewRequest} onClose={() => setViewRequest(null)} title="Review Leave Request" maxWidth="max-w-2xl">

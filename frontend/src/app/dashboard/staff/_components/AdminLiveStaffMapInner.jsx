@@ -2,12 +2,34 @@
 import { useState, useEffect } from "react";
 import useSWR from "swr";
 import api from "@/app/dashboard/_lib/api";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet-defaulticon-compatibility";
 import L from "leaflet";
 import { Store as StoreIcon, User, RefreshCw, Loader2, MapPin } from "lucide-react";
+
+function MapController({ stores }) {
+  const map = useMap();
+  useEffect(() => {
+    const handleFocus = (e) => {
+      const { staffId } = e.detail || {};
+      if (!staffId || !stores) return;
+      
+      for (const store of stores) {
+        if (store.active_staff?.some(s => s.id === staffId)) {
+          if (store.lat != null && store.lng != null) {
+            map.flyTo([store.lat, store.lng], 16, { animate: true });
+          }
+          break;
+        }
+      }
+    };
+    window.addEventListener('focus-staff-on-map', handleFocus);
+    return () => window.removeEventListener('focus-staff-on-map', handleFocus);
+  }, [map, stores]);
+  return null;
+}
 
 // Custom icon for staff
 const createStaffIcon = (staffList) => {
@@ -15,7 +37,16 @@ const createStaffIcon = (staffList) => {
 
   const mainStaff = staffList[0];
   const extraCount = staffList.length - 1;
-  const photoUrl = mainStaff.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(mainStaff.name)}&background=0f172a&color=fff&bold=true`;
+  
+  let rawPhoto = mainStaff.photo;
+  let finalPhotoUrl = null;
+  if (rawPhoto) {
+    finalPhotoUrl = rawPhoto.startsWith('http') 
+      ? rawPhoto 
+      : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${rawPhoto.startsWith('/') ? '' : '/'}${rawPhoto}`;
+  }
+  
+  const photoUrl = finalPhotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(mainStaff.name)}&background=0f172a&color=fff&bold=true`;
 
   return L.divIcon({
     className: "bg-transparent border-0",
@@ -85,6 +116,7 @@ export default function AdminLiveStaffMapInner() {
         ) : null}
         
         <MapContainer center={defaultCenter} zoom={defaultZoom} style={{ height: "100%", width: "100%" }}>
+          <MapController stores={activeStoresWithCoords} />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
@@ -109,11 +141,18 @@ export default function AdminLiveStaffMapInner() {
                     
                     <div className="space-y-2 max-h-[200px] overflow-y-auto">
                       <p className="text-xs font-semibold text-emerald-600 mb-2 uppercase tracking-wider">{store.active_staff.length} Staff Online</p>
-                      {store.active_staff.map(staff => (
+                      {store.active_staff.map(staff => {
+                        let staffPhotoUrl = staff.photo;
+                        if (staffPhotoUrl && !staffPhotoUrl.startsWith('http')) {
+                          const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000';
+                          staffPhotoUrl = `${baseUrl}${staffPhotoUrl.startsWith('/') ? '' : '/'}${staffPhotoUrl}`;
+                        }
+                        
+                        return (
                         <div key={staff.id} className="flex items-center gap-3 p-2 bg-slate-50 rounded-lg">
                           <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-200 shrink-0">
-                            {staff.photo ? (
-                              <img src={staff.photo} alt={staff.name} className="w-full h-full object-cover" />
+                            {staffPhotoUrl ? (
+                              <img src={staffPhotoUrl} alt={staff.name} className="w-full h-full object-cover" />
                             ) : (
                               <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(staff.name)}&background=0f172a&color=fff&bold=true`} alt={staff.name} className="w-full h-full object-cover" />
                             )}
@@ -126,7 +165,7 @@ export default function AdminLiveStaffMapInner() {
                             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div> Active
                           </div>
                         </div>
-                      ))}
+                      )})}
                     </div>
                   </div>
                 </Popup>

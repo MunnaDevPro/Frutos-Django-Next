@@ -15,11 +15,22 @@ class StaffProfileSerializer(serializers.ModelSerializer):
     user = StaffUserSerializer(read_only=True)
     store_slug = serializers.CharField(source='store.slug', read_only=True)
     store_name = serializers.CharField(source='store.name', read_only=True)
+    active_store_name = serializers.SerializerMethodField()
+    is_working = serializers.SerializerMethodField()
     
     class Meta:
         model = StaffProfile
         fields = ['id', 'user', 'staff_id', 'role', 'phone', 'hire_date', 'created_at',
-                  'can_create_orders', 'can_update_orders', 'can_delete_orders', 'can_create_products', 'can_update_products', 'can_delete_products', 'secret_key', 'photo', 'store_slug', 'store_name']
+                  'can_create_orders', 'can_update_orders', 'can_delete_orders', 'can_create_products', 'can_update_products', 'can_delete_products', 'secret_key', 'photo', 'store_slug', 'store_name', 'active_store_name', 'is_working']
+
+    def get_is_working(self, obj):
+        from datetime import date
+        return obj.shifts.filter(date=date.today(), status='IN_PROGRESS').exists()
+        
+    def get_active_store_name(self, obj):
+        from datetime import date
+        active_shift = obj.shifts.filter(date=date.today(), status='IN_PROGRESS').first()
+        return active_shift.store.name if active_shift and active_shift.store else None
 
 class StaffShiftSerializer(serializers.ModelSerializer):
     store_name = serializers.CharField(source='store.name', read_only=True)

@@ -167,7 +167,7 @@ export default function DataTable({
                 </th>
               ))}
               {actions && (
-                <th className="px-5 py-3.5 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <th className="px-5 py-3.5 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Actions
                 </th>
               )}
@@ -205,7 +205,7 @@ export default function DataTable({
                     </td>
                   ))}
                   {actions && (
-                    <td className="px-5 py-3.5 text-right">
+                    <td className="px-5 py-3.5 text-center">
                       {actions(row)}
                     </td>
                   )}

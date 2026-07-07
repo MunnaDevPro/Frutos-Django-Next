@@ -4,6 +4,7 @@ import { useState } from "react";
 import useSWR from "swr";
 import api from "@/app/dashboard/_lib/api";
 import { Loader2, Users, Store, ChevronDown, ChevronUp } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 function FormattedHours({ hours, large = false }) {
   if (!hours || hours <= 0) {
@@ -32,19 +33,6 @@ function FormattedHours({ hours, large = false }) {
   );
 }
 
-function RankBadge({ rank }) {
-  if (rank === 1) {
-    return <div className="w-8 h-8 rounded-full bg-[#00694C]/10 text-[#00694C] flex items-center justify-center font-bold text-sm shadow-sm border border-[#00694C]/20">1</div>;
-  }
-  if (rank === 2) {
-    return <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-sm border border-slate-200">2</div>;
-  }
-  if (rank === 3) {
-    return <div className="w-8 h-8 rounded-full bg-slate-50 text-slate-600 flex items-center justify-center font-bold text-sm border border-slate-200">3</div>;
-  }
-  return <div className="w-8 h-8 flex items-center justify-center font-medium text-slate-400 text-sm">{rank}</div>;
-}
-
 function StaffCard({ staff, rank }) {
   const [open, setOpen] = useState(false);
   const storeEntries = Object.entries(staff.stores_worked || {}).sort((a, b) => b[1].hours - a[1].hours);
@@ -52,28 +40,34 @@ function StaffCard({ staff, rank }) {
   return (
     <div className="bg-white border border-slate-200/80 rounded-xl overflow-hidden hover:shadow-lg hover:shadow-slate-200/50 hover:border-[#00694C]/30 transition-all duration-300">
       <div className="p-5 flex items-center gap-4">
-        {/* Rank */}
-        <div className="flex justify-center shrink-0">
-          <RankBadge rank={rank} />
-        </div>
-
         {/* Avatar */}
-        <div className="w-11 h-11 rounded-full overflow-hidden bg-slate-50 shrink-0 border border-slate-100 shadow-sm">
-          {staff.photo
-            ? <img 
-                src={staff.photo.startsWith('http') ? staff.photo : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${staff.photo.startsWith('/') ? '' : '/'}${staff.photo}`} 
-                alt={staff.name} 
-                className="w-full h-full object-cover" 
-              />
-            : <div className="w-full h-full flex items-center justify-center text-sm font-bold text-[#00694C] bg-gradient-to-br from-[#00694C]/10 to-[#00694C]/5">
-              {staff.name?.charAt(0)?.toUpperCase() || 'S'}
-            </div>}
+        <div className="relative shrink-0">
+          <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-50 border border-slate-100 shadow-sm">
+            {staff.photo
+              ? <img 
+                  src={staff.photo.startsWith('http') ? staff.photo : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${staff.photo.startsWith('/') ? '' : '/'}${staff.photo}`} 
+                  alt={staff.name} 
+                  className="w-full h-full object-cover" 
+                />
+              : <div className="w-full h-full flex items-center justify-center text-sm font-bold text-[#00694C] bg-gradient-to-br from-[#00694C]/10 to-[#00694C]/5">
+                {staff.name?.charAt(0)?.toUpperCase() || 'S'}
+              </div>}
+          </div>
+          {/* Rank Badge */}
+          <div className={`absolute -top-1.5 -right-1.5 w-[22px] h-[22px] rounded-full flex items-center justify-center text-[10px] font-bold shadow-sm border-2 border-white ${
+            rank === 1 ? 'bg-[#00694C] text-white' : 
+            rank === 2 ? 'bg-slate-700 text-white' : 
+            rank === 3 ? 'bg-slate-400 text-white' : 
+            'bg-slate-200 text-slate-600'
+          }`}>
+            {rank}
+          </div>
         </div>
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <div className="font-bold text-slate-800 truncate text-[15px]">{staff.name}</div>
-          <div className="text-xs text-slate-500 flex flex-wrap items-center gap-2 mt-1 font-medium">
+          <div className="font-bold text-slate-800 truncate text-[15px] leading-none mb-1.5">{staff.name}</div>
+          <div className="text-xs text-slate-500 flex flex-wrap items-center gap-1.5 font-medium">
             <span className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded uppercase tracking-wider text-[10px]">
               {staff.staff_code ? `ID: ${staff.staff_code}` : "No ID"}
             </span>
@@ -81,15 +75,6 @@ function StaffCard({ staff, rank }) {
               <>
                 <span className="text-slate-300">•</span>
                 <span>{staff.role}</span>
-              </>
-            )}
-            {storeEntries.length > 0 && (
-              <>
-                <span className="text-slate-300">•</span>
-                <span className="text-[#00694C] flex items-center gap-1 bg-[#00694C]/5 px-1.5 py-0.5 rounded">
-                  <Store className="w-3 h-3" />
-                  {storeEntries[0][0]}
-                </span>
               </>
             )}
           </div>
@@ -105,40 +90,72 @@ function StaffCard({ staff, rank }) {
 
         {/* Expand Store Breakdown */}
         {storeEntries.length > 1 && (
-          <button onClick={() => setOpen(!open)} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer shrink-0 ml-2 ${open ? 'bg-[#00694C]/10 text-[#00694C]' : 'hover:bg-slate-100 text-slate-400'}`}>
+          <button onClick={() => setOpen(!open)} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer shrink-0 ml-1 ${open ? 'bg-[#00694C]/10 text-[#00694C]' : 'hover:bg-slate-100 text-slate-400'}`}>
             {open ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
         )}
       </div>
 
       {/* Expanded Details: Store Breakdown */}
-      {open && storeEntries.length > 1 && (
-        <div className="px-5 pb-5 bg-slate-50/50 border-t border-slate-100/80">
-          <div className="pt-4 space-y-3">
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-              <span className="h-px bg-slate-200 flex-1"></span>
-              Hours by Store
-              <span className="h-px bg-slate-200 flex-1"></span>
-            </div>
-            {storeEntries.map(([name, stat]) => (
-              <div key={name} className="group">
-                <div className="flex justify-between mb-1.5">
-                  <span className="text-xs font-semibold text-slate-600 group-hover:text-[#00694C] transition-colors truncate">{name}</span>
-                  <span className="text-xs font-medium text-slate-500">
-                    <FormattedHours hours={stat.hours} />
-                  </span>
+      <AnimatePresence initial={false}>
+        {open && storeEntries.length > 1 && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="px-5 pb-5 bg-slate-50/50 border-t border-slate-100/80">
+              <div className="pt-4 space-y-2.5">
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                  <span className="h-px bg-slate-200 flex-1"></span>
+                  Hours by Store
+                  <span className="h-px bg-slate-200 flex-1"></span>
                 </div>
-                <div className="w-full bg-slate-200/70 rounded-full h-1.5 overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-[#00694C] to-[#00A175] transition-all duration-500 ease-out"
-                    style={{ width: `${Math.min(100, (stat.hours / Math.max(...storeEntries.map(e => e[1].hours))) * 100)}%` }}
-                  />
-                </div>
+                {storeEntries.map(([name, stat]) => (
+                  <div key={name} className="relative overflow-hidden p-3 bg-white border border-slate-200/60 rounded-xl shadow-[0_2px_8px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_12px_-4px_rgba(0,105,76,0.08)] hover:border-[#00694C]/20 transition-all group">
+                    <div className="flex items-center justify-between relative z-10">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 text-slate-400 flex items-center justify-center shrink-0 group-hover:bg-[#00694C]/5 group-hover:text-[#00694C] group-hover:border-[#00694C]/10 transition-all duration-300 overflow-hidden">
+                          {stat.image ? (
+                            <img 
+                              src={stat.image.startsWith('http') ? stat.image : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${stat.image.startsWith('/') ? '' : '/'}${stat.image}`} 
+                              alt={name} 
+                              className="w-full h-full object-cover" 
+                              onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                            />
+                          ) : null}
+                          {(!stat.image) && (
+                            <div className="w-full h-full flex items-center justify-center text-xs font-bold text-slate-500 bg-slate-100">
+                              {name?.charAt(0)?.toUpperCase() || 'S'}
+                            </div>
+                          )}
+                          {stat.image && (
+                            <div style={{display: 'none'}} className="w-full h-full items-center justify-center text-xs font-bold text-slate-500 bg-slate-100">
+                              {name?.charAt(0)?.toUpperCase() || 'S'}
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-slate-700 group-hover:text-slate-900 transition-colors">{name}</div>
+                          <div className="text-[10px] text-slate-400 font-medium mt-0.5">{stat.days} shift{stat.days !== 1 ? 's' : ''}</div>
+                        </div>
+                      </div>
+                      
+                      <div className="text-right">
+                        <div className="text-sm font-extrabold text-slate-600 group-hover:text-[#00694C] transition-colors">
+                          <FormattedHours hours={stat.hours} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -248,7 +265,7 @@ export default function StaffRankingTab({ stores }) {
           <p className="text-slate-500 text-sm">Staff rankings will appear here once they start working shifts.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-start">
           {rankedStaffList.map((staff) => (
             <StaffCard key={staff.staff_id} staff={staff} rank={staff.rank} />
           ))}

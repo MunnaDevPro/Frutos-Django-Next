@@ -1,4 +1,4 @@
-from rest_framework import viewsets, generics, permissions, status
+from rest_framework import viewsets, generics, permissions, status, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -151,7 +151,7 @@ class AdminLiveLocationsView(APIView):
                     'id': s.staff.id,
                     'name': s.staff.user.name or s.staff.user.email,
                     'role': s.staff.role,
-                    'photo': s.staff.photo.url if s.staff.photo else None,
+                    'photo': request.build_absolute_uri(s.staff.photo.url) if s.staff.photo else None,
                     'start_time': str(s.start_time) if s.start_time else None,
                 })
             
@@ -504,6 +504,7 @@ class MyStaffShiftHistoryView(APIView):
                 'date': str(s.date),
                 'store_id': s.store_id,
                 'store_name': s.store.name if s.store else None,
+                'store_image': request.build_absolute_uri(s.store.image.url) if s.store and s.store.image else None,
                 'start_time': str(s.start_time) if s.start_time else None,
                 'end_time': str(s.end_time) if s.end_time else None,
                 'status': s.status,
@@ -564,7 +565,11 @@ class AdminStaffShiftStatsView(APIView):
                 # Only add to stores_worked if it's a working shift
                 if is_working_shift:
                     if sname not in stores_worked:
-                        stores_worked[sname] = {'days': 0, 'hours': 0}
+                        stores_worked[sname] = {
+                            'days': 0, 
+                            'hours': 0,
+                            'image': request.build_absolute_uri(s.store.image.url) if s.store and s.store.image else None
+                        }
                     stores_worked[sname]['days'] += 1
                     stores_worked[sname]['hours'] += hours
 
@@ -681,6 +686,8 @@ class MyStaffDayOffRequestViewSet(viewsets.ModelViewSet):
 class AdminDayOffRequestViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUser]
     serializer_class = DayOffRequestSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['staff__user__name', 'staff__staff_id']
 
     def get_queryset(self):
         return DayOffRequest.objects.all().order_by('-created_at')
