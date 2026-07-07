@@ -235,10 +235,22 @@ class UserSerializer(serializers.ModelSerializer):
     """
     Serializer for user details
     """
+    photo = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ('id', 'email', 'name', 'user_type', 'is_active', 'date_joined', 'profile_image')
+        fields = ('id', 'email', 'name', 'user_type', 'is_active', 'date_joined', 'profile_image', 'photo')
         read_only_fields = ('id', 'date_joined')
+
+    def get_photo(self, obj):
+        request = self.context.get('request')
+        if obj.user_type == 'STAFF' and hasattr(obj, 'staff_profile') and obj.staff_profile.photo:
+            photo_url = obj.staff_profile.photo.url
+            return request.build_absolute_uri(photo_url) if request else photo_url
+        if obj.profile_image:
+            photo_url = obj.profile_image.url
+            return request.build_absolute_uri(photo_url) if request else photo_url
+        return None
 
 
 class WholesalerRegistrationSerializer(serializers.ModelSerializer):

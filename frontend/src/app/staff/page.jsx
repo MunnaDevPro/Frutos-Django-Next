@@ -412,8 +412,12 @@ export default function StaffDashboardPage() {
           <header className="flex justify-between items-center mb-10 hidden md:flex">
             <div className="flex items-center gap-3 text-sm font-semibold flex-wrap">
               <span className="italic font-serif text-[#00694C] text-lg">El Árbol</span>
-              <span className="text-slate-300">|</span>
-              <span className="text-slate-500 font-medium">{profile?.store_name || "Unassigned Store"}</span>
+              {current_active_shift && current_active_shift.store_name && (
+                <>
+                  <span className="text-slate-300">|</span>
+                  <span className="text-slate-500 font-medium">{current_active_shift.store_name}</span>
+                </>
+              )}
               {/* Live clock chip */}
               <div className="flex items-center gap-1.5 bg-[#00694C]/8 border border-[#00694C]/15 text-[#00694C] px-3 py-1 rounded-full">
                 <Clock className="w-3 h-3" />

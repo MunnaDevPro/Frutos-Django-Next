@@ -10,7 +10,7 @@ import ConfirmDialog from "@/app/dashboard/_components/ConfirmDialog";
 import { useToastContext } from "@/app/dashboard/_components/Toaster";
 import useSWR from "swr";
 import { adminUsersApi } from "@/app/dashboard/_lib/auth";
-import api from "@/app/dashboard/_lib/api";
+import api, { API_BASE_URL } from "@/app/dashboard/_lib/api";
 
 const PAGE_SIZE = 20;
 
@@ -124,15 +124,21 @@ export default function UsersPage() {
         {String(v).startsWith('ws_') ? `WS-${v.replace('ws_','')}` : v}
       </span>
     )},
-    { key: "photo", label: "Photo", render: (v, row) => (
+    { key: "photo", label: "Photo", render: (v, row) => {
+      let imgUrl = row.profile_image || row.photo || v;
+      if (imgUrl && imgUrl.startsWith('/')) {
+        imgUrl = `${API_BASE_URL}${imgUrl}`;
+      }
+      return (
       <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center border border-slate-200 shrink-0">
-        {v ? (
-          <img src={v} alt={row.name || "User"} className="w-full h-full object-cover" />
+        {imgUrl ? (
+          <img src={imgUrl} alt={row.name || "User"} className="w-full h-full object-cover" />
         ) : (
           <span className="text-xs font-semibold text-slate-500">{(row.name || row.email || "U").charAt(0).toUpperCase()}</span>
         )}
       </div>
-    )},
+      );
+    }},
     { key: "name", label: "Name" },
     { key: "email", label: "Email" },
     { key: "user_type", label: "Role", render: (v) => <RoleBadge value={v} /> },
@@ -354,11 +360,15 @@ export default function UsersPage() {
                 className="w-16 h-16 rounded-full overflow-hidden bg-white flex items-center justify-center border border-slate-200 shadow-sm shrink-0 relative group cursor-pointer"
                 onClick={() => fileInputRef.current?.click()}
               >
-                {viewItem.profile_image || viewItem.photo ? (
-                  <img src={viewItem.profile_image || viewItem.photo} alt={viewItem.name || "User"} className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-2xl font-black text-slate-400">{(viewItem.name || viewItem.email || "U").charAt(0).toUpperCase()}</span>
-                )}
+                {(() => {
+                  let img = viewItem.profile_image || viewItem.photo;
+                  if (img && img.startsWith('/')) img = `${API_BASE_URL}${img}`;
+                  return img ? (
+                    <img src={img} alt={viewItem.name || "User"} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-2xl font-black text-slate-400">{(viewItem.name || viewItem.email || "U").charAt(0).toUpperCase()}</span>
+                  );
+                })()}
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <Camera size={16} className="text-white" />
                 </div>

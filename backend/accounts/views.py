@@ -818,6 +818,14 @@ class AdminUserListView(APIView):
 
         normal_data = []
         for u in qs:
+            photo_url = None
+            if getattr(u, 'profile_image', None) and getattr(u.profile_image, 'name', None):
+                photo_url = request.build_absolute_uri(u.profile_image.url)
+            elif getattr(u, 'user_type', None) == 'STAFF' and hasattr(u, 'staff_profile') and getattr(u.staff_profile, 'photo', None) and getattr(u.staff_profile.photo, 'name', None):
+                photo_url = request.build_absolute_uri(u.staff_profile.photo.url)
+            elif hasattr(u, 'profile') and getattr(u.profile, 'avatar', None) and getattr(u.profile.avatar, 'name', None):
+                photo_url = request.build_absolute_uri(u.profile.avatar.url)
+
             normal_data.append({
                 'id':               u.id,
                 'name':             getattr(u, 'name', '') or u.email,
@@ -828,9 +836,8 @@ class AdminUserListView(APIView):
                 'business_name':    None,
                 'wholesale_status': None,
                 'is_wholesale':     False,
-                'photo':            request.build_absolute_uri(u.profile_image.url) if getattr(u, 'profile_image', None) and getattr(u.profile_image, 'name', None) else (request.build_absolute_uri(u.profile.avatar.url) if (hasattr(u, 'profile') and getattr(u.profile, 'avatar', None) and getattr(u.profile.avatar, 'name', None)) else None),
+                'photo':            photo_url,
             })
-
         # ── Wholesale users ───────────────────────────────────────
         ws_data = []
         try:
