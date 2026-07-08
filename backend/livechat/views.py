@@ -124,3 +124,111 @@ class LiveChatHistoryView(APIView):
             Q(sender=user, receiver_id=user_id) | Q(sender_id=user_id, receiver=user)
         ).delete()
         return Response({"detail": "Chat history deleted."})
+
+class AdminChatConversationsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if getattr(user, 'user_type', None) != 'ADMIN' and not getattr(user, 'is_superuser', False):
+            return Response({"detail": "Not authorized."}, status=403)
+            
+        messages = ChatMessage.objects.select_related('sender', 'receiver').order_by('-created_at')
+        
+        conversations_dict = {}
+        
+        for msg in messages:
+            pair_key = tuple(sorted([msg.sender_id, msg.receiver_id]))
+            
+            if pair_key not in conversations_dict:
+                user1 = msg.sender
+                user2 = msg.receiver
+                
+                conversations_dict[pair_key] = {
+                    'id': f"{pair_key[0]}_{pair_key[1]}",
+                    'user1_id': user1.id if user1 else None,
+                    'user1_name': user1.name if user1 else 'Unknown',
+                    'user1_email': user1.email if user1 else 'Unknown',
+                    'user1_image': request.build_absolute_uri(user1.profile_image.url) if user1 and getattr(user1, 'profile_image', None) else None,
+                    'user2_id': user2.id if user2 else None,
+                    'user2_name': user2.name if user2 else 'Unknown',
+                    'user2_email': user2.email if user2 else 'Unknown',
+                    'user2_image': request.build_absolute_uri(user2.profile_image.url) if user2 and getattr(user2, 'profile_image', None) else None,
+                    'last_message': msg.text,
+                    'last_message_time': msg.created_at,
+                    'total_messages': 0
+                }
+            conversations_dict[pair_key]['total_messages'] += 1
+            
+        result = list(conversations_dict.values())
+        return Response(result)
+
+class AdminChatMessagesView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        user = request.user
+        if getattr(user, 'user_type', None) != 'ADMIN' and not getattr(user, 'is_superuser', False):
+            return Response({"detail": "Not authorized."}, status=403)
+            
+        user1_id = request.query_params.get('user1_id')
+        user2_id = request.query_params.get('user2_id')
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+        
+        messages = ChatMessage.objects.select_related('sender', 'receiver').all()
+        
+        if user1_id and user2_id:
+            messages = messages.filter(
+                Q(sender_id=user1_id, receiver_id=user2_id) | Q(sender_id=user2_id, receiver_id=user1_id)
+            )
+            
+        if start_date:
+            messages = messages.filter(created_at__date__gte=start_date)
+        if end_date:
+            messages = messages.filter(created_at__date__lte=end_date)
+            
+        messages = messages.order_by('-created_at') # Order by newest first
+        
+        data = []
+        for msg in messages:
+            data.append({
+                'id': msg.id,
+                'sender_id': msg.sender_id,
+                'sender_name': msg.sender.name if msg.sender else 'Unknown',
+                'receiver_id': msg.receiver_id,
+                'receiver_name': msg.receiver.name if msg.receiver else 'Unknown',
+                'text': msg.text,
+                'created_at': msg.created_at,
+                'is_read': msg.is_read
+            })
+            
+        return Response(data)
+
+    def delete(self, request):
+        user = request.user
+        if getattr(user, 'user_type', None) != 'ADMIN' and not getattr(user, 'is_superuser', False):
+            return Response({"detail": "Not authorized."}, status=403)
+            
+        user1_id = request.query_params.get('user1_id')
+        user2_id = request.query_params.get('user2_id')
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+        
+        messages = ChatMessage.objects.all()
+        
+        if user1_id and user2_id:
+            messages = messages.filter(
+                Q(sender_id=user1_id, receiver_id=user2_id) | Q(sender_id=user2_id, receiver_id=user1_id)
+            )
+            
+        if start_date:
+            messages = messages.filter(created_at__date__gte=start_date)
+        if end_date:
+            messages = messages.filter(created_at__date__lte=end_date)
+            
+        if not user1_id and not user2_id and not start_date and not end_date:
+            return Response({"detail": "Must provide filters (user1, user2, start_date, or end_date) to delete."}, status=400)
+            
+        deleted_count, _ = messages.delete()
+        return Response({"detail": f"Deleted {deleted_count} messages successfully."})

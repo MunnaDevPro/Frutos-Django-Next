@@ -33,6 +33,7 @@ import {
   FileText,
   Megaphone,
   CalendarDays,
+  Database,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -76,6 +77,7 @@ const navGroups = [
     label: "Support",
     items: [
       { name: "Tickets", href: "/dashboard/tickets", icon: MessageSquare, badgeKey: "openTickets" },
+      { name: "Message Data Store", href: "/dashboard/chat-history", icon: Database },
     ],
   },
   {

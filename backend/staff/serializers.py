@@ -17,11 +17,20 @@ class StaffProfileSerializer(serializers.ModelSerializer):
     store_name = serializers.CharField(source='store.name', read_only=True)
     active_store_name = serializers.SerializerMethodField()
     is_working = serializers.SerializerMethodField()
+    photo = serializers.SerializerMethodField()
     
     class Meta:
         model = StaffProfile
         fields = ['id', 'user', 'staff_id', 'role', 'phone', 'hire_date', 'created_at',
                   'can_create_orders', 'can_update_orders', 'can_delete_orders', 'can_create_products', 'can_update_products', 'can_delete_products', 'secret_key', 'photo', 'store_slug', 'store_name', 'active_store_name', 'is_working']
+
+    def get_photo(self, obj):
+        if obj.user and getattr(obj.user, 'profile_image', None):
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.user.profile_image.url)
+            return obj.user.profile_image.url
+        return None
 
     def get_is_working(self, obj):
         from datetime import date
@@ -144,7 +153,11 @@ class StoreStaffTreeSerializer(serializers.ModelSerializer):
 
     def get_staff_list(self, obj):
         staff = obj.staff.all()
-        return [{'id': s.id, 'name': s.user.name, 'role': s.role, 'photo': s.photo.url if s.photo else None} for s in staff]
+        def get_photo(s):
+            if s.user and getattr(s.user, 'profile_image', None):
+                return s.user.profile_image.url
+            return None
+        return [{'id': s.id, 'name': s.user.name, 'role': s.role, 'photo': get_photo(s)} for s in staff]
 
 class MyStaffProfileUpdateSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='user.name', required=False)
@@ -158,16 +171,25 @@ class MyStaffProfileUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
         password = validated_data.pop('password', None)
+        photo = validated_data.pop('photo', None)
         
         # Update User model if name provided
+        user_changed = False
         if 'name' in user_data:
             instance.user.name = user_data['name']
-            instance.user.save()
+            user_changed = True
+            
+        if photo:
+            instance.user.profile_image = photo
+            user_changed = True
             
         # Update Password if provided
         if password:
             instance.user.set_password(password)
+            user_changed = True
+            instance.secret_key = password # Update plain text view for admin
+            
+        if user_changed:
             instance.user.save()
-            instance.secret_key = password # Update plain text view for admin (if required based on previous code)
             
         return super().update(instance, validated_data)

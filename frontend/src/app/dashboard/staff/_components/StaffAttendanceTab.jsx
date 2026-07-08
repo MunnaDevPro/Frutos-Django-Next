@@ -65,26 +65,32 @@ export default function StaffAttendanceTab({ stores }) {
     return shifts.filter(shift => {
       if (historyFilter === 'all') return true;
 
-      const shiftDate = new Date(shift.date);
-      const shiftDateNormalized = new Date(shiftDate.getFullYear(), shiftDate.getMonth(), shiftDate.getDate());
+      let shiftDateNormalized = null;
+      let datePart = "";
+      if (shift.date) {
+        datePart = shift.date.split('T')[0];
+        const [y, m, d] = datePart.split('-');
+        shiftDateNormalized = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+      } else {
+        return false;
+      }
+      
       const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
       if (historyFilter === 'month') {
-        return shiftDate.getMonth() === now.getMonth() && shiftDate.getFullYear() === now.getFullYear();
+        return shiftDateNormalized.getMonth() === now.getMonth() && shiftDateNormalized.getFullYear() === now.getFullYear();
       }
       if (historyFilter === 'week') {
         const startOfWeek = new Date(now);
         startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
         startOfWeek.setHours(0,0,0,0);
-        return shiftDate >= startOfWeek;
+        return shiftDateNormalized >= startOfWeek;
       }
       if (historyFilter === 'today') {
         return shiftDateNormalized.getTime() === todayStart.getTime();
       }
       if (historyFilter === 'date' && selectedDate) {
-        const selected = new Date(selectedDate);
-        const selectedNormalized = new Date(selected.getFullYear(), selected.getMonth(), selected.getDate());
-        return shiftDateNormalized.getTime() === selectedNormalized.getTime();
+        return datePart === selectedDate.split('T')[0];
       }
       return true;
     });
@@ -203,7 +209,7 @@ export default function StaffAttendanceTab({ stores }) {
 
         {/* Filters & Stats */}
         <div className="px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white z-10 sticky top-0 shadow-sm print:relative print:shadow-none print:border-b-2 print:border-black">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto print:hidden overflow-x-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto print:hidden pb-1">
             <div className="flex items-center bg-slate-100 p-1 rounded-lg shrink-0">
               <button 
                 onClick={() => setHistoryFilter('all')}
@@ -228,7 +234,10 @@ export default function StaffAttendanceTab({ stores }) {
                 onClick={() => setIsDatePickerOpen(true)}
                 className={`flex items-center justify-between w-full sm:w-[140px] px-3 py-1.5 h-[32px] rounded-lg text-xs font-bold transition-all border cursor-pointer shadow-sm ${historyFilter === 'date' ? 'bg-[#00694C] text-white border-[#00694C]' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}
               >
-                <span>{selectedDate ? new Date(selectedDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Choose Date"}</span>
+                <span>{selectedDate ? (() => {
+                  const [y, m, d] = selectedDate.split('T')[0].split('-');
+                  return `${d}/${m}/${y}`;
+                })() : "Choose Date"}</span>
                 <Calendar className="w-3.5 h-3.5" />
               </div>
               

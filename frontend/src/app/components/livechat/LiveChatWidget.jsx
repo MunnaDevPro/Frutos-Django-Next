@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
-import { MessageCircle, MessageSquare, X, Send, Search, Users, Phone, Video, Store, Loader2, Info } from 'lucide-react';
+import { MessageCircle, MessageSquare, X, Send, Search, Users, Phone, Video, Store, Loader2, Info, ChevronDown, Check } from 'lucide-react';
 
 const API_BASE = (() => {
   const envUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -80,6 +80,7 @@ export default function LiveChatWidget() {
   const [inputValue, setInputValue] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [storeFilter, setStoreFilter] = useState('');
+  const [isStoreDropdownOpen, setIsStoreDropdownOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [theirTypingStatus, setTheirTypingStatus] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
@@ -343,13 +344,13 @@ export default function LiveChatWidget() {
         {!activeChat ? (
           // --- CONTACTS LIST VIEW ---
           <>
-            <div className="bg-gradient-to-r from-emerald-600 to-green-500 pt-4 pb-4 px-4 text-white">
+            <div className="bg-gradient-to-r from-emerald-600 to-green-500 py-3 px-4 text-white">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-bold text-xl flex items-center gap-2">
+                  <h3 className="font-bold text-lg flex items-center gap-2">
                     Chats
                   </h3>
-                  <p className="text-emerald-100 text-sm mt-1 flex items-center gap-1 cursor-pointer">
+                  <p className="text-emerald-100 text-sm mt-0.5 flex items-center gap-1 cursor-pointer">
                     {user.user_type === 'ADMIN' ? 'Manage Staff' : 'Live Support'}
                   </p>
                 </div>
@@ -357,28 +358,64 @@ export default function LiveChatWidget() {
             </div>
 
             {user.user_type === 'ADMIN' && (
-              <div className="px-5 py-3 flex flex-col gap-3">
+              <div className="px-4 py-2 flex flex-col gap-2">
                 <div className="relative flex items-center">
-                  <Search className="absolute left-4 text-gray-400" size={18} />
+                  <Search className="absolute left-3 text-gray-400" size={16} />
                   <input
                     type="text"
                     placeholder="Search by name or store..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-11 pr-4 py-2.5 bg-gray-100/80 border-none rounded-full text-sm focus:ring-2 focus:ring-emerald-500 outline-none placeholder-gray-500"
+                    className="w-full pl-9 pr-3 py-1.5 bg-gray-100/80 border-none rounded-full text-sm focus:ring-2 focus:ring-emerald-500 outline-none placeholder-gray-500"
                   />
                 </div>
                 {uniqueStores.length > 0 && (
-                  <select
-                    value={storeFilter}
-                    onChange={(e) => setStoreFilter(e.target.value)}
-                    className="w-full px-3 py-2 bg-gray-50 border-none rounded-lg text-sm text-gray-700 focus:ring-2 focus:ring-emerald-500 outline-none"
-                  >
-                    <option value="">All Stores</option>
-                    {uniqueStores.map(store => (
-                      <option key={store} value={store}>{store}</option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <button
+                      onClick={() => setIsStoreDropdownOpen(!isStoreDropdownOpen)}
+                      className="w-full px-4 py-2 bg-gray-50/80 border border-gray-100 rounded-lg text-sm text-gray-700 flex items-center justify-between hover:bg-gray-100 transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    >
+                      <div className="flex items-center gap-2 truncate">
+                        <Store size={14} className="text-emerald-600 flex-shrink-0" />
+                        <span className="truncate">{storeFilter || "All Stores"}</span>
+                      </div>
+                      <ChevronDown size={14} className={`text-gray-400 transition-transform duration-200 flex-shrink-0 ${isStoreDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {isStoreDropdownOpen && (
+                      <>
+                        <div 
+                          className="fixed inset-0 z-40" 
+                          onClick={() => setIsStoreDropdownOpen(false)}
+                        />
+                        <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-gray-100 py-1.5 z-50 max-h-48 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-thumb]:rounded-full">
+                          <div
+                            onClick={() => {
+                              setStoreFilter("");
+                              setIsStoreDropdownOpen(false);
+                            }}
+                            className={`px-3 py-2 text-sm flex items-center justify-between cursor-pointer transition-colors ${!storeFilter ? 'bg-emerald-50/50 text-emerald-700 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
+                          >
+                            All Stores
+                            {!storeFilter && <Check size={14} className="text-emerald-600" />}
+                          </div>
+                          {uniqueStores.map(store => (
+                            <div
+                              key={store}
+                              onClick={() => {
+                                setStoreFilter(store);
+                                setIsStoreDropdownOpen(false);
+                              }}
+                              className={`px-3 py-2 text-sm flex items-center justify-between cursor-pointer transition-colors ${storeFilter === store ? 'bg-emerald-50/50 text-emerald-700 font-medium' : 'text-gray-700 hover:bg-gray-50'}`}
+                            >
+                              <span className="truncate pr-2">{store}</span>
+                              {storeFilter === store && <Check size={14} className="text-emerald-600 flex-shrink-0" />}
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 )}
               </div>
             )}
@@ -394,23 +431,23 @@ export default function LiveChatWidget() {
                   <div
                     key={contact.id}
                     onClick={() => openChat(contact)}
-                    className="flex items-center gap-4 py-3 px-5 hover:bg-gray-50 cursor-pointer transition-colors group relative border-b border-gray-50 last:border-none"
+                    className="flex items-center gap-3 py-2 px-4 hover:bg-gray-50 cursor-pointer transition-colors group relative border-b border-gray-50 last:border-none"
                   >
                     <div className="relative">
                       {contact.photo ? (
-                        <img src={contact.photo.startsWith('http') ? contact.photo : `${API_BASE.replace('/api', '')}${contact.photo}`} alt={contact.name} className="w-12 h-12 rounded-full object-cover" />
+                        <img src={contact.photo.startsWith('http') ? contact.photo : `${API_BASE.replace('/api', '')}${contact.photo}`} alt={contact.name} className="w-10 h-10 rounded-full object-cover" />
                       ) : (
-                        <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center font-bold text-lg">
+                        <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center font-bold text-lg">
                           {contact.name.charAt(0).toUpperCase()}
                         </div>
                       )}
                       {contact.is_active && (contact.store_name || contact.user_type === 'ADMIN') && (
-                        <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white"></div>
+                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0 flex justify-between items-center">
                       <div className="flex-1 min-w-0 pr-2">
-                        <h4 className="font-bold text-gray-900 text-[15px] truncate">{contact.name}</h4>
+                        <h4 className="font-bold text-gray-900 text-sm truncate">{contact.name}</h4>
                         <div className="flex items-center gap-1 mt-0.5 truncate">
                           {contact.store_name && (
                             <span className="text-[11px] text-emerald-600 font-medium whitespace-nowrap">

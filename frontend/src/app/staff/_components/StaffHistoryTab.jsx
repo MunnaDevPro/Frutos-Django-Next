@@ -165,16 +165,21 @@ export default function StaffHistoryTab() {
     if (storeFilter !== 'all' && shift.store_name !== storeFilter) return false;
     if (historyFilter === 'all') return true;
 
-    const shiftDate = new Date(shift.date);
-    const shiftDateNormalized = new Date(shiftDate.getFullYear(), shiftDate.getMonth(), shiftDate.getDate());
+    let shiftDateNormalized = null;
+    let datePart = "";
+    if (shift.date) {
+      datePart = shift.date.split('T')[0];
+      const [y, m, d] = datePart.split('-');
+      shiftDateNormalized = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+    } else {
+      return false; // Skip if no date
+    }
 
     if (historyFilter === 'month') return shiftDateNormalized >= startOfMonth;
     if (historyFilter === 'week') return shiftDateNormalized >= startOfWeek;
     if (historyFilter === 'today') return shiftDateNormalized.getTime() === todayStart.getTime();
     if (historyFilter === 'date' && selectedDate) {
-      const selected = new Date(selectedDate);
-      const selectedNormalized = new Date(selected.getFullYear(), selected.getMonth(), selected.getDate());
-      return shiftDateNormalized.getTime() === selectedNormalized.getTime();
+      return datePart === selectedDate.split('T')[0];
     }
     return true;
   });
@@ -280,7 +285,7 @@ export default function StaffHistoryTab() {
       )}
 
       {/* Shift List */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mt-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mt-6">
         <div className="px-6 py-4 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-[#00694C]" />
@@ -330,7 +335,7 @@ export default function StaffHistoryTab() {
             )}
 
             {/* Time Filter */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto shrink-0 overflow-x-auto pb-1">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto shrink-0 pb-1">
               <div className="flex items-center bg-slate-100 p-1 rounded-lg w-full sm:w-auto shrink-0 overflow-x-auto">
                 <button
                   onClick={() => setHistoryFilter('all')}
@@ -355,7 +360,10 @@ export default function StaffHistoryTab() {
                   onClick={() => setIsDatePickerOpen(true)}
                   className={`flex items-center justify-between w-full sm:w-[140px] px-3 py-1.5 h-[32px] rounded-lg text-xs font-bold transition-all border cursor-pointer shadow-sm ${historyFilter === 'date' ? 'bg-[#00694C] text-white border-[#00694C]' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'}`}
                 >
-                  <span>{selectedDate ? new Date(selectedDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) : "Choose Date"}</span>
+                  <span>{selectedDate ? (() => {
+                    const [y, m, d] = selectedDate.split('T')[0].split('-');
+                    return `${d}/${m}/${y}`;
+                  })() : "Choose Date"}</span>
                   <Calendar className="w-3.5 h-3.5" />
                 </div>
                 

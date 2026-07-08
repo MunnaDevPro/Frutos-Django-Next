@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import useSWR from "swr";
 import api from "@/app/dashboard/_lib/api";
 import { User, Phone, Lock, Save, Camera, Check, Calendar, Store as StoreIcon, TrendingUp, Loader2, BarChart2, ArrowRight, ChevronDown } from "lucide-react";
@@ -13,6 +13,12 @@ export default function StaffProfileSettings({ profile, user }) {
   const [photoPreview, setPhotoPreview] = useState(profile?.photo || null);
   const { success: successToast, error: errorToast } = useToastContext();
   const { fetchUser } = useStaffAuth();
+
+  useEffect(() => {
+    if (profile?.photo) {
+      setPhotoPreview(profile.photo);
+    }
+  }, [profile?.photo]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

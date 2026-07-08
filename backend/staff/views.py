@@ -89,10 +89,16 @@ class AdminStaffViewSet(viewsets.ModelViewSet):
             instance.secret_key = new_password
             instance.save()
             
+        if 'photo' in request.FILES:
+            user.profile_image = request.FILES['photo']
+            user_changed = True
+            
         if user_changed:
             user.save()
             
-        # Update StaffProfile fields
+        # Remove photo from request.data so StaffProfileSerializer doesn't try to save it
+        # Since it's a QueryDict, we might need to copy it if we want to mutate, but DRF update 
+        # ignores fields that are SerializerMethodFields anyway, so we can just let it be.
         return super().update(request, *args, **kwargs)
 
 class AdminStaffShiftViewSet(viewsets.ModelViewSet):
