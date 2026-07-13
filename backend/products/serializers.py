@@ -23,6 +23,9 @@ class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
         fields = ['id', 'name', 'slug', 'logo', 'logo_url', 'description', 'website', 'is_active']
+        extra_kwargs = {
+            'slug': {'required': False, 'allow_blank': True, 'validators': []},
+        }
     
     def get_logo_url(self, obj):
         request = self.context.get('request')
@@ -50,6 +53,10 @@ class SubCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = SubCategory
         fields = ['id','name','slug','image','image_url','category', 'category_name', 'total_products']
+        extra_kwargs = {
+            'slug': {'required': False, 'allow_blank': True, 'validators': []},
+            'image': {'required': False, 'allow_null': True},
+        }
 
     def get_total_products(self, obj):
         return getattr(obj, 'total_products', obj.products.count())

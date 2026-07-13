@@ -92,6 +92,14 @@ function CategoryForm({ initial = {}, onSubmit, submitLabel = "Save" }) {
   const [preview, setPreview] = useState(initial.image_url || "");
   const [submitting, setSubmitting] = useState(false);
 
+  const handleNameChange = (e) => {
+    const val = e.target.value;
+    setName(val);
+    if (!initial.slug) {
+      setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''));
+    }
+  };
+
   const handleImage = (e) => {
     const f = e.target.files?.[0];
     if (f) { setImage(f); setPreview(URL.createObjectURL(f)); }
@@ -112,7 +120,7 @@ function CategoryForm({ initial = {}, onSubmit, submitLabel = "Save" }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div><label className={lbl}>Category Name *</label><input required className={inp} value={name} onChange={e => setName(e.target.value)} placeholder="e.g., Electronics" /></div>
+        <div><label className={lbl}>Category Name *</label><input required className={inp} value={name} onChange={handleNameChange} placeholder="e.g., Electronics" /></div>
         <div><label className={lbl}>Slug (Optional)</label><input className={inp} value={slug} onChange={e => setSlug(e.target.value)} placeholder="auto-generated" /></div>
       </div>
       <div>
@@ -142,12 +150,21 @@ function CategoryForm({ initial = {}, onSubmit, submitLabel = "Save" }) {
 
 /* ─── SubCategory Form ───────────────────────────────────────── */
 function SubCategoryForm({ initial = {}, categories = [], onSubmit, submitLabel = "Save" }) {
+  const toast = useToastContext();
   const [name, setName] = useState(initial.name || "");
   const [slug, setSlug] = useState(initial.slug || "");
   const [category, setCategory] = useState(initial.category?.id || initial.category || "");
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(initial.image_url || "");
   const [submitting, setSubmitting] = useState(false);
+
+  const handleNameChange = (e) => {
+    const val = e.target.value;
+    setName(val);
+    if (!initial.slug) {
+      setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''));
+    }
+  };
 
   const handleImage = (e) => {
     const f = e.target.files?.[0];
@@ -156,6 +173,10 @@ function SubCategoryForm({ initial = {}, categories = [], onSubmit, submitLabel 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!category) {
+      toast.error("Please select a parent category");
+      return;
+    }
     setSubmitting(true);
     try {
       const fd = new FormData();
@@ -170,7 +191,7 @@ function SubCategoryForm({ initial = {}, categories = [], onSubmit, submitLabel 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div><label className={lbl}>SubCategory Name *</label><input required className={inp} value={name} onChange={e => setName(e.target.value)} placeholder="e.g., Smartphones" /></div>
+        <div><label className={lbl}>SubCategory Name *</label><input required className={inp} value={name} onChange={handleNameChange} placeholder="e.g., Smartphones" /></div>
         <div>
           <label className={lbl}>Parent Category *</label>
           <SearchableSelect
