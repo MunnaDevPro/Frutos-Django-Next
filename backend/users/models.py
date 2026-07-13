@@ -342,6 +342,15 @@ class VendorTicket(models.Model):
         related_name='responded_tickets'
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Vendor Ticket"
+        verbose_name_plural = "Vendor Tickets"
+
+    def __str__(self):
+        return f"Ticket #{self.pk} - {self.subject} ({self.status})"
 
 
 class PasswordResetOTP(models.Model):
@@ -385,15 +394,6 @@ class PasswordResetOTP(models.Model):
         """Check if OTP is still valid"""
         from django.utils import timezone
         return not self.is_used and timezone.now() < self.expires_at
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['-created_at']
-        verbose_name = "Vendor Ticket"
-        verbose_name_plural = "Vendor Tickets"
-
-    def __str__(self):
-        return f"Ticket #{self.pk} - {self.subject} ({self.status})"
 
 
 class Notification(models.Model):

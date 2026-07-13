@@ -131,7 +131,7 @@ class Migration(migrations.Migration):
             name='trade_license_number',
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
-        
+
         migrations.CreateModel(
             name='WholesaleGuaranteeCheck',
             fields=[
