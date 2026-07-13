@@ -15,6 +15,18 @@ const TABS = [
   { id: "specs",       label: "Specifications" },
 ];
 
+const UNIT_OPTIONS = [
+  { value: "BAN", label: "BANDEJA (TRAY)" },
+  { value: "CAJ", label: "CAJA (BOX)" },
+  { value: "GRA", label: "GRANDE (LARGE)" },
+  { value: "KG", label: "KILO (KILO)" },
+  { value: "MAN", label: "MANOJO (BUNCH)" },
+  { value: "MED", label: "MEDIO CAJA (HALF BOX)" },
+  { value: "PAL", label: "PALET (PALLET)" },
+  { value: "PEQ", label: "PEQUEÑO (SMALL)" },
+  { value: "PIE", label: "PIEZA (PIECE)" },
+];
+
 // ── Shared styles ──────────────────────────────────────────────
 const inputCls = "w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300 transition-all";
 const labelCls = "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5";
@@ -228,19 +240,12 @@ export default function ProductForm({
             </div>
             <div>
               <label className={labelCls}>Display Unit</label>
-              <select className={inputCls} value={form.unit || ""} onChange={e => handleChange("unit", e.target.value)}>
-                <option value="">Select a unit...</option>
-                <option value="kg">kg</option>
-                <option value="g">g</option>
-                <option value="L">L</option>
-                <option value="ml">ml</option>
-                <option value="box">box</option>
-                <option value="pcs">pcs</option>
-                <option value="pack">pack</option>
-                <option value="dozen">dozen</option>
-                <option value="case">case</option>
-                <option value="pallet">pallet</option>
-              </select>
+              <SearchableSelect
+                value={form.unit || ""}
+                onChange={v => handleChange("unit", v)}
+                options={UNIT_OPTIONS}
+                placeholder="Select a unit..."
+              />
             </div>
             <div>
               <label className={labelCls}>Variant / Quality</label>
@@ -383,19 +388,12 @@ export default function ProductForm({
             </div>
             <div>
               <label className={labelCls}>Wholesale Unit</label>
-              <select className={inputCls} value={form.wholesale_unit || ""} onChange={e => handleChange("wholesale_unit", e.target.value)}>
-                <option value="">Select a unit...</option>
-                <option value="kg">kg</option>
-                <option value="g">g</option>
-                <option value="L">L</option>
-                <option value="ml">ml</option>
-                <option value="box">box</option>
-                <option value="pcs">pcs</option>
-                <option value="pack">pack</option>
-                <option value="dozen">dozen</option>
-                <option value="case">case</option>
-                <option value="pallet">pallet</option>
-              </select>
+              <SearchableSelect
+                value={form.wholesale_unit || ""}
+                onChange={v => handleChange("wholesale_unit", v)}
+                options={UNIT_OPTIONS}
+                placeholder="Select a unit..."
+              />
             </div>
             <div>
               <label className={labelCls}>Min Purchase Qty</label>
