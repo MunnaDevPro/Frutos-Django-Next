@@ -394,6 +394,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     lookup_field = 'slug'
     permission_classes = [permissions.AllowAny]
+    pagination_class = None
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['name', 'slug']
 
@@ -445,6 +446,7 @@ class SubCategoryViewSet(viewsets.ModelViewSet):
     serializer_class = SubCategorySerializer
     lookup_field = 'slug'
     permission_classes = [permissions.AllowAny]
+    pagination_class = None
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['name', 'slug', 'category__name']
 
@@ -493,6 +495,7 @@ class ColorViewSet(viewsets.ModelViewSet):
     queryset = Color.objects.all().order_by('name')
     serializer_class = ColorSerializer
     permission_classes = [IsAdminOrReadOnly]
+    pagination_class = None
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['name', 'hex_code']
 
@@ -575,6 +578,7 @@ class SizeViewSet(viewsets.ModelViewSet):
     queryset = Size.objects.all().order_by('name')
     serializer_class = SizeSerializer
     permission_classes = [IsAdminOrReadOnly]
+    pagination_class = None
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['name']
 
@@ -603,6 +607,7 @@ class BrandViewSet(viewsets.ModelViewSet):
     serializer_class = BrandSerializer
     permission_classes = [IsAdminOrReadOnly]
     lookup_field = 'slug'
+    pagination_class = None
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['name', 'slug']
 
