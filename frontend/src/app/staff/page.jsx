@@ -90,7 +90,10 @@ export default function StaffDashboardPage() {
 
 
   const handleCheckIn = async (overrideStoreId) => {
-    const storeIdToUse = overrideStoreId || selectedStoreForCheckIn;
+    // If called directly from onClick, overrideStoreId will be an event object
+    const passedId = (overrideStoreId && typeof overrideStoreId !== 'object') ? overrideStoreId : null;
+    const storeIdToUse = passedId || selectedStoreForCheckIn;
+    
     if (!storeIdToUse) return;
     setIsCheckingIn(true);
     try {
@@ -99,7 +102,7 @@ export default function StaffDashboardPage() {
       setShowAttendanceModal(false);
     } catch (err) {
       console.error("Check-in failed", err);
-      alert(err.response?.data?.detail || "Failed to start shift");
+      alert(err.message || "Failed to start shift");
     } finally {
       setIsCheckingIn(false);
     }
@@ -117,7 +120,7 @@ export default function StaffDashboardPage() {
       setShowCheckOutModal(false);
     } catch (err) {
       console.error("Check-out failed", err);
-      alert(err.response?.data?.detail || "Failed to end shift");
+      alert(err.message || "Failed to end shift");
     } finally {
       setIsCheckingOut(false);
     }

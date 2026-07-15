@@ -184,6 +184,8 @@ export async function adminFetch(path, options = {}) {
     const token = getAccessToken();
     if (token && !skipAuth) headers["Authorization"] = `Bearer ${token}`;
 
+    fetchOpts.credentials = "omit";
+
     // Don't set Content-Type for FormData (browser does it with boundary)
     if (!(fetchOpts.body instanceof FormData) && !headers["Content-Type"]) {
         headers["Content-Type"] = "application/json";
