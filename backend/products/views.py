@@ -182,9 +182,6 @@ class ProductViewSet(viewsets.ModelViewSet):
 
         # ── ADMIN: always allowed, skip all staff checks ──────────────────
         if self._is_admin(user):
-            if 'shop' not in serializer.validated_data:
-                from rest_framework.exceptions import ValidationError
-                raise ValidationError({"shop": "Please select a shop for this product."})
             serializer.save(created_by=user, updated_by=user)
             return
 

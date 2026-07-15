@@ -163,7 +163,7 @@ class SubCategory(models.Model):
 
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name='products', db_index=True)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name='products', db_index=True, null=True, blank=True)
     stores = models.ManyToManyField('stores.Store', blank=True, related_name='products', help_text="Physical fulfillment stores")
     brand = models.ForeignKey(Brand, on_delete=models.PROTECT, related_name='products', null=True, blank=True, help_text="Product brand", db_index=True)
     name = models.CharField(max_length=255, db_index=True)
