@@ -268,7 +268,7 @@ export default function CreateAnnouncementPage() {
 
                         <div className="p-3">
                           {store.staff_list.length === 0 ? (
-                            <p className="text-xs text-slate-400 italic text-center py-2 bg-slate-50 rounded border border-dashed border-slate-200">No staff assigned to this store.</p>
+                            <p className="text-xs text-slate-400 italic text-center py-2 bg-slate-50 rounded border border-dashed border-slate-200">Staff not working now</p>
                           ) : filteredStaff.length === 0 ? (
                             <p className="text-xs text-slate-400 italic text-center py-2 bg-slate-50 rounded border border-dashed border-slate-200">No staff matched your search.</p>
                           ) : (

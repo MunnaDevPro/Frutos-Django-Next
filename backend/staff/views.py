@@ -420,7 +420,6 @@ class AnnouncementViewSet(viewsets.ModelViewSet):
             staff_profile = user.staff_profile
             return Announcement.objects.filter(
                 models.Q(target_all_stores=True) |
-                models.Q(target_stores=staff_profile.store) |
                 models.Q(target_staff=staff_profile)
             ).distinct().order_by('-created_at')
         except StaffProfile.DoesNotExist:
@@ -429,17 +428,33 @@ class AnnouncementViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         announcement = serializer.save(created_by=self.request.user)
         
+        from datetime import date
+        today = date.today()
+        
         # Create StaffNotification records
         target_staff_set = set()
+        
         if announcement.target_all_stores:
+            # Send to ALL staff regardless of working status
             for staff in StaffProfile.objects.all():
                 target_staff_set.add(staff)
         else:
+            # Store-based or staff-based: Only send to staff who are CURRENTLY IN ATTENDANCE
+            potential_staff = set()
             for store in announcement.target_stores.all():
                 for staff in store.staff.all():
-                    target_staff_set.add(staff)
+                    potential_staff.add(staff)
             for staff in announcement.target_staff.all():
-                target_staff_set.add(staff)
+                potential_staff.add(staff)
+                
+            for staff in potential_staff:
+                if StaffShift.objects.filter(staff=staff, date=today, status='IN_PROGRESS').exists():
+                    target_staff_set.add(staff)
+                    
+            # Explicitly add these working staff to the target_staff ManyToMany
+            # so they can see the announcement in their dashboard
+            for staff in target_staff_set:
+                announcement.target_staff.add(staff)
                 
         notifications = []
         for staff in target_staff_set:
@@ -461,10 +476,7 @@ class AnnouncementViewSet(viewsets.ModelViewSet):
         if announcement.target_all_stores:
             async_to_sync(channel_layer.group_send)('staff_all', message_data)
         else:
-            for store in announcement.target_stores.all():
-                async_to_sync(channel_layer.group_send)(f'store_{store.id}', message_data)
-            
-            for staff in announcement.target_staff.all():
+            for staff in target_staff_set:
                 async_to_sync(channel_layer.group_send)(f'user_{staff.user.id}', message_data)
 
     @action(detail=False, methods=['get'])

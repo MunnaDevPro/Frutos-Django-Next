@@ -160,7 +160,16 @@ class StoreStaffTreeSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'staff_list']
 
     def get_staff_list(self, obj):
-        staff = obj.staff.all()
+        from datetime import date
+        today = date.today()
+        
+        active_staff_ids = set(obj.staff.filter(
+            shifts__date=today, 
+            shifts__status='IN_PROGRESS'
+        ).values_list('id', flat=True))
+        
+        staff = [s for s in obj.staff.all() if s.id in active_staff_ids]
+        
         def get_photo(s):
             if s.photo:
                 request = self.context.get('request')
