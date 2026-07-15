@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import useSWR from "swr";
-import api from "@/app/dashboard/_lib/api";
+import api, { getPhotoUrl } from "@/app/dashboard/_lib/api";
 import { Loader2, Users, Store, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -46,7 +46,7 @@ function StaffCard({ staff, rank }) {
             <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden bg-slate-50 border border-slate-100 shadow-sm">
               {staff.photo
                 ? <img 
-                    src={staff.photo.startsWith('http') ? staff.photo : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${staff.photo.startsWith('/') ? '' : '/'}${staff.photo}`} 
+                    src={getPhotoUrl(staff.photo)} 
                     alt={staff.name} 
                     className="w-full h-full object-cover" 
                   />
@@ -126,7 +126,7 @@ function StaffCard({ staff, rank }) {
                         <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 text-slate-400 flex items-center justify-center shrink-0 group-hover:bg-[#00694C]/5 group-hover:text-[#00694C] group-hover:border-[#00694C]/10 transition-all duration-300 overflow-hidden">
                           {stat.image ? (
                             <img 
-                              src={stat.image.startsWith('http') ? stat.image : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000'}${stat.image.startsWith('/') ? '' : '/'}${stat.image}`} 
+                              src={getPhotoUrl(stat.image)} 
                               alt={name} 
                               className="w-full h-full object-cover" 
                               onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}

@@ -2,18 +2,12 @@
 
 import { useState, useMemo, useRef } from "react";
 import useSWR from "swr";
-import api from "@/app/dashboard/_lib/api";
+import api, { getPhotoUrl } from "@/app/dashboard/_lib/api";
 import { Loader2, Users, Store, Clock, Calendar, ChevronRight, ChevronLeft, X, AlertCircle, CalendarClock, CalendarOff, CheckCircle2, Printer, Trash2 } from "lucide-react";
 import DatePickerModal from "@/app/dashboard/_components/DatePickerModal";
 import ConfirmDialog from "@/app/dashboard/_components/ConfirmDialog";
 
-// Helper for photo URL
-const getPhotoUrl = (url) => {
-  if (!url) return null;
-  if (url.startsWith('http')) return url;
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://127.0.0.1:8000';
-  return `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`;
-};
+// Removed local getPhotoUrl in favor of the one from api.js
 
 // Helper to format decimal hours into "Xh Ym" or "Ym"
 const formatHours = (decimalHours) => {

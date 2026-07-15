@@ -258,4 +258,9 @@ export const api = {
 };
 
 export { API_BASE_URL };
+export const getPhotoUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    return `${API_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+};
 export default api;

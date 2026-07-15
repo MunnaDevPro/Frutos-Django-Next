@@ -11,7 +11,7 @@ import FormModal from "@/app/dashboard/_components/FormModal";
 import ConfirmDialog from "@/app/dashboard/_components/ConfirmDialog";
 import { useToastContext } from "@/app/dashboard/_components/Toaster";
 import useSWR from "swr";
-import api from "@/app/dashboard/_lib/api";
+import api, { getPhotoUrl } from "@/app/dashboard/_lib/api";
 import StaffRankingTab from "./_components/StaffRankingTab";
 import StaffAttendanceTab from "./_components/StaffAttendanceTab";
 import AdminDayOffRequestsTab from "./_components/AdminDayOffRequestsTab";
@@ -26,7 +26,7 @@ const columns = [
       <Link href={`/dashboard/staff/${row.id}`} className="flex items-center justify-start gap-3 group hover:opacity-80 transition-opacity">
         <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200">
           {row.photo ? (
-            <img src={row.photo} alt={row.user?.name || "Staff"} className="w-full h-full object-cover" />
+            <img src={getPhotoUrl(row.photo)} alt={row.user?.name || "Staff"} className="w-full h-full object-cover" />
           ) : (
             <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(row.user?.name || row.user?.email || 'S')}&background=0f172a&color=fff&size=64&bold=true`} alt="Default" className="w-full h-full object-cover" />
           )}
@@ -457,7 +457,7 @@ export default function StaffPage() {
             <div className="flex items-center gap-5 p-2 pt-4">
               <div className="w-16 h-16 rounded-full overflow-hidden border border-slate-200 shrink-0 bg-slate-100">
                 {viewStaff.photo ? (
-                  <img src={viewStaff.photo} alt={viewStaff.user?.name || "Staff"} className="w-full h-full object-cover" />
+                  <img src={getPhotoUrl(viewStaff.photo)} alt={viewStaff.user?.name || "Staff"} className="w-full h-full object-cover" />
                 ) : (
                   <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(viewStaff.user?.name || viewStaff.user?.email || 'S')}&background=0f172a&color=fff&size=128&bold=true`} alt="Default" className="w-full h-full object-cover" />
                 )}
