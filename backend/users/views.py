@@ -425,7 +425,11 @@ def admin_dashboard(request):
     active_products = Product.objects.filter(is_active=True).count()
     total_orders = Order.objects.count()
     pending_orders = Order.objects.filter(status='PENDING').count()
-    total_revenue = Order.objects.filter(payment_status='PAID').aggregate(
+    total_revenue = Order.objects.filter(status='DELIVERED').aggregate(
+        total=Sum('total_amount')
+    )['total'] or 0
+
+    total_pending_amount = Order.objects.filter(status='PENDING').aggregate(
         total=Sum('total_amount')
     )['total'] or 0
 
@@ -442,6 +446,7 @@ def admin_dashboard(request):
         'total_orders': total_orders,
         'pending_orders': pending_orders,
         'total_revenue': float(total_revenue),
+        'total_pending_amount': float(total_pending_amount),
     }
     
     return Response({

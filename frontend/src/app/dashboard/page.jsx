@@ -241,10 +241,10 @@ export default function DashboardHomePage() {
         <p className="text-slate-500 font-medium mt-1">Welcome back. Here is your store performance at a glance.</p>
       </div>
 
-      {/* Top 6 stat cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+      {/* Top 7 stat cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4 mb-8">
         {statsLoading
-          ? Array.from({ length: 6 }).map((_, i) => (
+          ? Array.from({ length: 7 }).map((_, i) => (
             <div key={i} className="bg-white border border-slate-100 rounded-xl p-5 h-28 animate-pulse shadow-sm" />
           ))
           : <>
@@ -306,6 +306,16 @@ export default function DashboardHomePage() {
                 <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Revenue</p>
               </div>
               <p className="text-2xl font-black text-green-600">€{Number(stats?.total_revenue || 0).toLocaleString()}</p>
+            </Link>
+
+            <Link href="/dashboard/analytics" className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md hover:-translate-y-1 transition-all">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-amber-50 text-amber-600 rounded-lg">
+                  <Euro className="w-5 h-5" />
+                </div>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pending Amt</p>
+              </div>
+              <p className="text-2xl font-black text-amber-600">€{Number(stats?.total_pending_amount || 0).toLocaleString()}</p>
             </Link>
           </>
         }

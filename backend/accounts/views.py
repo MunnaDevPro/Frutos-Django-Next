@@ -1037,11 +1037,13 @@ class AdminDashboardStatsView(APIView):
         try:
             from orders.models import Order
             total_orders   = Order.objects.count()
-            pending_orders = Order.objects.filter(status='pending').count()
-            total_revenue  = Order.objects.aggregate(
+            pending_orders = Order.objects.filter(status='PENDING').count()
+            total_revenue  = Order.objects.filter(status='DELIVERED').aggregate(
+                t=db_models.Sum('total_amount'))['t'] or 0
+            total_pending_amount = Order.objects.filter(status='PENDING').aggregate(
                 t=db_models.Sum('total_amount'))['t'] or 0
         except Exception:
-            total_orders = pending_orders = total_revenue = 0
+            total_orders = pending_orders = total_revenue = total_pending_amount = 0
 
         # Products
         try:
@@ -1106,6 +1108,7 @@ class AdminDashboardStatsView(APIView):
                 'total_products': total_products,
                 'total_orders':   total_orders,
                 'total_revenue':  float(total_revenue),
+                'total_pending_amount': float(total_pending_amount),
                 # User breakdown
                 'total_customers':      total_customers,
                 'total_sellers':        total_sellers,
