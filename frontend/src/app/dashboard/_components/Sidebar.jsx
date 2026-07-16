@@ -163,7 +163,7 @@ export default function Sidebar({ collapsed, onToggle }) {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2.5 space-y-4 db-scroll">
+      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-3 db-scroll">
         {filteredGroups.map((group) => (
           <div key={group.label}>
             {!collapsed && (
@@ -182,7 +182,7 @@ export default function Sidebar({ collapsed, onToggle }) {
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
                     className={`relative flex items-center ${
-                      collapsed ? "justify-center p-2" : "gap-3 px-3 py-2"
+                      collapsed ? "justify-center p-2" : "gap-2.5 px-2.5 py-1.5"
                     } rounded-xl text-sm font-semibold transition-all duration-300 group ${
                       active
                         ? "bg-[#00694C] text-white shadow-md shadow-[#00694C]/20"
@@ -247,23 +247,23 @@ export default function Sidebar({ collapsed, onToggle }) {
       </button>
 
       {/* Mobile overlay */}
-      {mobileOpen && (
-        <div className="md:hidden fixed inset-0 z-40">
-          <div
-            className="absolute inset-0 bg-black/20 backdrop-blur-sm animate-in fade-in duration-500 ease-out"
+      <div 
+        className={`md:hidden fixed inset-0 z-50 transition-opacity duration-700 ease-in-out ${mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} 
+      >
+        <div
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          onClick={() => setMobileOpen(false)}
+        />
+        <aside className={`relative w-56 h-full bg-white border-r border-slate-100 shadow-xl transform transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <button
             onClick={() => setMobileOpen(false)}
-          />
-          <aside className="relative w-56 h-full bg-white border-r border-slate-100 shadow-xl animate-in slide-in-from-left-full duration-500 ease-out">
-            <button
-              onClick={() => setMobileOpen(false)}
-              className="absolute top-3 right-3 p-1.5 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors shadow-sm z-50 cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-            <NavContent />
-          </aside>
-        </div>
-      )}
+            className="absolute top-4 right-4 p-1.5 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors shadow-sm z-50 cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+          <NavContent />
+        </aside>
+      </div>
 
       {/* Desktop sidebar */}
       <aside

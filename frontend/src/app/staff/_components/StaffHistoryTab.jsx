@@ -311,7 +311,7 @@ export default function StaffHistoryTab() {
                 {isStoreDropdownOpen && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setIsStoreDropdownOpen(false)}></div>
-                    <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white border border-slate-100 rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] py-1.5 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+                    <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white border border-slate-100 rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] py-1.5 max-h-60 overflow-y-auto db-scroll animate-in fade-in zoom-in-95 duration-200">
                       <button
                         onClick={() => { setStoreFilter('all'); setIsStoreDropdownOpen(false); }}
                         className={`w-full text-left px-4 py-2 text-xs font-semibold transition-colors flex items-center gap-2 cursor-pointer ${storeFilter === 'all' ? 'bg-emerald-50 text-[#00694C]' : 'text-slate-600 hover:bg-slate-50'}`}

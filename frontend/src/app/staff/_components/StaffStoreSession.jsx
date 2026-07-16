@@ -302,7 +302,7 @@ function StoreOrderHistoryTab({ profile, storeId }) {
                     <div className="text-slate-400 text-[11px]">{order.customer_email}</div>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex flex-col gap-1 max-h-[80px] overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="flex flex-col gap-1 max-h-[80px] overflow-y-auto pr-2 db-scroll">
                       {order.items?.map(item => (
                         <div key={item.id} className="text-[11px] text-slate-600 truncate max-w-[180px]" title={`${item.quantity}x ${item.product_name}`}>
                           <span className="font-bold text-slate-700">{item.quantity}x</span> {item.product_name}
@@ -326,7 +326,7 @@ function StoreOrderHistoryTab({ profile, storeId }) {
 
       {showCreate && (
         <div className="fixed inset-0 bg-black/60 z-[200] flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setShowCreate(false)}>
-          <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto db-scroll shadow-2xl" onClick={e => e.stopPropagation()}>
             <div className="p-6 border-b border-slate-100 flex justify-between items-center">
               <h2 className="text-lg font-bold text-slate-800">Create Manual Order</h2>
               <button onClick={() => setShowCreate(false)} className="text-2xl text-slate-400 hover:text-slate-600 cursor-pointer leading-none">×</button>

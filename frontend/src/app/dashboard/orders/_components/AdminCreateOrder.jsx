@@ -275,27 +275,27 @@ export default function AdminCreateOrder({ onBack, storeId, onSuccess }) {
     <div className="flex flex-col bg-white border border-slate-200 rounded-xl overflow-hidden min-h-[70vh]">
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 sm:p-5 border-b border-slate-100 bg-slate-50">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 sm:p-5 border-b border-slate-100 bg-slate-50">
         <div>
-          <h2 className="text-lg font-bold text-slate-800">
+          <h2 className="text-base sm:text-lg font-bold text-slate-800">
             {step === 1 ? "Step 1: Select Products" : "Step 2: Checkout Details"}
           </h2>
-          <p className="text-sm text-slate-500">
+          <p className="text-xs sm:text-sm text-slate-500">
             {step === 1 ? "Choose products, quantities, and sizes." : "Enter delivery and payment information."}
           </p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        <div className="flex flex-wrap sm:flex-nowrap sm:flex-row gap-2 w-full sm:w-auto mt-2 sm:mt-0">
           {step === 2 && (
             <button
               onClick={() => setStep(1)}
-              className="w-full sm:w-auto justify-center px-4 py-2 bg-white border border-slate-200 text-slate-600 font-semibold rounded-md text-sm hover:bg-slate-50 shadow-sm flex items-center gap-2"
+              className="w-full sm:w-auto justify-center px-3 py-1.5 sm:px-4 sm:py-2 bg-white border border-slate-200 text-slate-600 font-semibold rounded-md text-xs sm:text-sm hover:bg-slate-50 shadow-sm flex items-center gap-2"
             >
-              <ArrowLeft className="w-4 h-4" /> Back to Products
+              <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Back
             </button>
           )}
           <button
             onClick={onBack}
-            className="w-full sm:w-auto justify-center cursor-pointer px-4 py-2 bg-white border border-slate-200 text-slate-600 font-semibold rounded-md text-sm hover:bg-red-50 hover:text-red-600 hover:border-red-200 shadow-sm transition-colors"
+            className="w-full sm:w-auto justify-center cursor-pointer px-3 py-1.5 sm:px-4 sm:py-2 bg-white border border-slate-200 text-slate-600 font-semibold rounded-md text-xs sm:text-sm hover:bg-red-50 hover:text-red-600 hover:border-red-200 shadow-sm transition-colors"
           >
             Cancel Order
           </button>
@@ -305,18 +305,18 @@ export default function AdminCreateOrder({ onBack, storeId, onSuccess }) {
       {step === 1 && (
         <div className="flex flex-col flex-1">
           {/* Filters */}
-          <div className="p-4 pb-2 border-b border-slate-100 flex flex-col sm:flex-row gap-4 items-center justify-between bg-white">
+          <div className="p-3 pb-1.5 sm:p-4 sm:pb-2 border-b border-slate-100 flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-between bg-white">
             <div
               ref={categoryScrollRef}
               onMouseDown={handleCategoryMouseDown}
               onMouseLeave={handleCategoryMouseLeave}
               onMouseUp={handleCategoryMouseUp}
               onMouseMove={handleCategoryMouseMove}
-              className="flex overflow-x-auto gap-2 pb-3 db-scroll max-w-full cursor-grab active:cursor-grabbing select-none"
+              className="flex overflow-x-auto gap-2 pb-2 db-scroll max-w-full cursor-grab active:cursor-grabbing select-none w-full"
             >
               <button
                 onClick={() => handleCategoryClick("ALL")}
-                className={`cursor-pointer px-4 py-2 rounded-md text-sm font-semibold transition-all whitespace-nowrap ${activeCategory === "ALL"
+                className={`cursor-pointer px-3 py-1.5 sm:px-4 sm:py-2 rounded-md text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${activeCategory === "ALL"
                   ? "bg-[#00694C] text-white shadow-sm"
                   : "bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100"
                   }`}
@@ -327,7 +327,7 @@ export default function AdminCreateOrder({ onBack, storeId, onSuccess }) {
                 <button
                   key={cat}
                   onClick={() => handleCategoryClick(cat)}
-                  className={`cursor-pointer px-4 py-2 rounded-md text-sm font-semibold transition-all whitespace-nowrap ${activeCategory === cat
+                  className={`cursor-pointer px-3 py-1.5 sm:px-4 sm:py-2 rounded-md text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${activeCategory === cat
                     ? "bg-[#00694C] text-white shadow-sm"
                     : "bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100"
                     }`}
@@ -336,13 +336,13 @@ export default function AdminCreateOrder({ onBack, storeId, onSuccess }) {
                 </button>
               ))}
             </div>
-            <div className="w-full sm:w-64 shrink-0">
+            <div className="w-full sm:w-64 shrink-0 mt-1 sm:mt-0">
               <input
                 type="text"
                 placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-[#00694C]"
+                className="w-full px-3 py-1.5 text-xs sm:text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-[#00694C]"
               />
             </div>
           </div>
@@ -517,8 +517,8 @@ export default function AdminCreateOrder({ onBack, storeId, onSuccess }) {
       )}
 
       {step === 2 && (
-        <div className="p-6 md:p-8 bg-slate-50 flex-1 overflow-y-auto">
-          <div className="max-w-4xl mx-auto space-y-6">
+        <div className="p-3 sm:p-6 md:p-8 bg-slate-50 flex-1 overflow-y-auto">
+          <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
 
             {/* Delivery Section (from Website) */}
             <DeliverySection
@@ -544,8 +544,8 @@ export default function AdminCreateOrder({ onBack, storeId, onSuccess }) {
             />
 
             {/* Order Summary & Submit */}
-            <div className="bg-white p-6 md:p-8 rounded-xl border border-slate-200 shadow-sm mt-8">
-              <h3 className="text-xl font-bold text-slate-800 mb-6">Order Summary</h3>
+            <div className="bg-white p-4 sm:p-6 md:p-8 rounded-xl border border-slate-200 shadow-sm mt-4 sm:mt-8">
+              <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-4 sm:mb-6">Order Summary</h3>
               <div className="divide-y divide-slate-100 mb-6">
                 {getSelectedItemsArray().map((item, idx) => (
                   <div key={idx} className="py-3 flex justify-between items-center">
@@ -581,13 +581,13 @@ export default function AdminCreateOrder({ onBack, storeId, onSuccess }) {
                 </div>
               </div>
 
-              <div className="mt-8">
+              <div className="mt-4 sm:mt-6">
                 <button
                   onClick={handleSubmitOrder}
                   disabled={isSubmitting}
-                  className="w-full flex items-center justify-center gap-2 bg-[#00694C] hover:bg-[#005940] text-white px-6 py-4 rounded-xl font-bold text-lg shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 bg-[#00694C] hover:bg-[#005940] text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-bold text-sm sm:text-base shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
-                  {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : <Check className="w-6 h-6" />}
+                  {isSubmitting ? <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" /> : <Check className="w-4 h-4 sm:w-5 sm:h-5" />}
                   Confirm Order
                 </button>
               </div>

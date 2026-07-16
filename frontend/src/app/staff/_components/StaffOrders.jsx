@@ -344,18 +344,18 @@ export default function StaffOrders({ profile }) {
         <h1 className="text-2xl font-serif text-[#004A3A] font-medium tracking-tight">Order Line</h1>
       </div>
 
-      <div className="flex gap-3 mb-4">
+      <div className="flex flex-wrap gap-2 sm:gap-3 mb-4 w-full">
         {canCreate && (
           <button
             onClick={() => setActiveTab("CREATE_ORDER")}
-            className={`cursor-pointer px-4 py-2 rounded-lg font-bold text-sm transition-all ${activeTab === "CREATE_ORDER" ? "bg-[#00694C] text-white shadow-md" : "bg-white text-slate-600 shadow-sm hover:bg-slate-50"}`}
+            className={`cursor-pointer px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-bold text-xs sm:text-sm transition-all flex-1 sm:flex-none text-center justify-center ${activeTab === "CREATE_ORDER" ? "bg-[#00694C] text-white shadow-md" : "bg-white text-slate-600 shadow-sm hover:bg-slate-50"}`}
           >
             Create Manual Order
           </button>
         )}
         <button
           onClick={() => setActiveTab("TRACK_ORDERS")}
-          className={`cursor-pointer px-4 py-2 rounded-lg font-bold text-sm transition-all ${activeTab === "TRACK_ORDERS" ? "bg-[#00694C] text-white shadow-md" : "bg-white text-slate-600 shadow-sm hover:bg-slate-50"}`}
+          className={`cursor-pointer px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-bold text-xs sm:text-sm transition-all flex-1 sm:flex-none text-center justify-center ${activeTab === "TRACK_ORDERS" ? "bg-[#00694C] text-white shadow-md" : "bg-white text-slate-600 shadow-sm hover:bg-slate-50"}`}
         >
           Track Orders
         </button>
