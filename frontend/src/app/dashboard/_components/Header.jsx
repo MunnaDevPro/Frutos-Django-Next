@@ -55,7 +55,7 @@ function NotificationDropdown({ onClose }) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={`text-xs flex items-center gap-2 truncate ${isUnread ? 'font-bold text-slate-900' : 'font-semibold text-slate-800'}`}>
-                    {notif.title}
+                    {notif.title.replace(/[\u{1F300}-\u{1F6FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{1F1E6}-\u{1F1FF}\u{2300}-\u{23FF}\u{2B50}\u{2B06}]/gu, '').trim()}
                     {count > 1 && (
                       <span className="inline-flex items-center justify-center bg-indigo-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
                         {count}

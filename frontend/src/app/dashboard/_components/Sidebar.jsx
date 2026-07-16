@@ -222,15 +222,15 @@ export default function Sidebar({ collapsed, onToggle }) {
       {mobileOpen && (
         <div className="md:hidden fixed inset-0 z-40">
           <div
-            className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/20 backdrop-blur-sm animate-in fade-in duration-500 ease-out"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="relative w-64 h-full bg-white border-r border-slate-100 shadow-xl">
+          <aside className="relative w-56 h-full bg-white border-r border-slate-100 shadow-xl animate-in slide-in-from-left-full duration-500 ease-out">
             <button
               onClick={() => setMobileOpen(false)}
-              className="absolute top-3 right-3 p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+              className="absolute top-3 right-3 p-1.5 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors shadow-sm z-50"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
             <NavContent />
           </aside>

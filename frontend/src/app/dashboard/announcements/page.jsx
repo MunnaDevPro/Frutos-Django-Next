@@ -153,37 +153,37 @@ export default function AnnouncementsPage() {
                     }`}
                   >
                     <div 
-                      className={`flex items-center justify-between p-4 cursor-pointer transition-colors duration-300 select-none ${
+                      className={`flex items-start sm:items-center justify-between p-3 sm:p-4 cursor-pointer transition-colors duration-300 select-none gap-2 sm:gap-4 ${
                         isExpanded ? 'bg-gradient-to-r from-emerald-50/50 to-white' : 'bg-white hover:bg-slate-50'
                       }`}
                       onClick={() => toggleAccordion(ann.id)}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 shadow-sm ${
+                      <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
+                        <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shrink-0 mt-0.5 sm:mt-0 transition-all duration-300 shadow-sm ${
                           isExpanded 
                             ? 'bg-gradient-to-br from-emerald-600 to-emerald-800 text-white scale-110' 
                             : 'bg-emerald-50 text-emerald-600'
                         }`}>
-                          <Megaphone className="w-4 h-4" />
+                          <Megaphone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </div>
-                        <div>
-                          <h3 className={`font-semibold text-sm tracking-tight leading-tight transition-colors duration-300 ${
+                        <div className="flex-1 min-w-0">
+                          <h3 className={`font-semibold text-sm tracking-tight leading-snug sm:leading-tight transition-colors duration-300 break-words ${
                             isExpanded ? 'text-emerald-700' : 'text-slate-800'
                           }`}>
                             {ann.title}
                           </h3>
-                          <div className="flex items-center gap-1.5 mt-1">
-                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-1.5 py-0.5 rounded">
+                          <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100 px-1.5 py-0.5 rounded truncate max-w-[100px] sm:max-w-none">
                               {ann.created_by_name || 'Admin'}
                             </span>
-                            <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                            <span className="text-[10px] font-medium text-slate-400">
+                            <span className="w-1 h-1 rounded-full bg-slate-300 shrink-0"></span>
+                            <span className="text-[10px] font-medium text-slate-400 whitespace-nowrap">
                               {new Date(ann.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0 pt-1 sm:pt-0">
                         {isAdmin && (
                           <div className="hidden sm:flex gap-1 text-[9px] font-bold uppercase tracking-wider">
                             {ann.target_all_stores ? (
@@ -205,27 +205,27 @@ export default function AnnouncementsPage() {
                             <Link 
                               href={`/dashboard/announcements/create?title=${encodeURIComponent(ann.title)}&message=${encodeURIComponent(ann.message)}`}
                               onClick={(e) => e.stopPropagation()}
-                              className="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 hover:text-indigo-500 hover:bg-indigo-50 transition-all duration-300 mr-1 cursor-pointer"
+                              className="w-7 h-7 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-slate-300 hover:text-indigo-500 hover:bg-indigo-50 transition-all duration-300 cursor-pointer"
                               title="Forward announcement"
                             >
-                              <Forward className="w-4 h-4" />
+                              <Forward className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             </Link>
                             <button 
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setAnnouncementToDelete(ann.id);
                               }}
-                              className="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all duration-300 mr-1 cursor-pointer"
+                              className="w-7 h-7 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all duration-300 cursor-pointer"
                               title="Delete announcement"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             </button>
                           </>
                         )}
-                        <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 ${
+                        <div className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center transition-all duration-300 ml-0.5 ${
                           isExpanded ? 'bg-emerald-50 text-emerald-600' : 'text-slate-300 group-hover:text-emerald-600 group-hover:bg-slate-100'
                         }`}>
-                          <ChevronDown className={`w-4 h-4 transition-transform duration-500 ease-[cubic-bezier(0.87,0,0.13,1)] ${isExpanded ? 'rotate-180' : ''}`} />
+                          <ChevronDown className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-500 ease-[cubic-bezier(0.87,0,0.13,1)] ${isExpanded ? 'rotate-180' : ''}`} />
                         </div>
                       </div>
                     </div>
