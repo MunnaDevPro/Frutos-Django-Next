@@ -321,4 +321,4 @@ class WholesalePageContent(models.Model):
         verbose_name_plural = "Wholesale Page Content"
 
     def __str__(self):
-        return "Wholesale Page Content"
+        return "Wholesale Page Content"
