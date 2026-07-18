@@ -815,6 +815,28 @@ class OrderViewSet(viewsets.ModelViewSet):
                 order = serializer.save()
 
                 logger.info(f"Order created: {order.order_number}")
+
+                # ── Notify admins about new order ────────────────────────
+                try:
+                    from accounts.notifications import send_admin_notification
+                    send_admin_notification(
+                        notification_type='admin_alert',
+                        title='New Order Placed 🛍️',
+                        message=f'Order #{order.order_number} has been placed. Total: ৳{order.total_amount}',
+                        metadata={'orderNumber': order.order_number, 'icon': 'shopping_bag'}
+                    )
+                    # Out-of-stock check
+                    for item in order.items.all():
+                        if item.product and item.product.stock <= 0:
+                            send_admin_notification(
+                                notification_type='out_of_stock',
+                                title='Product Out of Stock ⚠️',
+                                message=f'Product "{item.product.name}" is now out of stock after order #{order.order_number}.',
+                                metadata={'productId': str(item.product.id), 'productName': item.product.name, 'icon': 'warning'}
+                            )
+                except Exception:
+                    pass  # never block order creation due to notification failure
+
                 return Response({
                     'success':      True,
                     'order_number': order.order_number,
