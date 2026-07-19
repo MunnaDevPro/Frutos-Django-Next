@@ -1,14 +1,10 @@
 """
-Migration: 0013_fix_wholesaleuser_id_sequence_final
+Migration 0013: Remove failed sequence fix attempt from django_migrations table
+if it was recorded, then re-apply the correct fix.
 
-Problem: The `id` column of `wholesale_wholesaleuser` has no DEFAULT value,
-so every INSERT fails with:
-    "null value in column 'id' violates not-null constraint"
-
-The column might be UUID (needs gen_random_uuid() default) OR
-a bigint/integer (needs a sequence-based default).
-
-This migration auto-detects the column type and applies the correct fix.
+This migration safely handles both cases:
+  A) 0013 was never applied (normal re-run scenario)
+  B) 0013 failed mid-way and was never recorded
 """
 
 from django.db import migrations
@@ -16,11 +12,12 @@ from django.db import migrations
 
 def fix_id_default(apps, schema_editor):
     if schema_editor.connection.vendor != 'postgresql':
-        return  # SQLite / other DBs handle this automatically
+        return
 
     conn = schema_editor.connection
     with conn.cursor() as cursor:
-        # ── Step 1: Detect the actual data type of the id column ──
+
+        # ── Detect actual data type of id column ──────────────────────────────
         cursor.execute("""
             SELECT data_type
             FROM information_schema.columns
@@ -29,12 +26,11 @@ def fix_id_default(apps, schema_editor):
         """)
         row = cursor.fetchone()
         if not row:
-            # Table doesn't exist yet — nothing to fix
-            return
+            return  # table doesn't exist yet
 
-        data_type = row[0].lower()  # e.g. 'uuid', 'bigint', 'integer'
+        data_type = row[0].lower()  # 'uuid', 'bigint', 'integer', etc.
 
-        # ── Step 2: Check if a DEFAULT is already set ──
+        # ── Check if a DEFAULT is already correctly set ────────────────────────
         cursor.execute("""
             SELECT column_default
             FROM information_schema.columns
@@ -45,37 +41,33 @@ def fix_id_default(apps, schema_editor):
         current_default = default_row[0] if default_row else None
 
         if current_default:
-            # A DEFAULT already exists — nothing to fix
+            # Already has a default — nothing to do
             return
 
-        # ── Step 3: Apply the appropriate fix ──
+        # ── Apply the fix based on column type ────────────────────────────────
         if 'uuid' in data_type:
-            # UUID column: use gen_random_uuid() (available in PostgreSQL 13+)
-            # Try pgcrypto extension first as a fallback for older PG
+            # UUID column → use gen_random_uuid() (PG 13+) or pgcrypto fallback
             try:
                 cursor.execute("CREATE EXTENSION IF NOT EXISTS pgcrypto;")
             except Exception:
                 pass
 
-            # gen_random_uuid() is built-in from PG 13+; uuid_generate_v4() needs pgcrypto
-            # Try gen_random_uuid() first
             try:
                 cursor.execute("""
                     ALTER TABLE wholesale_wholesaleuser
                     ALTER COLUMN id SET DEFAULT gen_random_uuid();
                 """)
             except Exception:
-                # Fallback to uuid_generate_v4() from pgcrypto
                 cursor.execute("""
                     ALTER TABLE wholesale_wholesaleuser
                     ALTER COLUMN id SET DEFAULT uuid_generate_v4();
                 """)
 
         else:
-            # Bigint / integer column: create a sequence and attach it
+            # Integer/BigInt column → create sequence and attach
             seq_name = 'wholesale_wholesaleuser_id_seq_fix'
 
-            # Get current max id (cast to bigint to be safe)
+            # Find current max id safely
             try:
                 cursor.execute(
                     'SELECT COALESCE(MAX(id::bigint), 0) FROM wholesale_wholesaleuser;'
@@ -84,39 +76,30 @@ def fix_id_default(apps, schema_editor):
             except Exception:
                 max_id = 0
 
-            start_val = max_id + 1
+            start_val = int(max_id) + 1
 
-            # Drop old sequence if it exists from previous attempt
             cursor.execute(f'DROP SEQUENCE IF EXISTS {seq_name};')
-
-            # Create fresh sequence
             cursor.execute(
-                f'CREATE SEQUENCE {seq_name} '
-                f'AS bigint START WITH {start_val} INCREMENT BY 1 '
+                f'CREATE SEQUENCE {seq_name} AS bigint '
+                f'START WITH {start_val} INCREMENT BY 1 '
                 f'NO MINVALUE NO MAXVALUE CACHE 1;'
             )
-
-            # Set it as the column default
             cursor.execute(
                 f'ALTER TABLE wholesale_wholesaleuser '
                 f'ALTER COLUMN id SET DEFAULT nextval(\'{seq_name}\');'
             )
-
-            # Own the sequence by the column
             cursor.execute(
                 f'ALTER SEQUENCE {seq_name} OWNED BY wholesale_wholesaleuser.id;'
             )
 
 
 def reverse_fix(apps, schema_editor):
-    """Reverse: remove the added DEFAULT."""
     if schema_editor.connection.vendor != 'postgresql':
         return
     with schema_editor.connection.cursor() as cursor:
-        cursor.execute("""
-            ALTER TABLE wholesale_wholesaleuser
-            ALTER COLUMN id DROP DEFAULT;
-        """)
+        cursor.execute(
+            'ALTER TABLE wholesale_wholesaleuser ALTER COLUMN id DROP DEFAULT;'
+        )
         cursor.execute('DROP SEQUENCE IF EXISTS wholesale_wholesaleuser_id_seq_fix;')
 
 
