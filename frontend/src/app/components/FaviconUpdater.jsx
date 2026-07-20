@@ -8,7 +8,7 @@ export default function FaviconUpdater() {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_API_URL 
           ? process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')
-          : 'http://localhost:8000/api';
+          : 'http://127.0.0.1:8000/api';
           
         const res = await fetch(`${baseUrl}/website/site-config/`, { cache: 'no-store' });
         
