@@ -1007,9 +1007,10 @@ class AdminUserDetailView(generics.RetrieveUpdateDestroyAPIView):
             if updates:
                 update_sql = ", ".join(updates)
                 clean_id = real_id.replace('-', '')
+                like_op = 'ILIKE' if connection.vendor == 'postgresql' else 'LIKE'
                 with connection.cursor() as cursor:
                     cursor.execute(
-                        f"UPDATE wholesale_wholesaleuser SET {update_sql} WHERE REPLACE(CAST(id AS TEXT), '-', '') ILIKE %s", 
+                        f"UPDATE wholesale_wholesaleuser SET {update_sql} WHERE REPLACE(CAST(id AS TEXT), '-', '') {like_op} %s", 
                         params + [clean_id]
                     )
             
@@ -1039,9 +1040,49 @@ class AdminUserDetailView(generics.RetrieveUpdateDestroyAPIView):
         return self.retrieve(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
-        self.get_object().delete()
-        return Response(status=204)
+        pk = str(self.kwargs.get('pk'))
 
+        # ── Bypass ORM for WholesaleUser deletion because of UUID/Integer mismatch ──
+        if pk.startswith('ws_'):
+            real_id = pk.replace('ws_', '', 1)
+            clean_id = real_id.replace('-', '')
+            
+            from django.db import connection
+            like_op = 'ILIKE' if connection.vendor == 'postgresql' else 'LIKE'
+            
+            with connection.cursor() as cursor:
+                # Safely attempt to delete related objects (ignore errors if tables don't exist)
+                try:
+                    cursor.execute(f"DELETE FROM wholesale_wholesaledocument WHERE user_id IN (SELECT id FROM wholesale_wholesaleuser WHERE REPLACE(CAST(id AS TEXT), '-', '') {like_op} %s)", [clean_id])
+                except Exception: pass
+                
+                try:
+                    cursor.execute(f"DELETE FROM wholesale_wholesaledailyreport WHERE user_id IN (SELECT id FROM wholesale_wholesaleuser WHERE REPLACE(CAST(id AS TEXT), '-', '') {like_op} %s)", [clean_id])
+                except Exception: pass
+                
+                try:
+                    cursor.execute(f"DELETE FROM wholesale_wholesalenotification WHERE user_id IN (SELECT id FROM wholesale_wholesaleuser WHERE REPLACE(CAST(id AS TEXT), '-', '') {like_op} %s)", [clean_id])
+                except Exception: pass
+                
+                try:
+                    cursor.execute(f"DELETE FROM wholesale_wholesaleuser_groups WHERE wholesaleuser_id IN (SELECT id FROM wholesale_wholesaleuser WHERE REPLACE(CAST(id AS TEXT), '-', '') {like_op} %s)", [clean_id])
+                except Exception: pass
+                
+                try:
+                    cursor.execute(f"DELETE FROM wholesale_wholesaleuser_user_permissions WHERE wholesaleuser_id IN (SELECT id FROM wholesale_wholesaleuser WHERE REPLACE(CAST(id AS TEXT), '-', '') {like_op} %s)", [clean_id])
+                except Exception: pass
+                
+                # Finally delete the user itself
+                cursor.execute(
+                    f"DELETE FROM wholesale_wholesaleuser WHERE REPLACE(CAST(id AS TEXT), '-', '') {like_op} %s", 
+                    [clean_id]
+                )
+            
+            return Response(status=status.HTTP_204_NO_CONTENT)
+            
+        return super().destroy(request, *args, **kwargs)
+
+    # End of AdminUserDetailView
 
 class AdminUserCreateView(generics.CreateAPIView):
     """POST /api/auth/admin/users/"""
