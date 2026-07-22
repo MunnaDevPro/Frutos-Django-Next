@@ -22,10 +22,14 @@ from .permissions import IsWholesaleUser
 
 
 def get_tokens_for_user(user):
+    import uuid
+    # Ensure user_id is an integer string even if user.id is a UUID object
+    user_id_str = str(user.id.int) if isinstance(user.id, uuid.UUID) else str(user.id)
+
     refresh = RefreshToken()
     refresh['token_type'] = 'refresh'
     refresh['jti'] = refresh['jti']
-    refresh['user_id']       = str(user.id)
+    refresh['user_id']       = user_id_str
     refresh['email']         = user.email
     refresh['business_name'] = user.business_name
     refresh['is_wholesale']  = True
@@ -34,7 +38,7 @@ def get_tokens_for_user(user):
 
     access = refresh.access_token
     access['token_type']     = 'access'
-    access['user_id']        = str(user.id)
+    access['user_id']        = user_id_str
     access['email']          = user.email
     access['business_name']  = user.business_name
     access['is_wholesale']   = True
