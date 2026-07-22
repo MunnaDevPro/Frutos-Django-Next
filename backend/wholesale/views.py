@@ -86,8 +86,12 @@ class WholesaleTokenRefreshView(APIView):
             return Response({'error': 'Refresh token required.'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             token = RefreshToken(refresh_token)
-            user_id = token['user_id']
-            user = WholesaleUser.objects.get(pk=user_id)
+            email = token.get('email')
+            if email:
+                user = WholesaleUser.objects.get(email=email)
+            else:
+                user_id = token['user_id']
+                user = WholesaleUser.objects.get(pk=user_id)
             if not user.is_active:
                 return Response({'error': 'Account is disabled.'}, status=status.HTTP_401_UNAUTHORIZED)
             new_tokens = get_tokens_for_user(user)
@@ -163,7 +167,10 @@ class WholesaleNotificationListView(generics.ListAPIView):
     serializer_class = WholesaleNotificationSerializer
 
     def get_queryset(self):
-        return WholesaleNotification.objects.filter(user=self.request.user)
+        user = self.request.user
+        if not hasattr(user, 'id') or not isinstance(user, WholesaleUser):
+            return WholesaleNotification.objects.none()
+        return WholesaleNotification.objects.filter(user=user)
 
 
 class WholesaleNotificationUnreadCountView(APIView):
@@ -171,8 +178,11 @@ class WholesaleNotificationUnreadCountView(APIView):
     permission_classes = [IsWholesaleUser]
 
     def get(self, request):
+        user = request.user
+        if not hasattr(user, 'id') or not isinstance(user, WholesaleUser):
+            return Response({'unread_count': 0})
         count = WholesaleNotification.objects.filter(
-            user=request.user, is_read=False
+            user=user, is_read=False
         ).count()
         return Response({'unread_count': count})
 
@@ -183,7 +193,10 @@ class WholesaleMarkNotificationsReadView(APIView):
 
     def post(self, request):
         ids = request.data.get('ids', [])
-        qs = WholesaleNotification.objects.filter(user=request.user)
+        user = request.user
+        if not hasattr(user, 'id') or not isinstance(user, WholesaleUser):
+            return Response({'status': 'invalid user'}, status=400)
+        qs = WholesaleNotification.objects.filter(user=user)
         if ids:
             qs = qs.filter(id__in=ids)
         else:
