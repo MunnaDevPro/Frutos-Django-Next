@@ -39,8 +39,6 @@ class WholesaleJWTAuthentication(BaseAuthentication):
                 user = WholesaleUser.objects.get(email=email)
             else:
                 user_id = payload.get('user_id')
-                if not str(user_id).isdigit():
-                    raise AuthenticationFailed('Invalid token format.')
                 user    = WholesaleUser.objects.get(pk=user_id)
             if not user.is_active:
                 raise AuthenticationFailed('Account is disabled.')

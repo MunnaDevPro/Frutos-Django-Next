@@ -167,10 +167,7 @@ class WholesaleNotificationListView(generics.ListAPIView):
     serializer_class = WholesaleNotificationSerializer
 
     def get_queryset(self):
-        user = self.request.user
-        if not hasattr(user, 'id') or not isinstance(user, WholesaleUser):
-            return WholesaleNotification.objects.none()
-        return WholesaleNotification.objects.filter(user=user)
+        return WholesaleNotification.objects.filter(user=self.request.user)
 
 
 class WholesaleNotificationUnreadCountView(APIView):
@@ -178,11 +175,8 @@ class WholesaleNotificationUnreadCountView(APIView):
     permission_classes = [IsWholesaleUser]
 
     def get(self, request):
-        user = request.user
-        if not hasattr(user, 'id') or not isinstance(user, WholesaleUser):
-            return Response({'unread_count': 0})
         count = WholesaleNotification.objects.filter(
-            user=user, is_read=False
+            user=request.user, is_read=False
         ).count()
         return Response({'unread_count': count})
 
@@ -193,10 +187,7 @@ class WholesaleMarkNotificationsReadView(APIView):
 
     def post(self, request):
         ids = request.data.get('ids', [])
-        user = request.user
-        if not hasattr(user, 'id') or not isinstance(user, WholesaleUser):
-            return Response({'status': 'invalid user'}, status=400)
-        qs = WholesaleNotification.objects.filter(user=user)
+        qs = WholesaleNotification.objects.filter(user=request.user)
         if ids:
             qs = qs.filter(id__in=ids)
         else:
@@ -490,7 +481,8 @@ class WholesaleSupportTicketTypingView(APIView):
         ticket = get_object_or_404(SupportTicket, id=ticket_id, wholesale_user=request.user)
         ticket.user_typing_at = timezone.now()
         ticket.save(update_fields=['user_typing_at'])
-        return Response({'status': 'typing...'})
+        return Response({'status': 'typing...'})
+
 from django.db import connection, transaction
 import traceback
 
