@@ -29,6 +29,7 @@ AUTH_USER_MODEL = 'users.User'
 
 INSTALLED_APPS = [
     'daphne',
+    'jazzmin',  # Must be before django.contrib.admin
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

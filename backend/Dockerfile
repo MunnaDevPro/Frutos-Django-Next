@@ -17,8 +17,7 @@ RUN apk add --no-cache \
     openssl-dev \
     cargo \
     bash \
-    mysql-dev \
-    mariadb-connector-c-dev \
+    dos2unix \
     su-exec
 
 # Stage 2: Builder — install packages
@@ -50,7 +49,8 @@ RUN addgroup -g 1001 -S django && \
     chown -R django:django /app
 
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh && \
+RUN dos2unix /entrypoint.sh && \
+    chmod +x /entrypoint.sh && \
     chown django:django /entrypoint.sh
 
 EXPOSE 8000
@@ -78,7 +78,8 @@ RUN addgroup -g 1001 -S django && \
     chown -R django:django /app /app/staticfiles /app/mediafiles
 
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh && \
+RUN dos2unix /entrypoint.sh && \
+    chmod +x /entrypoint.sh && \
     chown django:django /entrypoint.sh
 
 EXPOSE 8000
