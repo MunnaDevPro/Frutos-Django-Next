@@ -7,8 +7,7 @@ import { colorsService, sizesService } from "@/app/dashboard/_lib/services";
 
 const TABS = [
   { id: "basic",       label: "Basic Info" },
-  { id: "description", label: "Description" },
-  { id: "nutritional", label: "Nutritional" },
+  { id: "description", label: "Description & Nutrition" },
   { id: "pricing",     label: "Pricing & Stock" },
   { id: "wholesale",   label: "Wholesale" },
   { id: "media",       label: "Media" },
@@ -303,18 +302,15 @@ export default function ProductForm({
 
       {/* ── Tab: Description ── */}
       {activeTab === "description" && (
-        <div>
-          <label className={labelCls}>Product Description</label>
-          <textarea value={form.description} onChange={e => handleChange("description", e.target.value)}
-            rows={12} className={`${inputCls} resize-y`} placeholder="Full product description... HTML supported." />
-          <p className="text-xs text-slate-400 mt-1">Basic HTML tags are supported (bold, italic, lists etc.).</p>
-        </div>
-      )}
-
-      {/* ── Tab: Nutritional Info ── */}
-      {activeTab === "nutritional" && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div>
+            <label className={labelCls}>Product Description</label>
+            <textarea value={form.description} onChange={e => handleChange("description", e.target.value)}
+              rows={12} className={`${inputCls} resize-y`} placeholder="Full product description... HTML supported." />
+            <p className="text-xs text-slate-400 mt-1">Basic HTML tags are supported (bold, italic, lists etc.).</p>
+          </div>
+
+          <div className="pt-4 border-t border-slate-100">
             <label className={labelCls}>Nutritional Information</label>
             <textarea value={form.nutritional_info || ""}
               onChange={e => handleChange("nutritional_info", e.target.value)}

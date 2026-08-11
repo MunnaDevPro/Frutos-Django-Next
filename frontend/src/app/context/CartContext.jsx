@@ -94,21 +94,6 @@
 
 //   function removeItem(id)     { dispatch({ type: 'REMOVE_ITEM', id }) }
 //   function updateQty(id, qty) { dispatch({ type: 'UPDATE_QTY', id, qty }) }
-//   function clearCart()        { dispatch({ type: 'CLEAR_CART' }) }
-
-//   return (
-//     <CartContext.Provider value={{
-//       items: state.items,
-//       totalItems,
-//       subtotal,
-//       fulfillment,
-//       setFulfillment,
-//       sidebarOpen,
-//       setSidebarOpen,
-//       addItem,
-//       removeItem,
-//       updateQty,
-//       clearCart,
 //     }}>
 //       {children}
 //     </CartContext.Provider>
@@ -187,6 +172,7 @@ export function CartProvider({ children }) {
   const [state, dispatch]             = useReducer(cartReducer, { items: [] })
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [fulfillment, setFulfillment] = useState('delivery')
+  const [selectedStoreId, setSelectedStoreId] = useState(null)
   const [hydrated, setHydrated]       = useState(false)
 
   // ── Promo state ────────────────────────────────────────────────────────────
@@ -283,6 +269,8 @@ export function CartProvider({ children }) {
       subtotal,
       fulfillment,
       setFulfillment,
+      selectedStoreId,
+      setSelectedStoreId,
       sidebarOpen,
       setSidebarOpen,
       addItem,
