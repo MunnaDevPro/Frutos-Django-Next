@@ -3,15 +3,14 @@
 'use client'
 // src/app/basket/components/FulfillmentSwitcher.jsx
 
-import { useState, useEffect } from 'react'
-import { isStoreOpen } from '@/lib/stores-api'
-import { useCart } from '@/app/context/CartContext'
+// import { useState, useEffect } from 'react'
+// import { getDeliveryOption, getNearestStore } from '@/lib/api'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api'
+import { isStoreOpen } from '@/lib/stores-api'
 
 const MODES = [
-  { id: 'delivery',   label: 'Home Delivery' },
-  { id: 'collect',  label: 'Store Pickup' }
+  { id: 'delivery', label: 'Home Delivery'   },
+  { id: 'collect',  label: 'Click & Collect' },
 ]
 
 // ── Skeleton ───────────────────────────────────────────────────────────────────
@@ -202,56 +201,11 @@ function CollectPanel({ data, error }) {
 export default function FulfillmentSwitcher({
   fulfillment,
   setFulfillment,
-  initialDelivery = null,
+  initialDelivery = null,  
+  initialStore    = null,   
 }) {
   const deliveryError = !initialDelivery ? 'Could not load delivery info.' : null
-  
-  const { items, selectedStoreId, setSelectedStoreId } = useCart()
-  const [eligibleStores, setEligibleStores] = useState([])
-  const [loadingStores, setLoadingStores] = useState(false)
-  const [storeError, setStoreError] = useState(null)
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  
-  useEffect(() => {
-    if (items.length === 0) return
-    
-    const fetchEligibleStores = async () => {
-      setLoadingStores(true)
-      try {
-        const payload = items.map(item => ({
-          product_id: item.id || item.product,
-          quantity: item.qty
-        }))
-        
-        const res = await fetch(`${API_BASE}/fulfillment/stores/eligible/`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: payload })
-        })
-        
-        if (!res.ok) throw new Error('Failed to fetch stores')
-        const data = await res.json()
-        setEligibleStores(data)
-        
-        // Auto-select first store if none selected or current is invalid
-        if (data.length > 0) {
-           if (!selectedStoreId || !data.find(s => s.id === selectedStoreId)) {
-               setSelectedStoreId(data[0].id)
-           }
-        } else {
-           setSelectedStoreId(null)
-        }
-      } catch (err) {
-        setStoreError(err.message)
-      } finally {
-        setLoadingStores(false)
-      }
-    }
-    
-    fetchEligibleStores()
-  }, [items])
-  
-  const selectedStore = eligibleStores.find(s => s.id === selectedStoreId) || eligibleStores[0]
+  const storeError    = !initialStore    ? 'Could not load store info.'    : null
 
   return (
     <div className="mb-8 md:mb-10">
@@ -280,83 +234,7 @@ export default function FulfillmentSwitcher({
       {fulfillment === 'delivery' ? (
         <DeliveryPanel data={initialDelivery} error={deliveryError} />
       ) : (
-        <div className="space-y-4">
-          <div className="mt-4 p-4 rounded-xl" style={{ background: '#f5f9f5', border: '1px solid #d4ede5' }}>
-             <label className="block text-sm font-semibold mb-2" style={{ color: '#151e13' }}>
-               Select Fulfillment Store
-             </label>
-             {loadingStores ? (
-               <div className="animate-pulse h-12 bg-white rounded-lg border border-slate-200 w-full shadow-sm"></div>
-             ) : eligibleStores.length > 0 ? (
-               <div className="relative" tabIndex={0} onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setIsDropdownOpen(false) }}>
-                 {/* Custom Select Button */}
-                 <button 
-                   type="button"
-                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                   className="w-full flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-white hover:border-[#00694c]/40 focus:outline-none focus:ring-2 focus:ring-[#00694c]/20 focus:border-[#00694c] transition-all shadow-sm cursor-pointer group"
-                 >
-                   <div className="flex flex-col text-left">
-                     {selectedStore ? (
-                       <>
-                         <span className="text-[14px] font-bold text-slate-800">{selectedStore.name}</span>
-                         <span className="text-[12px] text-slate-500 mt-0.5">{selectedStore.city} • <span className={isStoreOpen(selectedStore) ? "text-[#00694c] font-semibold" : "text-red-500 font-semibold"}>{isStoreOpen(selectedStore) ? 'OPEN' : 'CLOSED'}</span></span>
-                       </>
-                     ) : (
-                       <span className="text-[14px] text-slate-500">Select a store...</span>
-                     )}
-                   </div>
-                   <span className={`material-symbols-outlined text-slate-400 group-hover:text-[#00694c] transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}>
-                     expand_more
-                   </span>
-                 </button>
-                 
-                 {/* Dropdown Menu */}
-                 {isDropdownOpen && (
-                   <div className="absolute z-10 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto animate-in fade-in slide-in-from-top-2 duration-200">
-                     <div className="py-1">
-                       {eligibleStores.map(store => {
-                         const open = isStoreOpen(store)
-                         const isSelected = store.id === selectedStoreId
-                         return (
-                           <button
-                             key={store.id}
-                             type="button"
-                             onClick={() => {
-                               setSelectedStoreId(store.id)
-                               setIsDropdownOpen(false)
-                             }}
-                             className={`w-full flex flex-col text-left px-4 py-3 hover:bg-[#f5f9f5] transition-colors ${isSelected ? 'bg-[#edf7f2]' : ''}`}
-                           >
-                             <div className="flex items-center justify-between w-full">
-                               <span className={`text-[14px] font-bold ${isSelected ? 'text-[#00694c]' : 'text-slate-800'}`}>
-                                 {store.name}
-                               </span>
-                               {isSelected && (
-                                 <span className="material-symbols-outlined text-[#00694c] text-[18px]">check</span>
-                               )}
-                             </div>
-                             <span className="text-[12px] text-slate-500 mt-0.5">
-                               {store.city} • <span className={open ? "text-[#00694c] font-semibold" : "text-red-500 font-semibold"}>{open ? 'OPEN' : 'CLOSED'}</span>
-                             </span>
-                           </button>
-                         )
-                       })}
-                     </div>
-                   </div>
-                 )}
-               </div>
-             ) : (
-               <div className="p-3 bg-red-50 border border-red-100 rounded-lg flex items-center gap-2">
-                 <span className="material-symbols-outlined text-red-500 text-[18px]">error</span>
-                 <p className="text-[13px] font-medium text-red-600">No stores have all items in stock.</p>
-               </div>
-             )}
-          </div>
-          
-          {selectedStore && (
-            <CollectPanel data={selectedStore} error={storeError} />
-          )}
-        </div>
+        <CollectPanel data={initialStore} error={storeError} />
       )}
     </div>
   )

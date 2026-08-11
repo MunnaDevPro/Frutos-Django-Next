@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { Eye, FileText, Pencil, Trash2, Receipt, AlertCircle, RefreshCw, Plus, BarChart2, Minus } from "lucide-react";
+import { Eye, FileText, Pencil, Trash2, Receipt, AlertCircle, RefreshCw, Plus, BarChart2 } from "lucide-react";
 import Container from "@/app/dashboard/_components/Container";
 import DataTable from "@/app/dashboard/_components/DataTable";
 import Modal from "@/app/dashboard/_components/Modal";
@@ -60,9 +60,8 @@ export default function OrdersPage() {
   const [viewItem, setViewItem] = useState(null);
   const [editItem, setEditItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
-  const [selectedOrders, setSelectedOrders] = useState([]);
-  const [decreasingItemId, setDecreasingItemId] = useState(null);
   const [showReport, setShowReport] = useState(false);
+  const [selectedOrders, setSelectedOrders] = useState([]);
 
   const { data: storesRaw } = useSWR("ref-stores", () => storesService.list());
   const stores = storesRaw?.results || (Array.isArray(storesRaw) ? storesRaw : []);
@@ -101,36 +100,7 @@ export default function OrdersPage() {
     { revalidateOnFocus: false, keepPreviousData: true, shouldRetryOnError: false }
   );
 
-  // Listen for real-time order notifications to refresh the list instantly
-  useEffect(() => {
-    const handleNewNotification = (e) => {
-      const data = e.detail;
-      if (data?.type === 'new_order' || data?.type === 'order_paid' || data?.title?.toLowerCase().includes('order')) {
-        mutate();
-      }
-    };
-    window.addEventListener('admin_notification_received', handleNewNotification);
-    return () => window.removeEventListener('admin_notification_received', handleNewNotification);
-  }, [mutate]);
-
   const rawList = rawData?.results || (Array.isArray(rawData) ? rawData : []);
-  
-  // Auto-open modal if order_number is in URL
-  useEffect(() => {
-    if (rawList.length > 0 && typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const orderNumber = urlParams.get('order_number');
-      if (orderNumber) {
-        const order = rawList.find(o => o.order_number === orderNumber);
-        if (order) {
-          setViewItem(order);
-          // Remove param from URL so it doesn't reopen on manual refresh
-          window.history.replaceState(null, '', '/dashboard/orders');
-        }
-      }
-    }
-  }, [rawList]);
-
   const data = activeFilter
     ? activeFilter === "WHOLESALE"
       ? rawList.filter(o => o.is_wholesale_order)
@@ -253,21 +223,6 @@ export default function OrdersPage() {
     }
   };
 
-  const handleDecreaseQuantity = async (orderNumber, itemId) => {
-    setDecreasingItemId(itemId);
-    try {
-      const response = await api.post(`/api/orders/${orderNumber}/decrease-item-quantity/`, { item_id: itemId });
-      toast.success("Quantity decreased");
-      setViewItem(prev => prev ? response.data : prev);
-      setEditItem(prev => prev ? response.data : prev);
-      mutate(); // Refresh the list
-    } catch (err) {
-      toast.error(err?.response?.data?.error || err?.message || "Failed to decrease quantity");
-    } finally {
-      setDecreasingItemId(null);
-    }
-  };
-
   return (
     <Container
       title={isCreating ? "Create Manual Order" : "Orders"}
@@ -359,78 +314,8 @@ export default function OrdersPage() {
           />
 
           {/* Update Status */}
-          <Modal open={!!editItem} onClose={() => setEditItem(null)} title="Update Order" maxWidth="max-w-2xl">
-            {editItem && (
-              <div className="space-y-6">
-                <FormModal fields={dynamicStatusFields} initialValues={{ status: editItem.status, payment_status: editItem.payment_status, tracking_number: editItem.tracking_number || "", fulfillment_store: editItem.fulfillment_store || "" }} onSubmit={handleStatusUpdate} submitLabel="Update Status" />
-                
-                {/* Items List inside Edit Modal */}
-                {editItem.items?.length > 0 && (
-                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mt-4">
-                    <div className="p-4 border-b border-slate-100 bg-slate-50/50">
-                      <h4 className="text-sm font-bold text-slate-800">Edit Order Items ({editItem.items.length})</h4>
-                    </div>
-                    <div className="divide-y divide-slate-100 max-h-[300px] overflow-y-auto">
-                      {editItem.items.map((item, i) => (
-                        <div key={i} className="p-4 hover:bg-slate-50/50 transition-colors flex items-center gap-4">
-                          <div className="w-14 h-14 bg-white border border-slate-100 shadow-sm rounded-xl flex items-center justify-center shrink-0 p-1">
-                            {item.product_image ? (
-                              <img src={item.product_image} alt={item.product_name} className="w-full h-full object-cover rounded-lg" />
-                            ) : (
-                              <FileText className="w-5 h-5 text-slate-300" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[15px] font-bold text-slate-800 truncate mb-1">{item.product_name || `Product #${item.product}`}</p>
-                            <p className="inline-block px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs font-semibold">
-                              {[item.color_name, item.size_name].filter(Boolean).join(" / ") || "Standard"}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-[15px] font-black text-slate-900">€{(item.quantity * Number(item.unit_price)).toLocaleString()}</p>
-                            <div className="flex items-center justify-end gap-2 mt-1">
-                              {item.quantity > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleDecreaseQuantity(editItem.order_number, item.id)}
-                                  disabled={decreasingItemId === item.id}
-                                  className="w-5 h-5 flex items-center justify-center bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                                  title="Decrease Quantity"
-                                >
-                                  {decreasingItemId === item.id ? (
-                                    <div className="w-2.5 h-2.5 border-2 border-red-600/30 border-t-red-600 rounded-full animate-spin" />
-                                  ) : (
-                                    <Minus size={12} strokeWidth={3} />
-                                  )}
-                                </button>
-                              )}
-                              <p className="text-[11px] font-bold text-slate-400 uppercase">{item.quantity} × €{Number(item.unit_price).toLocaleString()}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="bg-slate-50 border-t border-slate-200 p-4 flex flex-col gap-2">
-                      <div className="flex justify-between items-center text-slate-600 text-sm font-semibold">
-                        <span>Subtotal</span>
-                        <span>€{Number(editItem.cart_subtotal || editItem.total_amount).toLocaleString()}</span>
-                      </div>
-                      {Number(editItem.refunded_amount) > 0 && (
-                        <div className="flex justify-between items-center text-red-600 text-sm font-semibold">
-                          <span>Refunded (Reduced Items)</span>
-                          <span>- €{Number(editItem.refunded_amount).toLocaleString()}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between items-center text-slate-800 text-base font-black pt-2 border-t border-slate-200/60 mt-1">
-                        <span className="uppercase tracking-wider">Total</span>
-                        <span>€{Number(editItem.total_amount).toLocaleString()}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+          <Modal open={!!editItem} onClose={() => setEditItem(null)} title="Update Order">
+            {editItem && <FormModal fields={dynamicStatusFields} initialValues={{ status: editItem.status, payment_status: editItem.payment_status, tracking_number: editItem.tracking_number || "", fulfillment_store: editItem.fulfillment_store || "" }} onSubmit={handleStatusUpdate} submitLabel="Update" />}
           </Modal>
 
           {/* View Order */}
@@ -584,37 +469,14 @@ export default function OrdersPage() {
                           </div>
                           <div className="text-right">
                             <p className="text-[15px] font-black text-slate-900">€{(item.quantity * Number(item.unit_price)).toLocaleString()}</p>
-                            <div className="flex items-center justify-end gap-2 mt-1">
-                              {item.quantity > 1 && (
-                                <button
-                                  onClick={() => handleDecreaseQuantity(viewItem.order_number, item.id)}
-                                  className="w-5 h-5 flex items-center justify-center bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors cursor-pointer"
-                                  title="Decrease Quantity"
-                                >
-                                  <Minus size={12} strokeWidth={3} />
-                                </button>
-                              )}
-                              <p className="text-[11px] font-bold text-slate-400 uppercase">{item.quantity} × €{Number(item.unit_price).toLocaleString()}</p>
-                            </div>
+                            <p className="text-[11px] font-bold text-slate-400 uppercase mt-1">{item.quantity} × €{Number(item.unit_price).toLocaleString()}</p>
                           </div>
                         </div>
                       ))}
                     </div>
-                    <div className="bg-slate-50 border-t border-slate-100 p-4 flex flex-col gap-2">
-                      <div className="flex justify-between items-center text-slate-600 text-sm font-semibold">
-                        <span>Subtotal</span>
-                        <span>€{Number(viewItem.cart_subtotal || viewItem.total_amount).toLocaleString()}</span>
-                      </div>
-                      {Number(viewItem.refunded_amount) > 0 && (
-                        <div className="flex justify-between items-center text-red-600 text-sm font-semibold">
-                          <span>Refunded (Reduced Items)</span>
-                          <span>- €{Number(viewItem.refunded_amount).toLocaleString()}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between items-center text-slate-800 text-base font-black pt-2 border-t border-slate-200/60 mt-1">
-                        <span className="uppercase tracking-wider">Total</span>
-                        <span>€{Number(viewItem.total_amount).toLocaleString()}</span>
-                      </div>
+                    <div className="bg-slate-50 border-t border-slate-100 p-4 flex justify-between items-center text-slate-800">
+                      <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Subtotal</span>
+                      <span className="text-xl font-black text-slate-800">€{Number(viewItem.cart_subtotal || viewItem.total_amount).toLocaleString()}</span>
                     </div>
                   </div>
                 )}

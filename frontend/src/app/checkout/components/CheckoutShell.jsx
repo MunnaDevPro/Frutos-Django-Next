@@ -52,7 +52,6 @@ export default function CheckoutShell({ deliveryDates, deliverySlots, initialUse
   const {
     items, subtotal, clearCart,
     promoState, promoDiscount, discountedSubtotal,
-    selectedStoreId,
   } = useCart()
 
   const { authFetch, isAuthenticated, loading: authLoading, user } = useAuth()
@@ -217,7 +216,6 @@ export default function CheckoutShell({ deliveryDates, deliverySlots, initialUse
       delivery_slot:       slotObj?.id    ?? selectedSlot,
       delivery_slot_label: slotObj?.time  || slotObj?.label || '',
       ...(promoState?.code ? { coupon_code: promoState.code } : {}),
-      ...(selectedStoreId ? { fulfillment_store_id: selectedStoreId } : {}),
       items: sanitizedItems,
     }
 

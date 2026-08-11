@@ -74,9 +74,6 @@ function NotificationDropdown({ onClose }) {
               href = `/dashboard/tickets?ticket_id=${notif.metadata.ticket_id}`;
             } else if (notif.type === 'new_order' || notif.type === 'order_paid' || notif.title?.toLowerCase().includes('order')) {
               href = `/dashboard/orders`;
-              if (notif.metadata?.orderNumber) {
-                href += `?order_number=${notif.metadata.orderNumber}`;
-              }
             } else if (notif.type === 'DAY_OFF_REQUEST' || notif.title?.toLowerCase().includes('day off')) {
               href = `/dashboard/staff?tab=leave_requests`;
             }
@@ -91,9 +88,6 @@ function NotificationDropdown({ onClose }) {
                   onClick={async () => {
                     if (isUnread) {
                       await api.post('/api/auth/notifications/mark-read/', { ids: [notif.id], context: 'dashboard' });
-                    }
-                    if (href?.startsWith('/dashboard/orders')) {
-                      import('swr').then(({ mutate }) => mutate("admin-orders-list"));
                     }
                     onClose();
                   }}
