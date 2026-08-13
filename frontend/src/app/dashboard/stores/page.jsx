@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import * as LucideIcons from 'lucide-react'
 import { adminFetch } from '@/app/dashboard/_lib/api'
+import { isStoreOpen, getStoreStatusInfo, getTodayHoursText, getStoreCloseTime, formatTime12h } from '@/lib/stores-api'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -20,13 +21,13 @@ const FEATURE_OPTIONS = [
 ]
 
 const DEFAULT_SCHEDULES = {
-  sunday: { isOpen: false, open: '08:00', close: '21:00', breakStart: '13:00', breakEnd: '14:00' },
-  monday: { isOpen: false, open: '08:00', close: '21:00', breakStart: '13:00', breakEnd: '14:00' },
-  tuesday: { isOpen: false, open: '08:00', close: '21:00', breakStart: '13:00', breakEnd: '14:00' },
-  wednesday: { isOpen: false, open: '08:00', close: '21:00', breakStart: '13:00', breakEnd: '14:00' },
-  thursday: { isOpen: false, open: '08:00', close: '21:00', breakStart: '13:00', breakEnd: '14:00' },
-  friday: { isOpen: false, open: '08:00', close: '21:00', breakStart: '13:00', breakEnd: '14:00' },
-  saturday: { isOpen: false, open: '08:00', close: '21:00', breakStart: '13:00', breakEnd: '14:00' },
+  sunday: { isOpen: false, open: '', close: '', breakStart: '', breakEnd: '' },
+  monday: { isOpen: false, open: '', close: '', breakStart: '', breakEnd: '' },
+  tuesday: { isOpen: false, open: '', close: '', breakStart: '', breakEnd: '' },
+  wednesday: { isOpen: false, open: '', close: '', breakStart: '', breakEnd: '' },
+  thursday: { isOpen: false, open: '', close: '', breakStart: '', breakEnd: '' },
+  friday: { isOpen: false, open: '', close: '', breakStart: '', breakEnd: '' },
+  saturday: { isOpen: false, open: '', close: '', breakStart: '', breakEnd: '' },
 }
 
 const EMPTY_STORE = {
@@ -382,6 +383,33 @@ function LeftoverPacksManager({ packs, onChange }) {
 
 function StoreFormModal({ store, onClose, onSave }) {
   const isEdit = !!store?.id
+  const parsedSchedules = (() => {
+    let s = store?.schedules;
+    if (typeof s === 'string') {
+      try { 
+        s = JSON.parse(s); 
+      } catch (e) { 
+        try {
+          s = JSON.parse(s.replace(/'/g, '"').replace(/True/g, 'true').replace(/False/g, 'false'));
+        } catch (e2) {
+          s = {};
+        }
+      }
+    }
+    if (!s || typeof s !== 'object' || Object.keys(s).length === 0) {
+      return DEFAULT_SCHEDULES;
+    }
+    
+    // Ensure all days exist and merge correctly
+    const merged = { ...DEFAULT_SCHEDULES };
+    Object.keys(DEFAULT_SCHEDULES).forEach(day => {
+      if (s[day]) {
+        merged[day] = { ...DEFAULT_SCHEDULES[day], ...s[day] };
+      }
+    });
+    return merged;
+  })();
+
   const [form, setForm] = useState({
     ...EMPTY_STORE,
     ...(store || {}),
@@ -391,7 +419,7 @@ function StoreFormModal({ store, onClose, onSave }) {
     store_code: store?.storeCode || store?.store_code || '',
     open_time: store?.openTime || store?.open_time || '08:00',
     close_time: store?.closeTime || store?.close_time || '21:00',
-    schedules: store?.schedules || DEFAULT_SCHEDULES,
+    schedules: parsedSchedules,
     map_link: store?.mapLink || store?.map_link || '',
     short_name: store?.shortName || store?.short_name || '',
     full_address: store?.fullAddress || store?.full_address || '',
@@ -902,9 +930,17 @@ function StoreRow({ store, onEdit, onDelete, onToggle, onView }) {
         </div>
       </td>
       <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: '#64748b', fontWeight: '500' }}>
-          <Clock size={11} style={{ color: '#94a3b8' }} />
-          {store.hours || `${store.openTime || store.open_time} — ${store.closeTime || store.close_time}`}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: '#64748b', fontWeight: '500' }}>
+            <Clock size={11} style={{ color: '#94a3b8' }} />
+            {getTodayHoursText(store)}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: getStoreStatusInfo(store).color }} />
+            <span style={{ fontSize: '11px', fontWeight: '600', color: getStoreStatusInfo(store).color }}>
+              {getStoreStatusInfo(store).text}
+            </span>
+          </div>
         </div>
       </td>
       <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
@@ -956,6 +992,8 @@ export default function StoresPage() {
   const [deleting, setDeleting] = useState(false)
   const [searchFocused, setSearchFocused] = useState(false)
 
+  const [filterOpenStatus, setFilterOpenStatus] = useState('all')
+
   const load = async () => {
     setLoading(true)
     setError('')
@@ -979,7 +1017,13 @@ export default function StoresPage() {
     const matchStatus = filterActive === 'all' ||
       (filterActive === 'active' && s.is_active) ||
       (filterActive === 'inactive' && !s.is_active)
-    return matchSearch && matchStatus
+    
+    const isOpen = isStoreOpen(s)
+    const matchOpen = filterOpenStatus === 'all' ||
+      (filterOpenStatus === 'open' && isOpen) ||
+      (filterOpenStatus === 'closed' && !isOpen)
+      
+    return matchSearch && matchStatus && matchOpen
   })
 
   const handleEdit = (store) => { setEditStore(store); setShowForm(true) }
@@ -1075,6 +1119,24 @@ export default function StoresPage() {
                 cursor: 'pointer', transition: 'all 0.15s',
               }}>
               {f}
+            </button>
+          ))}
+        </div>
+        
+        <div className="flex gap-1 overflow-x-auto p-1 bg-white border border-slate-200 rounded-xl">
+          {['all', 'open', 'closed'].map(f => (
+            <button key={f} onClick={() => setFilterOpenStatus(f)}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '8px',
+                fontSize: '12px', fontWeight: '700',
+                textTransform: 'capitalize',
+                border: 'none',
+                background: filterOpenStatus === f ? '#0f172a' : 'transparent',
+                color: filterOpenStatus === f ? '#ffffff' : '#94a3b8',
+                cursor: 'pointer', transition: 'all 0.15s',
+              }}>
+              {f === 'all' ? 'Any Schedule' : f}
             </button>
           ))}
         </div>

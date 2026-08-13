@@ -68,6 +68,7 @@ class Store(models.Model):
     # ── Time fields (replaces CharField) ─────────────────────────────────────
     open_time    = models.TimeField(null=True, blank=True, help_text='Opening time (use AM/PM picker)')
     close_time   = models.TimeField(null=True, blank=True, help_text='Closing time (use AM/PM picker)')
+    schedules    = models.JSONField(default=dict, blank=True, help_text="Day-by-day schedules")
 
     # Auto-calculated on save — do not edit manually
     hours        = models.CharField(
