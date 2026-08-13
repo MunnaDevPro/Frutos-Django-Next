@@ -66,8 +66,8 @@ class Store(models.Model):
     store_code   = models.CharField(max_length=50, unique=True, blank=True, null=True, help_text='Unique Store ID')
 
     # ── Time fields (replaces CharField) ─────────────────────────────────────
-    open_time    = models.TimeField(help_text='Opening time (use AM/PM picker)')
-    close_time   = models.TimeField(help_text='Closing time (use AM/PM picker)')
+    open_time    = models.TimeField(null=True, blank=True, help_text='Opening time (use AM/PM picker)')
+    close_time   = models.TimeField(null=True, blank=True, help_text='Closing time (use AM/PM picker)')
 
     # Auto-calculated on save — do not edit manually
     hours        = models.CharField(

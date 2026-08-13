@@ -5,7 +5,7 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.db import models
-from .models import StaffProfile, StaffShift, StaffTask, StaffNotification, Announcement, DayOffRequest, StaffAdminChat
+from .models import StaffProfile, StaffShift, StaffTask, StaffNotification, Announcement, AnnouncementImage, DayOffRequest, StaffAdminChat
 from .serializers import (
     StaffProfileSerializer, CreateStaffSerializer, StaffShiftSerializer, 
     StaffTaskSerializer, StaffNotificationSerializer, DayOffRequestSerializer,
@@ -432,8 +432,21 @@ class AnnouncementViewSet(viewsets.ModelViewSet):
         except StaffProfile.DoesNotExist:
             return Announcement.objects.none()
 
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
     def perform_create(self, serializer):
         announcement = serializer.save(created_by=self.request.user)
+        
+        # Save multiple uploaded images
+        images = self.request.FILES.getlist('images')
+        for img in images:
+            AnnouncementImage.objects.create(announcement=announcement, image=img)
+            
+        # Save multiple uploaded files
+        from .models import AnnouncementFile
+        files = self.request.FILES.getlist('files')
+        for f in files:
+            AnnouncementFile.objects.create(announcement=announcement, file=f)
         
         from datetime import date
         today = date.today()

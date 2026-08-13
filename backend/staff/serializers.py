@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import StaffProfile, StaffShift, StaffTask, StaffNotification, Announcement, DayOffRequest, StaffAdminChat
+from .models import StaffProfile, StaffShift, StaffTask, StaffNotification, Announcement, AnnouncementImage, AnnouncementFile, DayOffRequest, StaffAdminChat
 from stores.models import Store
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
@@ -132,14 +132,52 @@ class CreateStaffSerializer(serializers.Serializer):
         )
         return staff_profile
 
+class AnnouncementImageSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AnnouncementImage
+        fields = ['id', 'image_url', 'uploaded_at']
+
+    def get_image_url(self, obj):
+        request = self.context.get('request')
+        if obj.image and request:
+            return request.build_absolute_uri(obj.image.url)
+        return obj.image.url if obj.image else None
+
+class AnnouncementFileSerializer(serializers.ModelSerializer):
+    file_url = serializers.SerializerMethodField()
+    file_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AnnouncementFile
+        fields = ['id', 'file_url', 'file_name', 'uploaded_at']
+
+    def get_file_url(self, obj):
+        request = self.context.get('request')
+        if obj.file and request:
+            return request.build_absolute_uri(obj.file.url)
+        return obj.file.url if obj.file else None
+
+    def get_file_name(self, obj):
+        if obj.file:
+            import os
+            return os.path.basename(obj.file.name)
+        return None
+
 class AnnouncementSerializer(serializers.ModelSerializer):
     created_by_name = serializers.CharField(source='created_by.name', read_only=True)
     target_stores_names = serializers.SerializerMethodField()
     target_staff_names = serializers.SerializerMethodField()
+    images = AnnouncementImageSerializer(many=True, read_only=True)
+    files = AnnouncementFileSerializer(many=True, read_only=True)
 
     class Meta:
         model = Announcement
-        fields = ['id', 'title', 'message', 'created_by', 'created_by_name', 'target_all_stores', 'target_stores', 'target_staff', 'created_at', 'target_stores_names', 'target_staff_names']
+        fields = ['id', 'title', 'message', 'created_by', 'created_by_name',
+                  'target_all_stores', 'target_stores', 'target_staff', 'created_at',
+                  'target_stores_names', 'target_staff_names',
+                  'images', 'files']
 
     def get_target_stores_names(self, obj):
         return [s.name for s in obj.target_stores.all()]

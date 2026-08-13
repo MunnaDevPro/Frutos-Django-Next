@@ -111,6 +111,22 @@ class Announcement(models.Model):
     def __str__(self):
         return self.title
 
+class AnnouncementFile(models.Model):
+    announcement = models.ForeignKey(Announcement, on_delete=models.CASCADE, related_name='files')
+    file = models.FileField(upload_to='announcement_files/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"File for {self.announcement.title}"
+
+class AnnouncementImage(models.Model):
+    announcement = models.ForeignKey(Announcement, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='announcement_images/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Image for {self.announcement.title}"
+
 class DayOffRequest(models.Model):
     STATUS_CHOICES = [
         ('PENDING', 'Pending'),
