@@ -194,7 +194,7 @@ class MyStaffDashboardView(APIView):
         # Get active stores for attendance modal
         from stores.models import Store
         from stores.serializers import StoreListSerializer
-        active_stores = Store.objects.filter(is_active=True).order_by('order', 'name')
+        active_stores = Store.objects.filter(is_active=True).exclude(restricted_staff=staff_profile).order_by('order', 'name')
 
         from datetime import date
         today = date.today()
@@ -231,6 +231,13 @@ class MyStaffCheckInView(APIView):
             
         from stores.models import Store
         store = get_object_or_404(Store, id=store_id)
+        
+        # Validate Store Code (PIN)
+        store_code_input = request.data.get('store_code')
+        if not store_code_input:
+            return Response({"detail": "Store ID (PIN) is required for check-in"}, status=status.HTTP_400_BAD_REQUEST)
+        if store.store_code and store.store_code != store_code_input:
+            return Response({"detail": "Invalid Store ID (PIN)"}, status=status.HTTP_400_BAD_REQUEST)
         
         from datetime import date
         from django.utils import timezone

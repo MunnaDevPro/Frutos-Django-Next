@@ -18,11 +18,12 @@ class StaffProfileSerializer(serializers.ModelSerializer):
     active_store_name = serializers.SerializerMethodField()
     is_working = serializers.SerializerMethodField()
     photo = serializers.SerializerMethodField()
+    restricted_stores = serializers.PrimaryKeyRelatedField(many=True, queryset=Store.objects.all(), required=False)
     
     class Meta:
         model = StaffProfile
         fields = ['id', 'user', 'staff_id', 'role', 'phone', 'hire_date', 'created_at',
-                  'can_create_orders', 'can_update_orders', 'can_delete_orders', 'can_create_products', 'can_update_products', 'can_delete_products', 'secret_key', 'photo', 'store_slug', 'store_name', 'active_store_name', 'is_working']
+                  'can_create_orders', 'can_update_orders', 'can_delete_orders', 'can_create_products', 'can_update_products', 'can_delete_products', 'secret_key', 'photo', 'store_slug', 'store_name', 'active_store_name', 'is_working', 'restricted_stores']
 
     def get_photo(self, obj):
         request = self.context.get('request')
@@ -95,6 +96,7 @@ class CreateStaffSerializer(serializers.Serializer):
     staff_id = serializers.CharField(max_length=50, required=False, allow_blank=True, allow_null=True)
     phone = serializers.CharField(max_length=20, required=False, allow_blank=True)
     photo = serializers.ImageField(required=False, allow_null=True)
+    restricted_stores = serializers.PrimaryKeyRelatedField(many=True, queryset=Store.objects.all(), required=False)
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
@@ -108,6 +110,8 @@ class CreateStaffSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         password = validated_data.get('password', '')
+        restricted_stores = validated_data.pop('restricted_stores', [])
+        
         user = User(
             email=validated_data['email'],
             name=validated_data['name'],
@@ -130,6 +134,10 @@ class CreateStaffSerializer(serializers.Serializer):
             secret_key=password,
             photo=validated_data.get('photo')
         )
+        
+        if restricted_stores:
+            staff_profile.restricted_stores.set(restricted_stores)
+            
         return staff_profile
 
 class AnnouncementImageSerializer(serializers.ModelSerializer):

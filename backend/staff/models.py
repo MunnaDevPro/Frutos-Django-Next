@@ -23,6 +23,9 @@ class StaffProfile(models.Model):
     # Store plain-text password for admin viewing (requested by user)
     secret_key = models.CharField(max_length=255, blank=True, null=True)
 
+    # Restricted stores for this staff member
+    restricted_stores = models.ManyToManyField('stores.Store', blank=True, related_name='restricted_staff')
+
     # Photo for staff dashboard
     photo = models.ImageField(upload_to='staff_photos/', blank=True, null=True)
 
