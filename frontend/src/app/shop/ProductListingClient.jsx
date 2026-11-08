@@ -162,6 +162,12 @@ export default function ProductListingClient({
   }, [initialProducts])
 
   useEffect(() => {
+    if (categories && categories.length > 0) {
+      setCats(categories)
+    }
+  }, [categories])
+
+  useEffect(() => {
     const interval = setInterval(fetchFresh, 10_000) // 10 সেকেন্ড
     return () => clearInterval(interval)
   }, [fetchFresh])
@@ -169,10 +175,17 @@ export default function ProductListingClient({
   const searchParams = useSearchParams()
   const initialCatParam = searchParams.get('category')
 
-  const CATEGORY_PILLS = useMemo(() => {
-    const currentCats = cats && cats.length > 0 ? cats : categories
-    return ['All Produce', ...currentCats.filter(c => c.name !== 'All' && c.name !== 'On Sale').map(c => c.name)]
+  const allCategoryObjects = useMemo(() => {
+    const currentCats = (cats && cats.length > 0) ? cats : categories
+    return currentCats || []
   }, [cats, categories])
+
+  const CATEGORY_PILLS = useMemo(() => {
+    const rawNames = allCategoryObjects
+      .map(c => (typeof c === 'string' ? c : c?.name))
+      .filter(name => Boolean(name) && name !== 'All' && name !== 'On Sale')
+    return ['All Produce', ...Array.from(new Set(rawNames))]
+  }, [allCategoryObjects])
 
   const frutasCatName = useMemo(() => getFrutasCategoryName(CATEGORY_PILLS), [CATEGORY_PILLS])
 
@@ -347,8 +360,12 @@ export default function ProductListingClient({
         <div className="space-y-2.5">
           {CATEGORY_PILLS.map((cat, index) => {
             const isActive = activeCategory === cat
-            const categoryObj = categories.find(c => c.name === cat)
-            const subcategories = categoryObj?.subcategories || []
+            const categoryObj = allCategoryObjects.find(
+              c => (typeof c === 'string' ? c : c?.name) === cat
+            )
+            const subcategories = (typeof categoryObj === 'object' && categoryObj !== null)
+              ? (categoryObj.subcategories || [])
+              : []
             
             return (
               <div key={`sidebar-${cat}-${index}`}>
