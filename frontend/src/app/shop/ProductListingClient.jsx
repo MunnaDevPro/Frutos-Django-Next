@@ -424,6 +424,54 @@ export default function ProductListingClient({
         </div>
       </div>
 
+      {/* Quality / Variant */}
+      {sortedVariants && sortedVariants.length > 0 && (
+        <div>
+          <h3 style={{ fontFamily: '"Newsreader", Georgia, serif', fontSize: '18px', fontWeight: 700, color: '#151e13', marginBottom: '16px' }}>
+            Quality / Variant
+          </h3>
+          <div className="space-y-2">
+            <button
+              onClick={() => setActiveVariant(null)}
+              className="flex items-center justify-between w-full text-left gap-2"
+              style={{ opacity: !activeVariant ? 1 : 0.65, border: 'none', background: 'none', cursor: 'pointer', padding: '2px 0' }}
+            >
+              <span className="truncate" style={{ fontSize: '14px', fontWeight: !activeVariant ? 700 : 500, color: !activeVariant ? '#00694c' : '#151e13', flex: 1 }}>
+                All Qualities
+              </span>
+              <span
+                className="px-2 py-0.5 rounded text-[10px] font-bold shrink-0"
+                style={{ background: !activeVariant ? '#adedd8' : '#e7f1df', color: !activeVariant ? '#2f6d5d' : '#6D7A73' }}
+              >
+                {products.length}
+              </span>
+            </button>
+            {sortedVariants.map((v) => {
+              const isVActive = activeVariant === v
+              const count = variantCount(v)
+              return (
+                <button
+                  key={`sidebar-v-${v}`}
+                  onClick={() => setActiveVariant(isVActive ? null : v)}
+                  className="flex items-center justify-between w-full text-left gap-2"
+                  style={{ opacity: isVActive ? 1 : 0.65, border: 'none', background: 'none', cursor: 'pointer', padding: '2px 0' }}
+                >
+                  <span className="truncate" style={{ fontSize: '14px', fontWeight: isVActive ? 700 : 500, color: isVActive ? '#00694c' : '#151e13', flex: 1 }}>
+                    {v}
+                  </span>
+                  <span
+                    className="px-2 py-0.5 rounded text-[10px] font-bold shrink-0"
+                    style={{ background: isVActive ? '#adedd8' : '#e7f1df', color: isVActive ? '#2f6d5d' : '#6D7A73' }}
+                  >
+                    {count}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Price Range */}
       <div>
         <h3 style={{ fontFamily: '"Newsreader", Georgia, serif', fontSize: '18px', fontWeight: 700, color: '#151e13', marginBottom: '16px' }}>
