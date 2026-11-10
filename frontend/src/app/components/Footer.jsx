@@ -158,7 +158,7 @@ export default function Footer({ config }) {
   ];
 
   return (
-    <footer className="relative bg-[#043328] text-white pt-8 pb-4 border-t border-white/5 mt-8">
+    <footer className="relative bg-[#16351D] text-white pt-8 pb-4 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-8 border-b border-white/10">
           

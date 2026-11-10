@@ -102,7 +102,7 @@ const EMPTY_APPLY = {
 }
 
 
-const WS_API = (process.env.NEXT_PUBLIC_API_URL) + '/wholesale'
+const WS_API = (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api') + '/wholesale'
 
 function WholesaleForgotPasswordFlow({ onBack, onSuccess }) {
   const [step, setStep]         = useState('email')

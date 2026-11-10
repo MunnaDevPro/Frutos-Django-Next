@@ -13,7 +13,7 @@ import PaymentSection   from './PaymentSection'
 import OrderSidebar     from './OrderSidebar'
 import { checkIsInternalWholesale } from '@/lib/categoryHelper'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api'
 
 function toArray(data) {
   if (Array.isArray(data)) return data

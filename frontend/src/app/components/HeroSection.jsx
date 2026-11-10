@@ -1,172 +1,129 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Truck, Leaf, ShieldCheck } from "lucide-react"
+import { MapPin, ArrowRight } from "lucide-react"
 
 export default function HeroSection({ hero }) {
-  return (
-    <section className="bg-[#FAFAF8] relative overflow-hidden">
-      
-      {/* Background Decor Elements (Optional, for more premium feel) */}
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-emerald-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 pointer-events-none"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-amber-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 pointer-events-none"></div>
+  const primaryHref = hero?.primary_cta_href || "/shop"
+  const secondaryHref = hero?.secondary_cta_href || "/stores"
 
-      {/* ── MOBILE Hero ──────────────────────────────────────────────────── */}
-      <div className="md:hidden relative overflow-hidden" style={{ height: '420px' }}>
+  return (
+    <section
+      className="relative w-full overflow-hidden"
+      style={{ backgroundColor: "#F2EFE2" }}
+    >
+      {/* ── Full-Width Seamless Reference Hero Artwork (Top=0, Right=0, Uncropped) ── */}
+      <div className="hidden md:block absolute inset-0 w-full h-full pointer-events-none select-none">
         <Image
-          src={hero.mobile_image_url}
-          alt="Fresh produce"
-          className="absolute inset-0 w-full h-full object-cover"
-          width={800}
-          height={600}
+          src="/homepage/hero_full.jpg?v=3"
+          alt="Fresh produce basket from local farms"
+          fill
           priority
+          unoptimized
+          sizes="100vw"
+          className="object-cover object-right-top"
         />
-        <div
-          className="absolute inset-0"
-          style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.65) 100%)' }}
-        />
-        <div className="absolute inset-0 flex flex-col justify-end px-5 pb-8">
-          <h1
-            className="text-white mb-5"
-            style={{
-              fontFamily: '"Playfair Display", Georgia, serif',
-              fontSize: '2rem', fontWeight: 700, lineHeight: 1.15,
-              textShadow: '0 2px 12px rgba(0,0,0,0.4)',
-            }}
-          >
-            {hero.mobile_heading}
-          </h1>
-          <div className="flex flex-col gap-3">
-            <Link
-              href={hero.primary_cta_href}
-              className="block text-center text-white font-semibold rounded-lg"
-              style={{
-                background: '#00694C', fontSize: '13.5px',
-                letterSpacing: '0.06em', padding: '13px 0',
-                boxShadow: '0 4px 18px rgba(0,105,76,0.4)',
-              }}
-            >
-              {hero.primary_cta_text.toUpperCase()}
-            </Link>
-            <Link
-              href={hero.secondary_cta_href}
-              className="block text-center text-white font-semibold rounded-lg"
-              style={{
-                border: '1.5px solid rgba(255,255,255,0.55)', fontSize: '13.5px',
-                letterSpacing: '0.06em', padding: '12px 0',
-                background: 'rgba(255,255,255,0.08)',
-              }}
-            >
-              {hero.secondary_cta_text.toUpperCase()}
-            </Link>
-          </div>
-        </div>
       </div>
 
-      {/* ── DESKTOP & TABLET Hero ────────────────────────────────────────── */}
-      <div className="hidden md:block max-w-[1280px] mx-auto px-6 lg:px-10 pb-10 md:pb-14 lg:pb-15 pt-6 md:pt-10 relative z-10">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8 lg:gap-10">
-          <div className="w-full md:max-w-[50%] lg:max-w-[620px] flex-shrink-0 text-center md:text-left">
-            
-            {/* Top Badge */}
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-100/60 border border-emerald-200/80 text-emerald-700 text-[10px] font-black uppercase tracking-widest mb-4 md:mb-5 shadow-sm">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+      {/* ── Content Container (Aligned with Category Bar & All Sections Below) ── */}
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="flex flex-col md:flex-row items-center justify-between min-h-[320px] md:min-h-[340px] lg:min-h-[375px] xl:min-h-[395px] pt-6 pb-8 md:pt-7 md:pb-11">
+
+          {/* ── Left Text Column ── */}
+          <div className="w-full md:w-[46%] lg:w-[44%] shrink-0 text-left">
+            {/* Eyebrow + horizontal line */}
+            <div className="flex items-center gap-3 mb-3">
+              <span
+                className="uppercase font-semibold tracking-[0.16em] shrink-0"
+                style={{ fontSize: "11.5px", color: "#445747" }}
+              >
+                PREMIUM &bull; FRESH &bull; LOCAL
               </span>
-              {hero.top_badge_text || '100% Fresh & Organic'}
+              <span
+                className="h-[1px] w-24 sm:w-36 lg:w-44"
+                style={{ backgroundColor: "#B8B59E" }}
+              />
             </div>
 
+            {/* Main Serif Italic Heading */}
             <h1
-              className="text-[#151E13] mb-3 md:mb-4"
+              className="mb-3.5"
               style={{
-                fontFamily: '"Playfair Display", Georgia, serif',
-                fontSize: 'clamp(2rem, 3.8vw, 3.2rem)', fontWeight: 800,
-                lineHeight: 1.1, textShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)',
+                fontFamily: 'var(--font-newsreader), "Playfair Display", Georgia, serif',
+                fontSize: "clamp(2.35rem, 4.1vw, 3.5rem)",
+                fontWeight: 700,
+                fontStyle: "italic",
+                lineHeight: 1.06,
+                color: "#16351D",
+                letterSpacing: "-0.01em",
               }}
             >
-              {hero.desktop_heading}
+              Fresh Produce,
+              <br />
+              Healthier You
             </h1>
-            
+
+            {/* Subtitle */}
             <p
-              className="text-[#4b5563] mb-6 md:mb-7 mx-auto md:mx-0 font-medium"
-              style={{ fontSize: 'clamp(14px, 1.5vw, 15px)', lineHeight: 1.5, maxWidth: '480px' }}
+              className="mb-6"
+              style={{
+                color: "#2F3B30",
+                fontSize: "clamp(13.5px, 1.15vw, 15px)",
+                lineHeight: 1.52,
+                maxWidth: "390px",
+                fontWeight: 450,
+              }}
             >
-              {hero.desktop_subtext}
+              From local farms to your table — experience the freshness of nature, delivered with care.
             </p>
 
-            <div className="flex items-center justify-center md:justify-start gap-3 flex-wrap mb-7 md:mb-8">
+            {/* CTA Buttons */}
+            <div className="flex items-center flex-wrap gap-3">
               <Link
-                href={hero.primary_cta_href}
-                className="inline-flex items-center justify-center bg-[#00694C] text-white font-bold rounded-[10px] hover:bg-[#085041] hover:-translate-y-0.5 transition-all duration-200"
-                style={{ fontSize: '14px', padding: '10px 22px', boxShadow: '0 4px 14px -4px rgba(0,105,76,0.5)' }}
-              >
-                {hero.primary_cta_text}
-              </Link>
-              <Link
-                href={hero.secondary_cta_href}
-                className="inline-flex items-center justify-center font-bold rounded-[10px] bg-white hover:bg-slate-50 transition-all duration-200"
+                href={primaryHref}
+                className="inline-flex items-center justify-center gap-2 rounded-full text-white font-semibold transition-all duration-200 hover:opacity-95 active:scale-[0.98]"
                 style={{
-                  fontSize: '14px', padding: '8px 22px',
-                  borderColor: '#cbd5e1', borderWidth: '2px', borderStyle: 'solid',
-                  color: '#334155', boxShadow: '0 2px 6px -2px rgba(0, 0, 0, 0.05)',
+                  backgroundColor: "#17361E",
+                  fontSize: "13.5px",
+                  padding: "10.5px 22px",
+                  boxShadow: "0 4px 12px rgba(23, 54, 30, 0.22)",
                 }}
               >
-                {hero.secondary_cta_text}
+                <span>Shop Fresh Produce</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+
+              <Link
+                href={secondaryHref}
+                className="inline-flex items-center justify-center gap-1.5 rounded-full font-semibold transition-all duration-200 hover:bg-[#E6E2D1] active:scale-[0.98]"
+                style={{
+                  backgroundColor: "rgba(242, 239, 226, 0.75)",
+                  border: "1px solid #636B5E",
+                  color: "#1B2E1E",
+                  fontSize: "13.5px",
+                  padding: "9.5px 22px",
+                }}
+              >
+                <MapPin className="w-3.5 h-3.5 text-[#243E28]" />
+                <span>Find a Store</span>
               </Link>
             </div>
-
-            {/* Feature Highlights */}
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 sm:gap-5 pt-4 border-t border-slate-200/80">
-               <div className="flex items-center gap-2">
-                 <div className="w-7 h-7 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shadow-sm border border-emerald-100">
-                   <Leaf className="w-3.5 h-3.5" />
-                 </div>
-                 <span className="text-[11px] font-black text-slate-700 uppercase tracking-wider">{hero.feature_1_text || 'Farm Fresh'}</span>
-               </div>
-               <div className="flex items-center gap-2">
-                 <div className="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shadow-sm border border-blue-100">
-                   <Truck className="w-3.5 h-3.5" />
-                 </div>
-                 <span className="text-[11px] font-black text-slate-700 uppercase tracking-wider">{hero.feature_2_text || 'Fast Delivery'}</span>
-               </div>
-               <div className="flex items-center gap-2">
-                 <div className="w-7 h-7 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 shadow-sm border border-amber-100">
-                   <ShieldCheck className="w-3.5 h-3.5" />
-                 </div>
-                 <span className="text-[11px] font-black text-slate-700 uppercase tracking-wider">{hero.feature_3_text || 'Quality Guaranteed'}</span>
-               </div>
-            </div>
-
           </div>
-          <div className="w-full md:flex-1 mt-8 md:mt-0 flex justify-center">
-            <img
-              src={hero.desktop_image_url}
-              alt="Fresh produce"
-              className="w-full h-auto object-contain max-h-[350px] md:max-h-[420px] lg:max-h-[480px]"
+
+          {/* ── Mobile Hero Image (Shown only on <768px) ── */}
+          <div className="relative md:hidden w-full h-[220px] sm:h-[260px] mt-5 rounded-xl overflow-hidden select-none pointer-events-none">
+            <Image
+              src="/homepage/hero_full.jpg?v=3"
+              alt="Fresh produce basket from local farms"
+              fill
+              priority
+              unoptimized
+              sizes="100vw"
+              className="object-cover object-right"
             />
           </div>
+
         </div>
       </div>
-
-      {/* ── Feature Cards ───────────────────────────────────────────────────
-      <div className="max-w-[1280px] mx-auto px-4 md:px-6 lg:px-10 pb-8 md:pb-10 pt-4 md:pt-0">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-          {featureCards.map(({ id, title, sub, icon }) => (
-            <div
-              key={id}
-              className="bg-white rounded-xl border border-[#BCCAC1]/30 flex items-center gap-3"
-              style={{ padding: '14px 16px', boxShadow: '0 1px 4px rgba(21,30,19,0.05)' }}
-            >
-              <span className="shrink-0">{icon}</span>
-              <div>
-                <p style={{ fontSize: '13px', fontWeight: 600, color: '#151E13', lineHeight: 1.3 }}>{title}</p>
-                <p style={{ fontSize: '11px', color: '#6D7A73', lineHeight: 1.4, marginTop: '2px' }}>{sub}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div> */}
-
     </section>
   )
 }
