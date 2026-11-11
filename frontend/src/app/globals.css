@@ -1,11 +1,11 @@
 @import "tailwindcss";
 :root {
-    --background: #F2EFE2;
-    --foreground: #172819;
-    --logo-color: #17361E;
-    --common-color: #17361E;
-    --section-color: #F2EFE2;
-    --search-color: #E8E4D5;
+    --background: #EFF9F2;
+    --foreground: #0D2C23;
+    --logo-color: #085041;
+    --common-color: #085041;
+    --section-color: #EFF9F2;
+    --search-color: #EDF5EF;
 }
 
 @theme inline {
@@ -69,4 +69,15 @@ body {
 
 .staff-sidebar-scroll::-webkit-scrollbar-thumb:hover {
   background: #00A67A;
+}
+
+@keyframes gridFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

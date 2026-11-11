@@ -8,43 +8,52 @@ export default function LeftoverPackBanner({ banner }) {
   return (
     <section
       className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 pt-5 md:pt-7 pb-10 md:pb-12"
-      style={{ backgroundColor: "#F2EFE2" }}
+      style={{ backgroundColor: "#EFF9F2" }}
     >
       <div
-        className="relative rounded-[20px] overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[215px]"
+        className="relative rounded-[20px] overflow-hidden flex flex-col md:flex-row md:items-stretch min-h-[215px]"
         style={{
-          backgroundColor: "#14311A",
-          boxShadow: "0 8px 26px rgba(20, 49, 26, 0.14)",
+          backgroundColor: "#085041",
+          backgroundImage:
+            "linear-gradient(100deg, #085041 0%, #085041 42%, #0A5E4D 72%, #0E6E59 100%)",
+          boxShadow: "0 8px 26px rgba(8, 80, 65, 0.18)",
         }}
       >
-        {/* ── Full Desktop Background Preserving Exact Curved S-Wave Farm Transition ── */}
-        <div className="hidden md:block absolute inset-0 w-full h-full pointer-events-none select-none">
+        {/* ── Desktop Farm Image with Curved S-Wave Transition ── */}
+        <div className="hidden md:block relative md:w-[31%] lg:w-[34%] xl:w-[35%] shrink-0 overflow-hidden select-none">
           <Image
-            src="/homepage/impact_full_bg.jpg?v=3"
+            src="/homepage/impact_farm.jpg"
             alt="Sustainable local farming fields"
             fill
-            unoptimized
-            sizes="100vw"
-            className="object-cover object-left"
+            sizes="(max-width: 1024px) 34vw, 460px"
+            className="object-cover object-left scale-[1.12] origin-left"
           />
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            className="pointer-events-none absolute -top-[1px] -right-[1px] h-[calc(100%+2px)] w-[52px] lg:w-[66px]"
+          >
+            <path
+              d="M 88 0 C 30 22, 8 58, 34 100 L 102 100 L 102 0 Z"
+              fill="#085041"
+            />
+          </svg>
         </div>
 
         {/* ── Mobile Farm Image (<768px) ── */}
-        <div className="md:hidden relative min-h-[185px] overflow-hidden select-none">
+        <div className="md:hidden relative h-[185px] sm:h-[210px] w-full overflow-hidden select-none">
           <Image
             src="/homepage/impact_farm.jpg"
             alt="Sustainable local farming fields"
             fill
             sizes="100vw"
-            className="object-cover object-center"
+            className="object-cover object-left scale-[1.15] origin-left"
           />
         </div>
 
-        {/* ── Left Spacer Column on Desktop (Over the Sunlit Farm Photo) ── */}
-        <div className="hidden md:block md:col-span-4" />
-
         {/* ── Center Column: Our Impact Content ── */}
-        <div className="relative z-10 md:col-span-5 flex flex-col justify-center px-6 sm:px-8 md:pl-10 py-6 md:py-7">
+        <div className="relative z-10 flex-1 flex flex-col justify-center px-6 sm:px-8 md:pl-8 md:pr-6 lg:pl-12 lg:pr-10 xl:pl-14 xl:pr-12 py-6 md:py-7">
           <span
             className="uppercase tracking-[0.16em] font-semibold mb-1.5"
             style={{ fontSize: "11px", color: "rgba(255,255,255,0.8)" }}
@@ -83,8 +92,8 @@ export default function LeftoverPackBanner({ banner }) {
             href={ctaHref}
             className="self-start inline-flex items-center gap-1.5 rounded-full font-semibold transition-all duration-200 hover:bg-white active:scale-[0.98]"
             style={{
-              backgroundColor: "#EBE6D4",
-              color: "#16351D",
+              backgroundColor: "#EFF9F2",
+              color: "#085041",
               fontSize: "12.5px",
               padding: "8px 20px",
             }}
@@ -96,7 +105,7 @@ export default function LeftoverPackBanner({ banner }) {
 
         {/* ── Right Column: 3 Vertical Impact Stats ── */}
         <div
-          className="relative z-10 md:col-span-3 flex flex-col justify-center gap-4 px-6 sm:px-7 py-5 md:py-6 border-t md:border-t-0 md:border-l my-0 md:my-5"
+          className="relative z-10 md:w-[225px] lg:w-[265px] xl:w-[295px] shrink-0 flex flex-col justify-center gap-4 px-6 sm:px-8 md:px-7 lg:px-9 py-5 md:py-6 border-t md:border-t-0 md:border-l my-0 md:my-5"
           style={{ borderColor: "rgba(255,255,255,0.16)" }}
         >
           {/* Stat 1: 50+ Local Farms */}

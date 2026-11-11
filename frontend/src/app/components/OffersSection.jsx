@@ -12,7 +12,7 @@ const DEFAULT_DEALS = [
     href: "/shop",
     image: "/homepage/offer_card_1.jpg?v=4",
     theme: "dark",
-    bgColor: "#1B3B20",
+    bgColor: "#085041",
   },
   {
     id: "deal-bananas",
@@ -22,7 +22,7 @@ const DEFAULT_DEALS = [
     href: "/shop",
     image: "/homepage/offer_card_2.jpg?v=4",
     theme: "light",
-    bgColor: "#F3F0E3",
+    bgColor: "#FAFCFA",
   },
   {
     id: "deal-oranges",
@@ -32,7 +32,7 @@ const DEFAULT_DEALS = [
     href: "/shop",
     image: "/homepage/offer_card_3.jpg?v=4",
     theme: "dark",
-    bgColor: "#19371E",
+    bgColor: "#085041",
   },
 ]
 
@@ -49,14 +49,14 @@ export default function OffersSection({ offers = [] }) {
     <section className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 pt-9 md:pt-11 pb-6 md:pb-8">
       {/* Eyebrow */}
       <div className="flex items-center gap-2.5 mb-1">
-        <span className="h-[1px] w-7" style={{ backgroundColor: "#A5A391" }} />
+        <span className="h-[1px] w-7" style={{ backgroundColor: "#8BB59E" }} />
         <span
           className="uppercase font-semibold tracking-[0.15em]"
-          style={{ fontSize: "11px", color: "#4E5F50" }}
+          style={{ fontSize: "11px", color: "#45665B" }}
         >
           SPECIAL OFFERS
         </span>
-        <span className="h-[1px] w-9" style={{ backgroundColor: "#A5A391" }} />
+        <span className="h-[1px] w-9" style={{ backgroundColor: "#8BB59E" }} />
       </div>
 
       {/* Section Title Row */}
@@ -66,7 +66,7 @@ export default function OffersSection({ offers = [] }) {
             fontFamily: 'var(--font-newsreader), "Playfair Display", Georgia, serif',
             fontSize: "clamp(1.5rem, 2.35vw, 2.0rem)",
             fontWeight: 700,
-            color: "#162F1B",
+            color: "#085041",
             lineHeight: 1.15,
           }}
         >
@@ -75,16 +75,16 @@ export default function OffersSection({ offers = [] }) {
 
         <Link
           href={offers?.length > 0 ? "/offers" : "/shop"}
-          className="group inline-flex items-center gap-1.5 no-underline shrink-0 transition-all duration-300 ease-out hover:text-[#17361E] hover:translate-x-0.5"
+          className="group inline-flex items-center gap-1.5 no-underline shrink-0 transition-all duration-300 ease-out hover:text-[#085041] hover:translate-x-0.5"
           style={{
             fontSize: "13px",
             fontWeight: 600,
-            color: "#3B4E3E",
+            color: "#245748",
             textDecoration: "none",
           }}
         >
           <span>View All Offers</span>
-          <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 ease-out group-hover:translate-x-1" />
+          <ArrowRight className="w-3.5 h-3.5 text-[#57A12A] transition-transform duration-300 ease-out group-hover:translate-x-1" />
         </Link>
       </div>
 
@@ -96,11 +96,11 @@ export default function OffersSection({ offers = [] }) {
             <Link
               key={card.id}
               href={card.href}
-              className="group relative rounded-[16px] overflow-hidden flex items-center min-h-[146px] sm:min-h-[154px] no-underline transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1.5 hover:shadow-[0_14px_30px_rgba(22,47,27,0.16)]"
+              className="group relative rounded-[16px] overflow-hidden flex items-center min-h-[146px] sm:min-h-[154px] no-underline transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1.5 hover:shadow-[0_14px_30px_rgba(8,80,65,0.16)]"
               style={{
                 backgroundColor: card.bgColor,
-                border: isDark ? "1px solid rgba(23,54,30,0.22)" : "1px solid #DFDBC8",
-                boxShadow: "0 4px 16px rgba(22, 47, 27, 0.08)",
+                border: isDark ? "1px solid rgba(8,80,65,0.28)" : "1px solid #C8E2D0",
+                boxShadow: "0 4px 16px rgba(8, 80, 65, 0.08)",
                 textDecoration: "none",
               }}
             >
@@ -114,6 +114,14 @@ export default function OffersSection({ offers = [] }) {
                   sizes="(max-width: 768px) 100vw, 33vw"
                   className="object-cover object-center transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
                 />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: isDark
+                      ? "linear-gradient(90deg, rgba(8, 80, 65, 0.94) 0%, rgba(8, 80, 65, 0.72) 44%, rgba(8, 80, 65, 0) 70%)"
+                      : "linear-gradient(90deg, #FFFFFF 0%, rgba(250, 252, 250, 0.92) 45%, rgba(250, 252, 250, 0) 68%)",
+                  }}
+                />
               </div>
 
               {/* Left Text Content */}
@@ -124,7 +132,7 @@ export default function OffersSection({ offers = [] }) {
                     fontFamily: 'var(--font-newsreader), "Playfair Display", Georgia, serif',
                     fontSize: "clamp(1.45rem, 2vw, 1.75rem)",
                     fontWeight: 700,
-                    color: isDark ? "#FFFFFF" : "#162F1B",
+                    color: isDark ? "#FFFFFF" : "#085041",
                     lineHeight: 1.1,
                     marginBottom: "4px",
                   }}
@@ -136,7 +144,7 @@ export default function OffersSection({ offers = [] }) {
                   style={{
                     fontSize: "13.5px",
                     fontWeight: 450,
-                    color: isDark ? "rgba(255,255,255,0.9)" : "#2E3C30",
+                    color: isDark ? "rgba(255,255,255,0.9)" : "#284B3F",
                     marginBottom: "14px",
                     lineHeight: 1.3,
                   }}
@@ -147,12 +155,12 @@ export default function OffersSection({ offers = [] }) {
                   className="inline-flex items-center gap-1.5 font-semibold no-underline transition-all duration-300 ease-out group-hover:gap-2.5 group-hover:translate-x-1"
                   style={{
                     fontSize: "13px",
-                    color: isDark ? "#FFFFFF" : "#162F1B",
+                    color: isDark ? "#FFFFFF" : "#085041",
                     textDecoration: "none",
                   }}
                 >
                   <span>{card.ctaText}</span>
-                  <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 ease-out group-hover:translate-x-1" />
+                  <ArrowRight className={`w-3.5 h-3.5 transition-transform duration-300 ease-out group-hover:translate-x-1 ${isDark ? "text-[#8EE06B]" : "text-[#57A12A]"}`} />
                 </span>
               </div>
             </Link>

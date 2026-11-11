@@ -66,8 +66,8 @@ export default async function RootLayout({ children }) {
         />
         <style>{`
           html, body, #__next {
-            background: #F2EFE2 !important;
-            color: #162F1B !important;
+            background: #EFF9F2 !important;
+            color: #0D2C23 !important;
           }
         `}</style>
       </head>
@@ -75,13 +75,13 @@ export default async function RootLayout({ children }) {
         className={`${newsreader.variable} ${manrope.variable}`}
         style={{
           fontFamily: '"Manrope", sans-serif',
-          background: '#F2EFE2',
-          color:      '#162F1B',
+          background: '#EFF9F2',
+          color:      '#0D2C23',
           minHeight:  '100vh',
         }}
       >
         <FaviconUpdater />
-        <NextTopLoader color="#17361E" height={2} showSpinner={false} />
+        <NextTopLoader color="#57A12A" height={2} showSpinner={false} />
         <Providers>
           <AuthProvider>
             <WishlistProvider>
@@ -91,7 +91,7 @@ export default async function RootLayout({ children }) {
                   navbarLogoUrl={siteConfig?.navbar_logo_url || ''}
                   brandName={siteConfig?.brand_name || 'El Árbol'}
                 />
-                <main style={{ background: '#F2EFE2', minHeight: '100vh' }} className="md:pb-0">
+                <main style={{ background: '#EFF9F2', minHeight: '100vh' }} className="md:pb-0">
                   {children}
                 </main>
                 <FloatingCart />

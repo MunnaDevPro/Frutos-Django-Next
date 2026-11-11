@@ -27,20 +27,20 @@ export default function HowItWorks() {
   return (
     <section
       className="pt-8 md:pt-11 pb-14 md:pb-16"
-      style={{ backgroundColor: "#F2EFE2" }}
+      style={{ backgroundColor: "#EFF9F2" }}
     >
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Centered Eyebrow + Heading */}
         <div className="text-center mb-8 md:mb-10">
           <div className="inline-flex items-center justify-center gap-3 mb-1.5">
-            <span className="h-[1px] w-10" style={{ backgroundColor: "#B7B3A1" }} />
+            <span className="h-[1px] w-10" style={{ backgroundColor: "#8BB59E" }} />
             <span
               className="uppercase font-semibold tracking-[0.16em]"
-              style={{ fontSize: "11px", color: "#4E5F50" }}
+              style={{ fontSize: "11px", color: "#45665B" }}
             >
               HOW IT WORKS
             </span>
-            <span className="h-[1px] w-10" style={{ backgroundColor: "#B7B3A1" }} />
+            <span className="h-[1px] w-10" style={{ backgroundColor: "#8BB59E" }} />
           </div>
 
           {/* Subtle organic brush accent */}
@@ -48,10 +48,10 @@ export default function HowItWorks() {
             <svg width="110" height="10" viewBox="0 0 110 10" fill="none">
               <path
                 d="M4 7C30 2 76 1.5 106 6.5"
-                stroke="#35573B"
+                stroke="#57A12A"
                 strokeWidth="3.2"
                 strokeLinecap="round"
-                strokeOpacity="0.65"
+                strokeOpacity="0.82"
               />
             </svg>
           </div>
@@ -61,7 +61,7 @@ export default function HowItWorks() {
               fontFamily: 'var(--font-newsreader), "Playfair Display", Georgia, serif',
               fontSize: "clamp(1.55rem, 2.6vw, 2.15rem)",
               fontWeight: 700,
-              color: "#162F1B",
+              color: "#085041",
               lineHeight: 1.15,
             }}
           >
@@ -79,14 +79,14 @@ export default function HowItWorks() {
                 <div
                   className="w-14 h-14 rounded-full flex items-center justify-center gap-1 shrink-0"
                   style={{
-                    backgroundColor: "#E6E1CF",
-                    border: "1px solid #DCD6C1",
+                    backgroundColor: "#E1F2E6",
+                    border: "1px solid #C5E0CE",
                   }}
                 >
                   <span
                     className="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold shrink-0"
                     style={{
-                      backgroundColor: "#26482C",
+                      backgroundColor: "#085041",
                       fontSize: "11px",
                     }}
                   >
@@ -97,7 +97,7 @@ export default function HowItWorks() {
                     height="16"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#26482C"
+                    stroke="#085041"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -114,7 +114,7 @@ export default function HowItWorks() {
                     style={{
                       fontSize: "14.5px",
                       fontWeight: 700,
-                      color: "#162F1B",
+                      color: "#085041",
                       marginBottom: "3px",
                       lineHeight: 1.25,
                     }}
@@ -124,7 +124,7 @@ export default function HowItWorks() {
                   <p
                     style={{
                       fontSize: "12.5px",
-                      color: "#455346",
+                      color: "#3D5D51",
                       lineHeight: 1.45,
                       maxWidth: "230px",
                     }}
@@ -136,10 +136,10 @@ export default function HowItWorks() {
 
               {/* Connecting Arrow on Desktop (between steps 1-2 and 2-3) */}
               {index < displaySteps.length - 1 && (
-                <div className="hidden md:flex items-center justify-center shrink-0 px-1 text-[#A9A592]">
+                <div className="hidden md:flex items-center justify-center shrink-0 px-1 text-[#8BB59E]">
                   <svg width="46" height="14" viewBox="0 0 46 14" fill="none">
-                    <line x1="0" y1="7" x2="39" y2="7" stroke="#B7B3A1" strokeWidth="1.3" />
-                    <path d="M36 3.5L41.5 7L36 10.5" stroke="#B7B3A1" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                    <line x1="0" y1="7" x2="39" y2="7" stroke="#8BB59E" strokeWidth="1.3" />
+                    <path d="M36 3.5L41.5 7L36 10.5" stroke="#57A12A" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
               )}

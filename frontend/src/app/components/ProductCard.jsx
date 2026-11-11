@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Check, Heart, ShoppingBag } from 'lucide-react'
 import { slugify } from '@/app/lib/slugify'
 import { useWishlist } from '@/app/context/WishlistContext'
 import { useAuth } from '@/app/context/AuthContext'
@@ -34,8 +35,27 @@ function pickFallbackImage(product, index) {
   return STUDIO_FALLBACK_IMAGES[hash % STUDIO_FALLBACK_IMAGES.length]
 }
 
-// ── Heart / Wishlist button ────────────────────────────────────────────────────
-function WishlistButton({ product, variant = 'overlay' }) {
+const SHOWCASE_BADGES = [
+  { label: 'Class A', bg: '#E3F1E5', color: '#28633A' },
+  { label: 'Premium', bg: '#F3ECD2', color: '#7D631D' },
+  { label: 'Class B', bg: '#E9F1DA', color: '#3B6A24' },
+  { label: 'Class B', bg: '#E9F1DA', color: '#3B6A24' },
+  { label: 'Premium', bg: '#F3ECD2', color: '#7D631D' },
+]
+
+function resolveTagStyle(label) {
+  const lower = (label || '').toLowerCase()
+  if (lower.includes('premium') || lower.includes('organic')) {
+    return { bg: '#F4EDD4', color: '#785E18' }
+  }
+  if (lower.includes('b')) {
+    return { bg: '#EBF2DC', color: '#3B6A24' }
+  }
+  return { bg: '#E4F2E7', color: '#245F38' }
+}
+
+// ── Floating Wishlist Button ───────────────────────────────────────────────────
+function WishlistButton({ product }) {
   const { isAuthenticated } = useAuth()
   const { isSaved, toggle } = useWishlist()
   const [localSaved, setLocalSaved] = useState(false)
@@ -55,76 +75,36 @@ function WishlistButton({ product, variant = 'overlay' }) {
     setTimeout(() => setAnimating(false), 260)
   }
 
-  if (variant === 'inline') {
-    return (
-      <button
-        type="button"
-        onClick={handleClick}
-        aria-label={saved ? 'Remove from wishlist' : 'Add to wishlist'}
-        className="shrink-0 p-0.5 text-[#889287] hover:text-[#17361E] transition-colors cursor-pointer bg-transparent border-none"
-      >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill={saved ? '#E53935' : 'none'}
-          stroke={saved ? '#E53935' : '#8A9488'}
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-        </svg>
-      </button>
-    )
-  }
-
   return (
     <button
       type="button"
       onClick={handleClick}
       title={saved ? 'Remove from saved' : 'Save for later'}
-      style={{
-        position: 'absolute',
-        top: 8,
-        right: 8,
-        width: 26,
-        height: 26,
-        borderRadius: '50%',
-        background: 'transparent',
-        border: 'none',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-        zIndex: 10,
-        transform: animating ? 'scale(1.22)' : 'scale(1)',
-        transition: 'transform 0.2s ease',
-      }}
+      aria-label={saved ? 'Remove from wishlist' : 'Add to wishlist'}
+      className={`absolute top-2.5 right-2.5 z-10 w-[30px] h-[30px] rounded-full flex items-center justify-center border cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-110 ${
+        saved
+          ? 'bg-[#FFF4F4] border-[#F4C7C7] text-[#E04444]'
+          : 'bg-white/95 border-[#DCE8DF] text-[#45685A] hover:border-[#9EC4AA] hover:text-[#085041]'
+      } ${animating ? 'scale-125' : 'scale-100'}`}
+      style={{ backdropFilter: 'blur(4px)' }}
     >
-      <svg
-        width="15"
-        height="15"
-        viewBox="0 0 24 24"
-        fill={saved ? '#E53935' : 'none'}
-        stroke={saved ? '#E53935' : '#253827'}
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-      </svg>
+      <Heart
+        className="w-[14px] h-[14px] transition-colors duration-200"
+        strokeWidth={1.9}
+        fill={saved ? '#E04444' : 'none'}
+      />
     </button>
   )
 }
 
 // ── Main ProductCard ──────────────────────────────────────────────────────────
-export default function ProductCard({ product, index, notified, onNotify }) {
+export default function ProductCard({ product, index, notified, onNotify, variant = 'default' }) {
   const [isNavigating, setIsNavigating] = useState(false)
   const [imgError, setImgError] = useState(false)
   const [added, setAdded] = useState(false)
   const { items, addItem } = useCart()
 
+  const isShowcase = variant === 'showcase'
   const slug = product.slug || slugify(product.name || product.displayName || 'product')
   const {
     name,
@@ -138,7 +118,6 @@ export default function ProductCard({ product, index, notified, onNotify }) {
     minWholesaleQty = 1,
     inStock = true,
     image,
-    onSale,
   } = product
 
   const shownTitle = displayName || name
@@ -158,6 +137,10 @@ export default function ProductCard({ product, index, notified, onNotify }) {
   const displayPrice = Number(wholesalePrice ? wholesalePrice : rawPrice || 2.5)
   const isWholesalePrice = !!wholesalePrice
   const unitLabel = unit ? unit.replace(/^\/\s*/, '') : 'kg'
+
+  const idx = typeof index === 'number' && index >= 0 ? index : 0
+  const tagLabel = badge || (isShowcase ? SHOWCASE_BADGES[idx % SHOWCASE_BADGES.length].label : 'Fresh')
+  const tagStyle = resolveTagStyle(tagLabel)
 
   function handleAddToCart(e) {
     e.preventDefault()
@@ -184,118 +167,116 @@ export default function ProductCard({ product, index, notified, onNotify }) {
   return (
     <Link
       href={'/products/' + slug}
-      className="block group w-full min-w-0"
+      className="block group h-full w-full min-w-0 no-underline"
       onClick={() => setIsNavigating(true)}
     >
       <div
-        className={
-          'flex flex-col w-full min-w-0 rounded-[16px] p-3 transition-all duration-200 hover:-translate-y-0.5 ' +
-          (isNavigating ? 'opacity-60 scale-[0.98]' : '')
-        }
-        style={{
-          backgroundColor: '#F6F4EA',
-          border: '1px solid #DFDBC8',
-          boxShadow: '0 3px 12px rgba(22, 47, 27, 0.05)',
-        }}
+        className={`isolate flex flex-col w-full h-full min-w-0 rounded-t-[28px] sm:rounded-t-[32px] rounded-b-[14px] bg-white p-2.5 sm:p-3 border border-[#D8E7DC] shadow-[0_2px_10px_-4px_rgba(8,80,65,0.03)] [will-change:translate,transform] transition-[translate,scale,transform,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1 group-hover:border-[#7DB290] group-hover:shadow-[0_14px_28px_-10px_rgba(8,80,65,0.14)] ${
+          isNavigating ? 'opacity-65 scale-[0.98]' : ''
+        }`}
       >
-        {/* ── Top Studio Image Box ── */}
+        {/* Top Classic Arched Studio Image Stage */}
         <div
-          className="relative w-full aspect-[4/3] rounded-[12px] overflow-hidden flex-shrink-0 mb-2.5"
-          style={{ backgroundColor: '#FAF9F4' }}
+          className="relative w-full aspect-[4/3] rounded-t-[20px] sm:rounded-t-[24px] rounded-b-[10px] overflow-hidden flex-shrink-0 mb-2.5 border border-[#EBF3ED] group-hover:border-[#CFE2D4] transition-colors duration-500 [isolation:isolate] [transform:translateZ(0)]"
+          style={{ backgroundColor: '#F6FAF7' }}
         >
           <Image
             src={resolvedImage}
             alt={shownTitle}
             fill
             unoptimized
-            sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            sizes={
+              isShowcase
+                ? '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw'
+                : '(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw'
+            }
             onError={() => setImgError(true)}
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover transform-gpu [will-change:scale,transform] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
           />
 
-          {/* Top-right Wishlist Heart */}
-          <WishlistButton product={product} variant="overlay" />
+          {/* Subtle botanical depth glaze on hover */}
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#085041]/[0.07] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+            aria-hidden="true"
+          />
 
-          {/* Out of stock overlay */}
+          <WishlistButton product={product} />
+
           {!effectiveInStock && (
-            <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex items-center justify-center">
-              <span className="bg-white text-[#172819] text-[11px] font-semibold px-3 py-1 rounded-full shadow-sm">
+            <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center">
+              <span className="bg-white text-[#085041] text-[10.5px] font-semibold px-3 py-0.5 rounded-full border border-[#DCE8DF]">
                 OUT OF STOCK
               </span>
             </div>
           )}
         </div>
 
-        {/* ── Product Info Body ── */}
-        <div className="flex flex-col flex-1 px-0.5 min-w-0">
-          {/* Title Row + secondary small heart */}
-          <div className="flex items-center justify-between gap-2 mb-0.5">
-            <h3
-              className="truncate group-hover:text-[#17361E] transition-colors"
-              style={{
-                fontFamily: 'var(--font-newsreader), "Playfair Display", Georgia, serif',
-                fontSize: '16.5px',
-                fontWeight: 700,
-                color: '#172819',
-                lineHeight: 1.22,
-              }}
-            >
-              {shownTitle}
-            </h3>
-            <WishlistButton product={product} variant="inline" />
-          </div>
+        {/* Classic Editorial Content Body */}
+        <div className="flex flex-col flex-1 px-1 pt-0.5 min-w-0">
+          <h3
+            className="truncate text-[#085041] group-hover:text-[#0C6850] transition-colors duration-300 mb-1"
+            style={{
+              fontFamily: 'var(--font-newsreader), "Playfair Display", Georgia, serif',
+              fontSize: isShowcase ? '15.5px' : '16.5px',
+              fontWeight: 700,
+              lineHeight: 1.22,
+            }}
+          >
+            {shownTitle}
+          </h3>
 
-          {/* Price Row */}
-          <div className="flex items-baseline gap-1.5 mb-2.5">
+          {/* Grade Badge + Clean Unit Indicator */}
+          <div className="flex items-center justify-between gap-2 mb-2.5">
             <span
+              className="inline-block rounded-full px-2.5 py-[2px] text-[10.5px] font-semibold leading-tight tracking-[0.01em]"
               style={{
-                fontSize: '13.5px',
-                fontWeight: 500,
-                color: '#253326',
+                backgroundColor: tagStyle.bg,
+                color: tagStyle.color,
               }}
             >
-              ${displayPrice.toFixed(2)}/{unitLabel}
+              {tagLabel}
             </span>
-            {oldPrice && Number(oldPrice) > displayPrice && (
-              <span className="text-[11.5px] text-[#8B9489] line-through">
-                ${Number(oldPrice).toFixed(2)}
-              </span>
-            )}
+            <span className="text-[11px] font-medium text-[#6B8A7E] whitespace-nowrap">
+              /{unitLabel}
+            </span>
           </div>
 
-          {/* Add to Cart Pill Button (Matching Reference Proportion & Color) */}
-          <div className="mt-auto" onClick={(e) => e.preventDefault()}>
+          {/* Hairline Specimen Divider + Price & Pill Action CTA */}
+          <div
+            className="mt-auto pt-2.5 border-t border-[#EBF3EC] flex items-center justify-between gap-1.5"
+            onClick={(e) => e.preventDefault()}
+          >
+            <div className="flex flex-col min-w-0">
+              <span
+                className="font-bold leading-none whitespace-nowrap"
+                style={{ fontSize: '15.5px', color: '#D96F1A' }}
+              >
+                &euro;{displayPrice.toFixed(2)}
+              </span>
+              {oldPrice && Number(oldPrice) > displayPrice && (
+                <span className="text-[10.5px] text-[#96AEA3] line-through leading-none mt-1 whitespace-nowrap">
+                  &euro;{Number(oldPrice).toFixed(2)}
+                </span>
+              )}
+            </div>
+
             <button
               type="button"
               onClick={handleAddToCart}
-              className="rounded-full inline-flex items-center justify-center gap-1.5 text-white font-medium transition-all duration-200 cursor-pointer active:scale-[0.98]"
-              style={{
-                backgroundColor: added ? '#17361E' : '#4E5D4E',
-                fontSize: '12px',
-                padding: '6.5px 16px',
-                minWidth: '120px',
-              }}
-              onMouseEnter={(e) => {
-                if (!added) e.currentTarget.style.backgroundColor = '#2F4332'
-              }}
-              onMouseLeave={(e) => {
-                if (!added) e.currentTarget.style.backgroundColor = '#4E5D4E'
-              }}
+              className={`rounded-full inline-flex items-center justify-center gap-1.5 text-white font-semibold cursor-pointer border-none whitespace-nowrap shrink-0 px-3 sm:px-3.5 py-[7px] text-[11.5px] shadow-[0_0_0_0_rgba(8,80,65,0)] transition-[background-color,scale,transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.96] ${
+                added
+                  ? 'bg-[#3D7F1B]'
+                  : 'bg-[#085041] hover:bg-[#053A2E] hover:shadow-[0_4px_12px_-2px_rgba(8,80,65,0.22)]'
+              }`}
             >
               {added ? (
                 <>
-                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.4" viewBox="0 0 24 24">
-                    <path d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Check className="w-3 h-3 shrink-0" strokeWidth={2.5} />
                   <span>Added</span>
                 </>
               ) : effectiveInStock ? (
                 <>
-                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.9" viewBox="0 0 24 24">
-                    <circle cx="9" cy="21" r="1" />
-                    <circle cx="20" cy="21" r="1" />
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-                  </svg>
+                  <ShoppingBag className="hidden xl:inline-block w-3 h-3 shrink-0" strokeWidth={2.1} />
                   <span>Add to Cart</span>
                 </>
               ) : (

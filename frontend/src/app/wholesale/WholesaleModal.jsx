@@ -1,7 +1,8 @@
 'use client'
 // src/app/wholesale/WholesaleModal.jsx
 import { useState, useEffect, useRef } from 'react'
-import { signIn, signOut, useSession } from 'next-auth/react'
+import { signIn, signOut } from 'next-auth/react'
+import { useSafeSession } from '@/lib/useSafeSession'
 import { wholesaleRegister, wholesaleLogin } from '@/lib/api'
 import { getStores, haversineDistance } from '@/lib/stores-api'
 import { useAuth } from '@/app/context/AuthContext'
@@ -922,7 +923,7 @@ function SearchableStoreSelect({ stores, value, onChange, userPostcode = '', pla
 
 
 export default function WholesaleModal({ isOpen, onClose }) {
-  const { data: session } = useSession()
+  const { data: session } = useSafeSession()
   const { user: normalUser, logout: normalLogout } = useAuth()
   const [step, setStep] = useState(1)  // 1=apply, 2=login, 3=success
   const [loginMode, setLoginMode] = useState('wholesale_id') // 'wholesale_id' or 'email'

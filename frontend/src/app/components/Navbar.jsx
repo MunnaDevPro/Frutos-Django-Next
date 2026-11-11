@@ -1,29 +1,50 @@
 'use client'
 // src/app/components/Navbar.jsx
 import Image from 'next/image'
-import { useSession } from 'next-auth/react'
+import { useSafeSession } from '@/lib/useSafeSession'
 import Link from 'next/link'
 import { useState, useRef, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
+import {
+  Home,
+  MapPin,
+  Store,
+  Users,
+  Package,
+  ChevronDown,
+  Search,
+  Bell,
+  ShoppingBag,
+  LogIn,
+  X,
+  Menu,
+} from 'lucide-react'
 import { useCart } from '@/app/context/CartContext'
 import { useAuth } from '@/app/context/AuthContext'
 import AuthModal from '@/app/components/AuthModal'
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api').replace(/\/$/, '')
+const MEDIA_BASE = API_BASE.replace(/\/api$/, '')
+
+function resolveLogoUrl(url) {
+  if (!url) return '/el-erbol-logo.png'
+  if (url.startsWith('/media/')) return `${MEDIA_BASE}${url}`
+  return url
+}
 
 const navLinks = [
-  { label: 'Home',         href: '/'          },
-  { label: 'Find a Store', href: '/stores'    },
-  { label: 'Our Produce',  href: '/shop', hasChevron: true },
-  { label: 'About Us',     href: '/about'     },
-  { label: 'Contact',      href: '/wholesale' },
+  { label: 'Home',         href: '/',          Icon: Home },
+  { label: 'Find a Store', href: '/stores',    Icon: MapPin },
+  { label: 'Our Shop',     href: '/shop',      Icon: Store },
+  { label: 'About Us',     href: '/about',     Icon: Users },
+  { label: 'Wholesale',    href: '/wholesale', Icon: Package },
 ]
 
 // ── Profile Menu ─────────────────────────────────────────────────────────────
 function ProfileMenu({ user, logout }) {
   const [open, setOpen] = useState(false)
-  const menuRef         = useRef(null)
-  const router          = useRouter()
+  const menuRef = useRef(null)
+  const router = useRouter()
 
   useEffect(() => {
     function handler(e) {
@@ -33,9 +54,11 @@ function ProfileMenu({ user, logout }) {
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  const avatarUrl   = user?.profile?.resolvedAvatar || ''
-  const initials    = ((user?.firstName?.[0] || '') + (user?.lastName?.[0] || '')).toUpperCase()
-                      || user?.email?.[0]?.toUpperCase() || '?'
+  const avatarUrl = user?.profile?.resolvedAvatar || ''
+  const initials =
+    ((user?.firstName?.[0] || '') + (user?.lastName?.[0] || '')).toUpperCase() ||
+    user?.email?.[0]?.toUpperCase() ||
+    '?'
   const displayName = user?.fullName || user?.firstName || user?.email || 'My Account'
 
   async function handleLogout() {
@@ -45,124 +68,69 @@ function ProfileMenu({ user, logout }) {
   }
 
   const menuItems = [
-    { label: 'My Profile',  icon: 'person',          href: '/profile'             },
-    { label: 'My Orders',   icon: 'receipt_long',    href: '/profile?tab=orders'  },
-    { label: 'Saved Items', icon: 'favorite_border', href: '/profile?tab=saved'   },
-    { label: 'Settings',    icon: 'settings',        href: '/profile?tab=settings'},
+    { label: 'My Profile',  icon: 'person',          href: '/profile' },
+    { label: 'My Orders',   icon: 'receipt_long',    href: '/profile?tab=orders' },
+    { label: 'Saved Items', icon: 'favorite_border', href: '/profile?tab=saved' },
+    { label: 'Settings',    icon: 'settings',        href: '/profile?tab=settings' },
   ]
 
   return (
-    <div ref={menuRef} style={{ position: 'relative' }}>
+    <div ref={menuRef} className="relative">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-2 rounded-full text-white font-medium transition-colors cursor-pointer border-none"
+        className="inline-flex items-center gap-2 rounded-full text-white font-semibold transition-all duration-200 hover:brightness-110 active:scale-[0.98] cursor-pointer border-none whitespace-nowrap"
         style={{
-          backgroundColor: '#2A4733',
+          background: 'linear-gradient(135deg, #0F4E31 0%, #0B3C25 100%)',
           fontSize: '12.5px',
-          padding: '6px 14px 6px 8px',
+          padding: '6px 13px 6px 7px',
         }}
       >
-        <div
-          style={{
-            width: '24px',
-            height: '24px',
-            borderRadius: '50%',
-            background: avatarUrl ? 'transparent' : 'rgba(255,255,255,0.2)',
-            overflow: 'hidden',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}
-        >
+        <div className="w-6 h-6 rounded-full bg-white/20 overflow-hidden flex items-center justify-center shrink-0">
           {avatarUrl ? (
-            <Image src={avatarUrl} alt={displayName} width={28} height={28} style={{ objectFit: 'cover' }} />
+            <Image src={avatarUrl} alt={displayName} width={28} height={28} className="object-cover" />
           ) : (
-            <span style={{ fontSize: '10.5px', fontWeight: 700, color: 'white', lineHeight: 1 }}>
-              {initials}
-            </span>
+            <span className="text-[10.5px] font-bold text-white leading-none">{initials}</span>
           )}
         </div>
-        <span className="truncate max-w-[96px]">{displayName.split(' ')[0]}</span>
-        <span>→</span>
+        <span className="truncate max-w-[92px]">{displayName.split(' ')[0]}</span>
+        <ChevronDown
+          className={`w-3.5 h-3.5 text-white/90 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        />
       </button>
 
       {open && (
         <div
+          className="absolute right-0 top-[calc(100%+12px)] w-[224px] bg-[#FAFCF9] rounded-2xl border border-[#C8DEC8] overflow-hidden z-50"
           style={{
-            position: 'absolute',
-            top: 'calc(100% + 10px)',
-            right: 0,
-            width: '220px',
-            background: '#FAF9F4',
-            borderRadius: '16px',
-            boxShadow: '0 12px 40px rgba(8,28,20,.14), 0 2px 8px rgba(0,0,0,.06)',
-            border: '1px solid #DFDBC8',
-            overflow: 'hidden',
-            zIndex: 100,
-            animation: 'profileDropIn .18s ease',
+            boxShadow: '0 14px 40px rgba(12, 68, 41, 0.16), 0 2px 8px rgba(0, 0, 0, 0.05)',
           }}
         >
-          <div style={{ padding: '14px 16px 12px', borderBottom: '1px solid #E6E2D1' }}>
-            <p style={{ fontSize: '13.5px', fontWeight: 600, color: '#162F1B', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {displayName}
-            </p>
-            <p style={{ fontSize: '12px', color: '#5A685B', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {user?.email}
-            </p>
+          <div className="px-4 py-3 border-b border-[#E0ECE0]">
+            <p className="text-[13.5px] font-semibold text-[#0C4429] truncate m-0">{displayName}</p>
+            <p className="text-[12px] text-[#4B6A5F] truncate mt-0.5 mb-0">{user?.email}</p>
           </div>
-          <div style={{ padding: '6px 0' }}>
+          <div className="py-1.5">
             {menuItems.map(({ label, icon, href }) => (
               <Link
                 key={href}
                 href={href}
                 onClick={() => setOpen(false)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  padding: '9px 16px',
-                  fontSize: '13.5px',
-                  color: '#253527',
-                  textDecoration: 'none',
-                  transition: 'background .12s',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = '#EFECE0')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                className="flex items-center gap-2.5 px-4 py-2 text-[13px] text-[#123027] no-underline hover:bg-[#EAF5EE] transition-colors"
               >
-                <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#4E5F50' }}>
-                  {icon}
-                </span>
-                {label}
+                <span className="material-symbols-outlined text-[18px] text-[#0C4429]">{icon}</span>
+                <span>{label}</span>
               </Link>
             ))}
           </div>
-          <div style={{ borderTop: '1px solid #E6E2D1', padding: '6px 0' }}>
+          <div className="border-t border-[#E0ECE0] py-1.5">
             <button
               type="button"
               onClick={handleLogout}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '9px 16px',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '13.5px',
-                color: '#C84040',
-                textAlign: 'left',
-                transition: 'background .12s',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#FFF5F5')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              className="w-full flex items-center gap-2.5 px-4 py-2 bg-transparent border-none cursor-pointer text-[13px] text-[#C84040] text-left hover:bg-[#FFF5F5] transition-colors"
             >
-              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-                logout
-              </span>
-              Log Out
+              <span className="material-symbols-outlined text-[18px]">logout</span>
+              <span>Log Out</span>
             </button>
           </div>
         </div>
@@ -172,9 +140,12 @@ function ProfileMenu({ user, logout }) {
 }
 
 // ── Main Navbar ──────────────────────────────────────────────────────────────
-export default function Navbar({ navbarLogoUrl = '', brandName = 'El Árbol' }) {
+export default function Navbar({ navbarLogoUrl = '', brandName = 'El Árbol', navbarTagline = '' }) {
   const { user, isAuthenticated, logout, authFetch } = useAuth()
-  const { data: session } = useSession()
+  const { data: session } = useSafeSession()
+
+  const [liveBranding, setLiveBranding] = useState(null)
+  const [failedLogoSrc, setFailedLogoSrc] = useState(null)
 
   const isWholesaleUser = !!session?.user?.accessToken
   const isInternalWholesale =
@@ -191,15 +162,84 @@ export default function Navbar({ navbarLogoUrl = '', brandName = 'El Árbol' }) 
     'Wholesale'
   const wholesaleInitial = wholesaleName[0].toUpperCase()
 
-  const [open, setOpen]                         = useState(false)
-  const [authOpen, setAuthOpen]                 = useState(false)
-  const [authMode, setAuthMode]                 = useState('login')
-  const [query, setQuery]                       = useState('')
-  const [showDropdown, setShowDropdown]         = useState(false)
-  const [activeIndex, setActiveIndex]           = useState(-1)
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
-  const [allProducts, setAllProducts]           = useState([])
-  const [unreadCount, setUnreadCount]           = useState(0)
+  const [scrolled, setScrolled]                   = useState(false)
+  const [open, setOpen]                           = useState(false)
+  const [authOpen, setAuthOpen]                   = useState(false)
+  const [authMode, setAuthMode]                   = useState('login')
+  const [query, setQuery]                         = useState('')
+  const [desktopSearchOpen, setDesktopSearchOpen] = useState(false)
+  const [showDropdown, setShowDropdown]           = useState(false)
+  const [activeIndex, setActiveIndex]             = useState(-1)
+  const [mobileSearchOpen, setMobileSearchOpen]   = useState(false)
+  const [allProducts, setAllProducts]             = useState([])
+  const [unreadCount, setUnreadCount]             = useState(0)
+
+  // Sync brand logo & name dynamically with backend site-config
+  useEffect(() => {
+    let active = true
+    const propsKey = `${navbarLogoUrl || ''}|${brandName || ''}`
+
+    async function loadSiteBranding() {
+      try {
+        const res = await fetch(`${API_BASE}/website/site-config/?t=${Date.now()}`, { cache: 'no-store' })
+        if (!res.ok) return
+        const data = await res.json()
+        if (!active || !data) return
+        setLiveBranding({
+          forPropsKey: propsKey,
+          navbarLogoUrl: data.navbar_logo_url || data.logo_url || '',
+          brandName: data.brand_name || '',
+          navbarTagline: data.navbar_tagline || '',
+        })
+      } catch {
+        /* fallback to SSR props */
+      }
+    }
+
+    loadSiteBranding()
+
+    const handleSettingsUpdate = (e) => {
+      const detailLogo = e?.detail?.navbar_logo_url || e?.detail?.logo_url
+      const detailName = e?.detail?.brand_name
+      if (detailLogo || detailName) {
+        setLiveBranding((prev) => ({
+          forPropsKey: propsKey,
+          navbarLogoUrl: detailLogo ?? prev?.navbarLogoUrl ?? navbarLogoUrl,
+          brandName: detailName ?? prev?.brandName ?? brandName,
+          navbarTagline: e?.detail?.navbar_tagline ?? prev?.navbarTagline ?? navbarTagline,
+        }))
+      }
+      loadSiteBranding()
+    }
+
+    window.addEventListener('site_settings_updated', handleSettingsUpdate)
+    return () => {
+      active = false
+      window.removeEventListener('site_settings_updated', handleSettingsUpdate)
+    }
+  }, [navbarLogoUrl, brandName, navbarTagline])
+
+  const currentPropsKey = `${navbarLogoUrl || ''}|${brandName || ''}`
+  const activeLive = liveBranding?.forPropsKey === currentPropsKey ? liveBranding : null
+  const activeBrandName = activeLive?.brandName || brandName || 'El Árbol'
+  const activeTagline = activeLive?.navbarTagline || navbarTagline || 'Fresh. Local. Together.'
+  const resolvedLogo = resolveLogoUrl(activeLive?.navbarLogoUrl || navbarLogoUrl || '/el-erbol-logo.png')
+  const showImageLogo = Boolean(resolvedLogo) && failedLogoSrc !== resolvedLogo
+
+  // Sticky floating pill scroll transition with hysteresis to prevent bounce
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY
+      setScrolled((prev) => {
+        if (!prev && y > 36) return true
+        if (prev && y < 12) return false
+        return prev
+      })
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   // Fetch products for live search autocomplete
   useEffect(() => {
@@ -247,11 +287,11 @@ export default function Navbar({ navbarLogoUrl = '', brandName = 'El Árbol' }) 
   }, [])
 
   // Fetch unread notification count when authenticated
+  const canViewNotifications = isAuthenticated || (isWholesaleUser && !isInternalWholesale)
+  const displayUnreadCount = canViewNotifications ? unreadCount : 0
+
   useEffect(() => {
-    if (!isAuthenticated && (!isWholesaleUser || isInternalWholesale)) {
-      setUnreadCount(0)
-      return
-    }
+    if (!canViewNotifications) return
 
     async function fetchCount() {
       try {
@@ -276,7 +316,7 @@ export default function Navbar({ navbarLogoUrl = '', brandName = 'El Árbol' }) 
     fetchCount()
     const interval = setInterval(fetchCount, 10_000)
     return () => clearInterval(interval)
-  }, [isAuthenticated, isWholesaleUser, isInternalWholesale, session, authFetch])
+  }, [canViewNotifications, isAuthenticated, isWholesaleUser, session, authFetch])
 
   const filtered =
     query.trim().length > 0
@@ -292,14 +332,20 @@ export default function Navbar({ navbarLogoUrl = '', brandName = 'El Árbol' }) 
 
   const { totalItems, setSidebarOpen } = useCart()
   const pathname = usePathname()
-  const router   = useRouter()
+  const router = useRouter()
 
-  const inputRef       = useRef(null)
+  const inputRef = useRef(null)
   const mobileInputRef = useRef(null)
-  const dropdownRef    = useRef(null)
+  const searchWrapperRef = useRef(null)
 
-  const openLogin  = () => { setAuthMode('login');  setAuthOpen(true) }
-  const openSignup = () => { setAuthMode('signup'); setAuthOpen(true) }
+  const openLogin = () => {
+    setAuthMode('login')
+    setAuthOpen(true)
+  }
+  const openSignup = () => {
+    setAuthMode('signup')
+    setAuthOpen(true)
+  }
 
   function isActive(href) {
     if (href === '/') return pathname === '/'
@@ -308,12 +354,9 @@ export default function Navbar({ navbarLogoUrl = '', brandName = 'El Árbol' }) 
 
   useEffect(() => {
     function handleClickOutside(e) {
-      if (
-        !dropdownRef.current?.contains(e.target) &&
-        !inputRef.current?.contains(e.target) &&
-        !mobileInputRef.current?.contains(e.target)
-      ) {
+      if (!searchWrapperRef.current?.contains(e.target) && !mobileInputRef.current?.contains(e.target)) {
         setShowDropdown(false)
+        setDesktopSearchOpen(false)
         setActiveIndex(-1)
       }
     }
@@ -322,14 +365,28 @@ export default function Navbar({ navbarLogoUrl = '', brandName = 'El Árbol' }) 
   }, [])
 
   useEffect(() => {
+    if (desktopSearchOpen) {
+      setTimeout(() => inputRef.current?.focus(), 40)
+    }
+  }, [desktopSearchOpen])
+
+  useEffect(() => {
     if (mobileSearchOpen) {
       setTimeout(() => mobileInputRef.current?.focus(), 50)
-    } else {
-      setQuery('')
-      setShowDropdown(false)
-      setActiveIndex(-1)
     }
   }, [mobileSearchOpen])
+
+  function toggleMobileSearch() {
+    setMobileSearchOpen((prev) => {
+      if (prev) {
+        setQuery('')
+        setShowDropdown(false)
+        setActiveIndex(-1)
+      }
+      return !prev
+    })
+    setOpen(false)
+  }
 
   function handleInputChange(e) {
     setQuery(e.target.value)
@@ -338,7 +395,23 @@ export default function Navbar({ navbarLogoUrl = '', brandName = 'El Árbol' }) 
   }
 
   function handleKeyDown(e) {
-    if (!showDropdown || !filtered.length) return
+    if (e.key === 'Escape') {
+      setShowDropdown(false)
+      setDesktopSearchOpen(false)
+      setActiveIndex(-1)
+      setMobileSearchOpen(false)
+      return
+    }
+    if (!showDropdown || !filtered.length) {
+      if (e.key === 'Enter' && query.trim()) {
+        e.preventDefault()
+        router.push(`/shop?q=${encodeURIComponent(query.trim())}`)
+        setDesktopSearchOpen(false)
+        setMobileSearchOpen(false)
+        setShowDropdown(false)
+      }
+      return
+    }
     if (e.key === 'ArrowDown') {
       e.preventDefault()
       setActiveIndex((i) => Math.min(i + 1, filtered.length - 1))
@@ -348,16 +421,13 @@ export default function Navbar({ navbarLogoUrl = '', brandName = 'El Árbol' }) 
     } else if (e.key === 'Enter' && activeIndex >= 0) {
       e.preventDefault()
       navigateToProduct(filtered[activeIndex])
-    } else if (e.key === 'Escape') {
-      setShowDropdown(false)
-      setActiveIndex(-1)
-      setMobileSearchOpen(false)
     }
   }
 
   function navigateToProduct(product) {
     setQuery('')
     setShowDropdown(false)
+    setDesktopSearchOpen(false)
     setActiveIndex(-1)
     setMobileSearchOpen(false)
     const slug =
@@ -403,410 +473,479 @@ export default function Navbar({ navbarLogoUrl = '', brandName = 'El Árbol' }) 
     }
   }
 
+  const transitionEase = '420ms cubic-bezier(0.22, 1, 0.36, 1)'
+
   return (
     <>
-      <header
-        className="sticky top-0 z-50 backdrop-blur-sm border-b"
-        style={{
-          backgroundColor: '#F5F3E7',
-          borderColor: '#E2DDD0',
-        }}
-      >
-        <nav className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 h-[64px] flex items-center justify-between gap-4">
-          {/* ── Left Brand Emblem + Title + Tagline ── */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0 no-underline">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 overflow-hidden">
-              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="brandCircleGrad" x1="4" y1="6" x2="36" y2="34" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#E5E6CD" />
-                    <stop offset="55%" stopColor="#BDCEA4" />
-                    <stop offset="100%" stopColor="#8AA86E" />
-                  </linearGradient>
-                </defs>
-                <circle cx="20" cy="20" r="18.5" fill="url(#brandCircleGrad)" stroke="#7E9768" strokeWidth="1.2" />
-                <circle cx="20" cy="20" r="16" stroke="#F4F3E6" strokeWidth="0.9" strokeOpacity="0.7" />
-                {/* Center Tall Leaf */}
-                <path
-                  d="M19.5 9.5C16.2 13.5 16.2 19.2 19.5 23.5C22.8 19.2 22.8 13.5 19.5 9.5Z"
-                  fill="#2C522E"
-                  stroke="#1C391E"
-                  strokeWidth="1.2"
-                  strokeLinejoin="round"
-                />
-                {/* Left Leaf */}
-                <path
-                  d="M19.2 25.5C13.2 24.8 10.2 20.5 10.8 15.8C15.5 16.5 18.5 20.2 19.2 25.5Z"
-                  fill="#3A643B"
-                  stroke="#1C391E"
-                  strokeWidth="1.2"
-                  strokeLinejoin="round"
-                />
-                {/* Right Small Sprout Leaf */}
-                <path
-                  d="M20.2 24.5C24.5 24.2 27.5 21.5 27.8 18C24.2 18.2 21.2 20.5 20.2 24.5Z"
-                  fill="#4E7B4B"
-                  stroke="#1C391E"
-                  strokeWidth="1.2"
-                  strokeLinejoin="round"
-                />
-                {/* Stem & Veins */}
-                <path
-                  d="M19.5 14V31.5M19.2 25.2L14.2 19.8M20.2 24.2L24.5 20.5"
-                  stroke="#1C391E"
-                  strokeWidth="1.35"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
-            <div className="flex flex-col">
-              <span
-                style={{
-                  fontFamily: 'var(--font-newsreader), "Playfair Display", Georgia, serif',
-                  fontSize: '19px',
-                  fontWeight: 700,
-                  color: '#16351D',
-                  lineHeight: 1.05,
-                  letterSpacing: '-0.01em',
-                }}
-              >
-                Market Finder
-              </span>
-              <span
-                style={{
-                  fontFamily: 'var(--font-newsreader), "Playfair Display", Georgia, serif',
-                  fontSize: '10.5px',
-                  fontStyle: 'italic',
-                  color: '#4E5F50',
-                  lineHeight: 1.2,
-                }}
-              >
-                Fresh. Local. Together
-              </span>
-            </div>
-          </Link>
-
-          {/* ── Center Desktop Navigation Links ── */}
-          <ul className="hidden md:flex items-center gap-5 lg:gap-7 h-full m-0 p-0 list-none">
-            {navLinks.map(({ label, href, hasChevron }) => {
-              const active = isActive(href)
-              return (
-                <li key={label} className="h-full flex items-center">
-                  <Link
-                    href={href}
-                    className="h-full inline-flex items-center gap-1 whitespace-nowrap transition-colors"
+      {/* Fixed-height sticky track prevents any layout jump while inner bar smoothly morphs into a floating pill */}
+      <header className="sticky top-0 z-50 w-full h-[66px] md:h-[70px] pointer-events-none">
+        <div
+          className="w-full flex justify-center items-start pointer-events-none"
+          style={{
+            transform: scrolled ? 'translateY(12px)' : 'translateY(0px)',
+            transition: `transform ${transitionEase}`,
+          }}
+        >
+          <nav
+            className="mx-auto pointer-events-auto relative"
+            style={{
+              width: scrolled ? 'min(1140px, calc(100% - 24px))' : '100%',
+              height: scrolled ? '60px' : '70px',
+              borderRadius: scrolled ? '9999px' : '0px',
+              backgroundColor: scrolled ? 'rgba(249, 250, 244, 0.94)' : 'rgba(250, 250, 246, 0.96)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              borderWidth: '1.5px',
+              borderStyle: 'solid',
+              borderColor: scrolled ? '#B6CEB7' : 'transparent transparent #DCE8DF transparent',
+              boxShadow: scrolled
+                ? '0 12px 32px -6px rgba(12, 68, 41, 0.14), 0 3px 10px rgba(12, 68, 41, 0.06)'
+                : 'none',
+              transition: `width ${transitionEase}, height ${transitionEase}, border-radius ${transitionEase}, background-color 320ms ease, border-color 320ms ease, box-shadow 420ms ease`,
+            }}
+          >
+            <div
+              className="w-full max-w-[1320px] mx-auto h-full flex items-center justify-between gap-2 lg:gap-3"
+              style={{
+                paddingInline: scrolled ? '18px' : '24px',
+                transition: `padding-inline ${transitionEase}`,
+              }}
+            >
+              {/* ── Left Brand Logo + Name + Tagline (Integrated with Backend Site Config) ── */}
+              <Link href="/" className="flex items-center gap-2.5 shrink-0 no-underline group">
+                <div className="h-9 md:h-[38px] min-w-[36px] max-w-[100px] rounded-full flex items-center justify-center shrink-0 overflow-hidden transition-transform duration-200 group-hover:scale-[1.03]">
+                  {showImageLogo ? (
+                    <Image
+                      src={resolvedLogo}
+                      alt={`${activeBrandName} logo`}
+                      width={38}
+                      height={38}
+                      unoptimized
+                      onError={() => setFailedLogoSrc(resolvedLogo)}
+                      style={{ width: 'auto', height: '100%', maxWidth: '100px' }}
+                      className="object-contain"
+                    />
+                  ) : (
+                    <svg width="38" height="38" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <linearGradient id="brandCircleGrad" x1="4" y1="6" x2="36" y2="34" gradientUnits="userSpaceOnUse">
+                          <stop offset="0%" stopColor="#F5FAF1" />
+                          <stop offset="65%" stopColor="#E1F0DC" />
+                          <stop offset="100%" stopColor="#BFE0B5" />
+                        </linearGradient>
+                      </defs>
+                      <circle cx="20" cy="20" r="18.2" fill="url(#brandCircleGrad)" stroke="#3D7838" strokeWidth="1.5" />
+                      <circle cx="20" cy="20" r="15.4" stroke="#FFFFFF" strokeWidth="0.9" strokeOpacity="0.85" />
+                      <path
+                        d="M19.3 26.2C12.4 25.4 9.6 20.1 10.6 14.3C16.2 15.1 19.1 19.8 19.3 26.2Z"
+                        fill="#0C4429"
+                        stroke="#093620"
+                        strokeWidth="1.1"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M20.2 25.5C20.2 19.2 23.4 13.8 29.2 13.2C29.8 19.2 26.6 24.4 20.2 25.5Z"
+                        fill="#357A38"
+                        stroke="#093620"
+                        strokeWidth="1.1"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M19.8 22.5V31M18.8 24.8L13.5 18.6M20.6 24.1L25.8 17.8"
+                        stroke="#FFFFFF"
+                        strokeWidth="1.15"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  )}
+                </div>
+                <div className="flex flex-col">
+                  <span
                     style={{
-                      fontSize: '13.5px',
-                      fontWeight: active ? 600 : 500,
-                      color: active ? '#16351D' : '#354337',
-                      borderBottom: active ? '2px solid #16351D' : '2px solid transparent',
+                      fontFamily: 'var(--font-newsreader), "Playfair Display", Georgia, serif',
+                      fontSize: '18px',
+                      fontWeight: 700,
+                      color: '#0C4429',
+                      lineHeight: 1.05,
+                      letterSpacing: '-0.01em',
                     }}
                   >
-                    <span>{label}</span>
-                    {hasChevron && (
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                        <polyline points="6 9 12 15 18 9" />
-                      </svg>
-                    )}
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
+                    {activeBrandName}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-newsreader), "Playfair Display", Georgia, serif',
+                      fontSize: '10px',
+                      fontStyle: 'italic',
+                      color: '#346148',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {activeTagline}
+                  </span>
+                </div>
+              </Link>
 
-          {/* ── Right Actions (Search, Bell, Cart, My Account Pill) ── */}
-          <div className="hidden md:flex items-center gap-2.5 ml-auto">
-            {/* Search Input Pill */}
-            <div className="relative hidden lg:block">
-              <label
-                className="flex items-center gap-2 rounded-full px-3.5 py-2 w-[220px] cursor-text"
-                style={{
-                  backgroundColor: '#E8E4D5',
-                  border: '1px solid #DCD7C4',
-                }}
-              >
-                <svg width="14" height="14" fill="none" stroke="#5E6B5F" strokeWidth="2" viewBox="0 0 24 24">
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="m21 21-4.35-4.35" />
-                </svg>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  placeholder="Search fresh produce.."
-                  value={query}
-                  onChange={handleInputChange}
-                  onFocus={() => query.trim() && setShowDropdown(true)}
-                  onKeyDown={handleKeyDown}
-                  className="bg-transparent outline-none w-full placeholder:text-[#667266]"
-                  style={{ fontSize: '12.5px', color: '#162F1B', border: 'none' }}
-                />
-                {query && (
+              {/* Hairline Divider */}
+              <span className="hidden xl:block h-5 w-px bg-[#DCE6DA] shrink-0" aria-hidden="true" />
+
+              {/* ── Center Desktop Navigation Links with Icons & Dividers ── */}
+              <ul className="hidden md:flex items-center gap-0.5 lg:gap-1 xl:gap-1.5 m-0 p-0 list-none">
+                {navLinks.map(({ label, href, Icon, hasChevron }, idx) => {
+                  const active = isActive(href)
+                  return (
+                    <li key={label} className="flex items-center gap-0.5 xl:gap-1.5">
+                      <Link
+                        href={href}
+                        className={`inline-flex items-center gap-1.5 rounded-full whitespace-nowrap no-underline transition-all duration-200 ${
+                          active
+                            ? 'bg-[#0C4429] text-white font-semibold px-3.5 py-1.5 shadow-[0_2px_8px_rgba(12,68,41,0.2)]'
+                            : 'text-[#1E4431] hover:text-[#0C4429] hover:bg-[#E7F1E4]/85 font-medium px-2.5 lg:px-3 py-1.5'
+                        }`}
+                        style={{ fontSize: '13px' }}
+                      >
+                        <Icon
+                          className={`hidden lg:block w-[14px] h-[14px] shrink-0 ${
+                            active ? 'text-white' : 'text-[#1E4431]'
+                          }`}
+                          strokeWidth={1.9}
+                        />
+                        <span>{label}</span>
+                        {hasChevron && (
+                          <ChevronDown
+                            className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-white/90' : 'text-[#315843]'}`}
+                            strokeWidth={2}
+                          />
+                        )}
+                      </Link>
+                      {idx < navLinks.length - 1 && (
+                        <span className="hidden xl:block h-4 w-px bg-[#E3EBE0] shrink-0" aria-hidden="true" />
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+
+              {/* Hairline Divider */}
+              <span className="hidden xl:block h-5 w-px bg-[#DCE6DA] shrink-0" aria-hidden="true" />
+
+              {/* ── Right Actions (Search Circle Popover, Bell, Cart, My Account Pill) ── */}
+              <div className="hidden md:flex items-center gap-1.5 lg:gap-2 shrink-0">
+                {/* Expandable Circular Search Button & Popover */}
+                <div ref={searchWrapperRef} className="relative">
                   <button
                     type="button"
-                    onClick={() => {
-                      setQuery('')
-                      setShowDropdown(false)
-                      inputRef.current?.focus()
-                    }}
-                    className="flex-shrink-0 text-[#5E6B5F] hover:text-[#162F1B] transition-colors bg-transparent border-none p-0 cursor-pointer"
+                    onClick={() => setDesktopSearchOpen((v) => !v)}
+                    aria-label="Search produce"
+                    className={`w-9 h-9 flex items-center justify-center rounded-full transition-all duration-200 cursor-pointer border-none ${
+                      desktopSearchOpen
+                        ? 'bg-[#0C4429] text-white'
+                        : 'bg-[#E5EFE2] text-[#0C4429] hover:bg-[#D7E6D4]'
+                    }`}
                   >
-                    <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path d="M18 6 6 18M6 6l12 12" />
-                    </svg>
+                    <Search className="w-4 h-4" strokeWidth={2.1} />
                   </button>
-                )}
-              </label>
 
-              {showDropdown && query.trim().length > 0 && (
-                <div
-                  ref={dropdownRef}
-                  className="absolute left-0 top-[calc(100%+8px)] w-[280px] bg-[#FAF9F4] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-[#DFDBC8] overflow-hidden z-50"
-                >
-                  {filtered.length > 0 ? (
-                    <>
-                      <p className="px-4 pt-3 pb-1.5 text-[11px] font-semibold tracking-widest text-[#5E6B5F] uppercase">
-                        Products
-                      </p>
-                      <ul className="m-0 p-0 list-none">
-                        {filtered.map((product, idx) => (
-                          <li key={product.id}>
+                  {desktopSearchOpen && (
+                    <div
+                      className="absolute right-0 top-[calc(100%+12px)] w-[310px] bg-[#FAFCF9] rounded-2xl border border-[#C6DBC6] overflow-hidden z-50"
+                      style={{
+                        boxShadow: '0 14px 40px rgba(12, 68, 41, 0.16), 0 2px 8px rgba(0, 0, 0, 0.05)',
+                      }}
+                    >
+                      <div className="p-2.5 border-b border-[#E3EDE2]">
+                        <div className="flex items-center gap-2 rounded-full bg-[#EFF6ED] border border-[#D1E2CE] px-3.5 py-2">
+                          <Search className="w-3.5 h-3.5 text-[#3F6351] shrink-0" strokeWidth={2} />
+                          <input
+                            ref={inputRef}
+                            type="text"
+                            placeholder="Search fresh produce..."
+                            value={query}
+                            onChange={handleInputChange}
+                            onFocus={() => query.trim() && setShowDropdown(true)}
+                            onKeyDown={handleKeyDown}
+                            className="bg-transparent outline-none w-full text-[13px] text-[#0D2C23] placeholder:text-[#58786C] border-none"
+                          />
+                          {query && (
                             <button
                               type="button"
-                              onMouseEnter={() => setActiveIndex(idx)}
-                              onMouseLeave={() => setActiveIndex(-1)}
-                              onClick={() => navigateToProduct(product)}
-                              className="w-full text-left flex items-center gap-3 px-4 py-2.5 transition-colors cursor-pointer border-none"
-                              style={{
-                                backgroundColor: activeIndex === idx ? '#EFECE0' : 'transparent',
+                              onClick={() => {
+                                setQuery('')
+                                setShowDropdown(false)
+                                inputRef.current?.focus()
                               }}
+                              aria-label="Clear search"
+                              className="text-[#4D6E62] hover:text-[#0C4429] bg-transparent border-none p-0 cursor-pointer shrink-0"
                             >
-                              <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0 bg-white">
-                                <img
-                                  src={product.image}
-                                  alt={product.name}
-                                  onError={(e) => {
-                                    e.currentTarget.src = '/homepage/prod_apple.jpg'
-                                  }}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[13px] font-medium text-[#162F1B] truncate m-0">
-                                  {highlightMatch(product.name, query)}
-                                </p>
-                                <p className="text-[11px] text-[#5E6B5F] m-0">{product.category}</p>
-                              </div>
-                              <span className="text-[12.5px] font-semibold text-[#17361E]">
-                                ${product.price.toFixed(2)}
-                              </span>
+                              <X className="w-3.5 h-3.5" strokeWidth={2.3} />
                             </button>
-                          </li>
-                        ))}
-                      </ul>
-                      <div className="border-t border-[#E6E2D1] px-4 py-2.5">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            router.push(`/shop?q=${encodeURIComponent(query)}`)
-                            setShowDropdown(false)
-                          }}
-                          className="text-[12px] text-[#17361E] font-semibold hover:underline bg-transparent border-none p-0 cursor-pointer"
-                        >
-                          See all results for &quot;{query}&quot; →
-                        </button>
+                          )}
+                        </div>
                       </div>
-                    </>
-                  ) : (
-                    <div className="px-4 py-5 text-center">
-                      <p className="text-[12.5px] text-[#5E6B5F] m-0">
-                        No products found for <span className="font-semibold text-[#162F1B]">&quot;{query}&quot;</span>
-                      </p>
+
+                      {showDropdown && query.trim().length > 0 && (
+                        <div>
+                          {filtered.length > 0 ? (
+                            <>
+                              <p className="px-4 pt-2.5 pb-1 text-[10.5px] font-semibold tracking-widest text-[#4D6E62] uppercase m-0">
+                                Products
+                              </p>
+                              <ul className="m-0 p-0 list-none max-h-[270px] overflow-y-auto">
+                                {filtered.map((product, idx) => (
+                                  <li key={product.id}>
+                                    <button
+                                      type="button"
+                                      onMouseEnter={() => setActiveIndex(idx)}
+                                      onMouseLeave={() => setActiveIndex(-1)}
+                                      onClick={() => navigateToProduct(product)}
+                                      className={`w-full text-left flex items-center gap-3 px-4 py-2 transition-colors cursor-pointer border-none ${
+                                        activeIndex === idx ? 'bg-[#EAF5EE]' : 'bg-transparent'
+                                      }`}
+                                    >
+                                      <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0 bg-white border border-[#E5EDE4]">
+                                        <Image
+                                          src={product.image}
+                                          alt={product.name}
+                                          width={36}
+                                          height={36}
+                                          unoptimized
+                                          className="w-full h-full object-cover"
+                                        />
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-[13px] font-medium text-[#0D2C23] truncate m-0">
+                                          {highlightMatch(product.name, query)}
+                                        </p>
+                                        <p className="text-[11px] text-[#4D6E62] m-0">{product.category}</p>
+                                      </div>
+                                      <span className="text-[12.5px] font-semibold text-[#0C4429]">
+                                        €{product.price.toFixed(2)}
+                                      </span>
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                              <div className="border-t border-[#E3EDE2] px-4 py-2">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    router.push(`/shop?q=${encodeURIComponent(query)}`)
+                                    setShowDropdown(false)
+                                    setDesktopSearchOpen(false)
+                                  }}
+                                  className="text-[12px] text-[#0C4429] font-semibold hover:underline bg-transparent border-none p-0 cursor-pointer"
+                                >
+                                  See all results for &quot;{query}&quot; →
+                                </button>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="px-4 py-5 text-center">
+                              <p className="text-[12.5px] text-[#4D6E62] m-0">
+                                No products found for{' '}
+                                <span className="font-semibold text-[#0C4429]">&quot;{query}&quot;</span>
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-              )}
-            </div>
 
-            {/* Notification Bell */}
-            {!isInternalWholesale && (
-              <button
-                type="button"
-                onClick={handleBellClick}
-                aria-label="Notifications"
-                className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#E8E4D5] transition-colors relative cursor-pointer bg-transparent border-none"
-              >
-                <svg width="18" height="18" fill="none" stroke="#253527" strokeWidth="1.8" viewBox="0 0 24 24">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                </svg>
-                {unreadCount > 0 && (
-                  <span
-                    className="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] px-[3px] bg-[#C84040] text-white rounded-full flex items-center justify-center"
-                    style={{ fontSize: '9.5px', fontWeight: 700, lineHeight: 1 }}
+                {/* Notification Bell */}
+                {!isInternalWholesale && (
+                  <button
+                    type="button"
+                    onClick={handleBellClick}
+                    aria-label="Notifications"
+                    className="w-8 h-8 flex items-center justify-center rounded-full text-[#0C4429] hover:bg-[#E5EFE2] transition-colors relative cursor-pointer bg-transparent border-none"
                   >
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
+                    <Bell className="w-[17px] h-[17px]" strokeWidth={1.9} />
+                    {displayUnreadCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-1 bg-[#C84040] text-white rounded-full flex items-center justify-center text-[9.5px] font-bold leading-none">
+                        {displayUnreadCount > 99 ? '99+' : displayUnreadCount}
+                      </span>
+                    )}
+                  </button>
                 )}
-              </button>
-            )}
 
-            {/* Cart Button */}
-            <button
-              type="button"
-              onClick={() => setSidebarOpen(true)}
-              aria-label="Shopping Cart"
-              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#E8E4D5] transition-colors relative cursor-pointer bg-transparent border-none"
-            >
-              <svg width="18" height="18" fill="none" stroke="#253527" strokeWidth="1.8" viewBox="0 0 24 24">
-                <path d="M5 8h14l-1.5 11H6.5L5 8z" />
-                <path d="M9 8V6a3 3 0 1 1 6 0v2" />
-              </svg>
-              {totalItems > 0 && (
-                <span
-                  className="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] px-[3px] bg-[#17361E] text-white rounded-full flex items-center justify-center"
-                  style={{ fontSize: '9.5px', fontWeight: 700, lineHeight: 1 }}
+                {/* Cart Button */}
+                <button
+                  type="button"
+                  onClick={() => setSidebarOpen(true)}
+                  aria-label="Shopping Cart"
+                  className="w-8 h-8 flex items-center justify-center rounded-full text-[#0C4429] hover:bg-[#E5EFE2] transition-colors relative cursor-pointer bg-transparent border-none"
                 >
-                  {totalItems > 99 ? '99+' : totalItems}
-                </span>
-              )}
-            </button>
+                  <ShoppingBag className="w-[17px] h-[17px]" strokeWidth={1.9} />
+                  {totalItems > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-1 bg-[#4F9A28] text-white rounded-full flex items-center justify-center text-[9.5px] font-bold leading-none">
+                      {totalItems > 99 ? '99+' : totalItems}
+                    </span>
+                  )}
+                </button>
 
-            {/* Auth / My Account Pill */}
-            {isAuthenticated ? (
-              <ProfileMenu user={user} logout={logout} />
-            ) : isWholesaleUser ? (
-              <Link
-                href="/wholesale/profile"
-                className="inline-flex items-center gap-2 rounded-full text-white font-medium no-underline"
-                style={{
-                  backgroundColor: '#2A4733',
-                  fontSize: '12.5px',
-                  padding: '7px 14px',
-                }}
-              >
-                <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-bold">
-                  {wholesaleInitial}
-                </span>
-                <span className="truncate max-w-[85px]">{wholesaleName.split(' ')[0]}</span>
-                <span>→</span>
-              </Link>
-            ) : (
-              <button
-                type="button"
-                onClick={openLogin}
-                className="inline-flex items-center gap-1.5 rounded-full text-white font-medium transition-colors hover:bg-[#17361E] cursor-pointer border-none"
-                style={{
-                  backgroundColor: '#2C4735',
-                  fontSize: '12.5px',
-                  padding: '8px 16px',
-                }}
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-                <span>My Account</span>
-                <span>→</span>
-              </button>
-            )}
-          </div>
+                {/* Auth / My Account Dark Green Pill */}
+                {isAuthenticated ? (
+                  <ProfileMenu user={user} logout={logout} />
+                ) : isWholesaleUser ? (
+                  <Link
+                    href="/wholesale/profile"
+                    className="inline-flex items-center gap-2 rounded-full text-white font-semibold hover:brightness-110 transition-all duration-200 no-underline whitespace-nowrap"
+                    style={{
+                      background: 'linear-gradient(135deg, #0F4E31 0%, #0B3C25 100%)',
+                      fontSize: '12.5px',
+                      padding: '6.5px 14px 6.5px 8px',
+                    }}
+                  >
+                    <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-bold">
+                      {wholesaleInitial}
+                    </span>
+                    <span className="truncate max-w-[85px]">{wholesaleName.split(' ')[0]}</span>
+                    <ChevronDown className="w-3.5 h-3.5 text-white/90" />
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={openLogin}
+                    className="inline-flex items-center gap-1.5 rounded-full text-white font-semibold transition-all duration-200 hover:brightness-110 active:scale-[0.98] cursor-pointer border-none whitespace-nowrap"
+                    style={{
+                      background: 'linear-gradient(135deg, #0F4E31 0%, #0B3C25 100%)',
+                      fontSize: '12.5px',
+                      padding: '8px 16px',
+                      boxShadow: '0 2px 6px rgba(11, 60, 37, 0.18)',
+                    }}
+                  >
+                    <LogIn className="w-3.5 h-3.5 text-white shrink-0" strokeWidth={2.2} />
+                    <span>Sign In</span>
+                  </button>
+                )}
+              </div>
 
-          {/* ── Mobile Right Controls ── */}
-          <div className="flex md:hidden items-center gap-1 ml-auto">
-            <button
-              type="button"
-              onClick={() => {
-                setMobileSearchOpen((v) => !v)
-                setOpen(false)
-              }}
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-transparent border-none cursor-pointer"
-              aria-label="Search"
-            >
-              <svg width="18" height="18" fill="none" stroke="#162F1B" strokeWidth="2" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
-              </svg>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setSidebarOpen(true)}
-              className="w-9 h-9 flex items-center justify-center relative bg-transparent border-none cursor-pointer"
-              aria-label="Cart"
-            >
-              <svg width="18" height="18" fill="none" stroke="#162F1B" strokeWidth="1.8" viewBox="0 0 24 24">
-                <path d="M5 8h14l-1.5 11H6.5L5 8z" />
-                <path d="M9 8V6a3 3 0 1 1 6 0v2" />
-              </svg>
-              {totalItems > 0 && (
-                <span
-                  className="absolute top-0.5 right-0.5 min-w-[15px] h-[15px] px-[3px] bg-[#17361E] text-white rounded-full flex items-center justify-center"
-                  style={{ fontSize: '9px', fontWeight: 700, lineHeight: 1 }}
+              {/* ── Mobile Right Controls ── */}
+              <div className="flex md:hidden items-center gap-1 ml-auto">
+                <button
+                  type="button"
+                  onClick={toggleMobileSearch}
+                  className="w-9 h-9 flex items-center justify-center rounded-full bg-[#E5EFE2] text-[#0C4429] border-none cursor-pointer"
+                  aria-label="Search"
                 >
-                  {totalItems > 99 ? '99+' : totalItems}
-                </span>
-              )}
-            </button>
+                  <Search className="w-4 h-4" strokeWidth={2} />
+                </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(!open)
-                setMobileSearchOpen(false)
-              }}
-              className="w-9 h-9 flex items-center justify-center bg-transparent border-none cursor-pointer"
-              aria-label="Menu"
-            >
-              <svg width="19" height="19" fill="none" stroke="#162F1B" strokeWidth="2" viewBox="0 0 24 24">
-                {open ? <path d="M18 6 6 18M6 6l12 12" /> : <path d="M4 6h16M4 12h16M4 18h16" />}
-              </svg>
-            </button>
-          </div>
-        </nav>
+                <button
+                  type="button"
+                  onClick={() => setSidebarOpen(true)}
+                  className="w-9 h-9 flex items-center justify-center rounded-full text-[#0C4429] relative bg-transparent border-none cursor-pointer"
+                  aria-label="Cart"
+                >
+                  <ShoppingBag className="w-[18px] h-[18px]" strokeWidth={1.9} />
+                  {totalItems > 0 && (
+                    <span className="absolute top-0.5 right-0.5 min-w-[15px] h-[15px] px-[3px] bg-[#4F9A28] text-white rounded-full flex items-center justify-center text-[9px] font-bold leading-none">
+                      {totalItems > 99 ? '99+' : totalItems}
+                    </span>
+                  )}
+                </button>
 
-        {/* Mobile Search Bar */}
-        {mobileSearchOpen && (
-          <div className="lg:hidden bg-[#F5F3E7] border-t border-[#E2DDD0] px-4 py-3">
-            <div className="flex items-center gap-2 bg-[#E8E4D5] rounded-full px-4 py-2">
-              <svg width="15" height="15" fill="none" stroke="#5E6B5F" strokeWidth="2" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
-              </svg>
-              <input
-                ref={mobileInputRef}
-                type="text"
-                placeholder="Search fresh produce.."
-                value={query}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                className="bg-transparent outline-none flex-1 placeholder:text-[#667266]"
-                style={{ fontSize: '13.5px', color: '#162F1B', border: 'none' }}
-              />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(!open)
+                    setMobileSearchOpen(false)
+                  }}
+                  className="w-9 h-9 flex items-center justify-center text-[#0C4429] bg-transparent border-none cursor-pointer"
+                  aria-label="Menu"
+                >
+                  {open ? <X className="w-5 h-5" strokeWidth={2} /> : <Menu className="w-5 h-5" strokeWidth={2} />}
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+
+            {/* Mobile Search Dropdown Strip */}
+            {mobileSearchOpen && (
+              <div className="md:hidden absolute left-0 right-0 top-[calc(100%+8px)] mx-2 bg-[#FAFCF9] border border-[#C6DBC6] rounded-2xl p-3 shadow-lg z-50">
+                <div className="flex items-center gap-2 bg-[#EFF6ED] border border-[#D1E2CE] rounded-full px-3.5 py-2">
+                  <Search className="w-4 h-4 text-[#3F6351] shrink-0" strokeWidth={2} />
+                  <input
+                    ref={mobileInputRef}
+                    type="text"
+                    placeholder="Search fresh produce.."
+                    value={query}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    className="bg-transparent outline-none flex-1 text-[13.5px] text-[#0D2C23] placeholder:text-[#58786C] border-none"
+                  />
+                  {query && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setQuery('')
+                        setShowDropdown(false)
+                        mobileInputRef.current?.focus()
+                      }}
+                      className="text-[#4D6E62] bg-transparent border-none p-0 cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                {query.trim().length > 0 && filtered.length > 0 && (
+                  <ul className="m-0 pt-2 p-0 list-none max-h-[220px] overflow-y-auto divide-y divide-[#EDF4EB]">
+                    {filtered.map((product) => (
+                      <li key={product.id}>
+                        <button
+                          type="button"
+                          onClick={() => navigateToProduct(product)}
+                          className="w-full text-left flex items-center gap-2.5 px-2 py-2 bg-transparent border-none cursor-pointer"
+                        >
+                          <Image
+                            src={product.image}
+                            alt={product.name}
+                            width={32}
+                            height={32}
+                            unoptimized
+                            className="w-8 h-8 rounded-md object-cover shrink-0"
+                          />
+                          <span className="flex-1 text-[13px] font-medium text-[#0D2C23] truncate">
+                            {highlightMatch(product.name, query)}
+                          </span>
+                          <span className="text-[12px] font-semibold text-[#0C4429]">
+                            €{product.price.toFixed(2)}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+          </nav>
+        </div>
       </header>
 
       {/* Mobile Navigation Drawer */}
       {open && (
-        <div className="fixed inset-0 top-[66px] bg-[#F2EFE2] z-40 px-6 pt-6 pb-10 flex flex-col md:hidden overflow-y-auto">
-          {navLinks.map(({ label, href }) => {
+        <div className="fixed inset-0 pt-[84px] bg-[#EFF9F2] z-40 px-6 pb-10 flex flex-col md:hidden overflow-y-auto">
+          {navLinks.map(({ label, href, Icon }) => {
             const active = isActive(href)
             return (
               <Link
                 key={label}
                 href={href}
                 onClick={() => setOpen(false)}
-                className="border-b border-[#DFDBC8] py-3.5 flex items-center justify-between no-underline"
+                className="border-b border-[#CFE0D5] py-3.5 flex items-center justify-between no-underline"
                 style={{
                   fontFamily: 'var(--font-newsreader), "Playfair Display", Georgia, serif',
-                  fontSize: '1.35rem',
+                  fontSize: '1.25rem',
                   fontWeight: 600,
-                  color: active ? '#17361E' : '#253527',
+                  color: active ? '#0C4429' : '#1E3F34',
                 }}
               >
-                {label}
-                {active && <span className="w-2 h-2 rounded-full bg-[#17361E]" />}
+                <span className="inline-flex items-center gap-2.5">
+                  <Icon className="w-[18px] h-[18px]" strokeWidth={1.85} />
+                  <span>{label}</span>
+                </span>
+                {active && <span className="w-2.5 h-2.5 rounded-full bg-[#357A38]" />}
               </Link>
             )
           })}
@@ -819,10 +958,9 @@ export default function Navbar({ navbarLogoUrl = '', brandName = 'El Árbol' }) 
                   setOpen(false)
                   openLogin()
                 }}
-                className="flex-1 text-center border border-[#17361E] rounded-full bg-transparent cursor-pointer"
-                style={{ fontSize: '13.5px', fontWeight: 600, color: '#17361E', padding: '10px 0' }}
+                className="flex-1 text-center border border-[#0C4429] rounded-full bg-transparent cursor-pointer text-[13.5px] font-semibold text-[#0C4429] py-2.5"
               >
-                Log In
+                Sign In
               </button>
               <button
                 type="button"
@@ -830,8 +968,7 @@ export default function Navbar({ navbarLogoUrl = '', brandName = 'El Árbol' }) 
                   setOpen(false)
                   openSignup()
                 }}
-                className="flex-1 text-center bg-[#17361E] text-white rounded-full border-none cursor-pointer"
-                style={{ fontSize: '13.5px', fontWeight: 600, padding: '10px 0' }}
+                className="flex-1 text-center bg-[#0C4429] text-white rounded-full border-none cursor-pointer text-[13.5px] font-semibold py-2.5"
               >
                 Sign Up
               </button>
@@ -852,7 +989,7 @@ function highlightMatch(text, query) {
   return (
     <>
       {text.slice(0, idx)}
-      <mark style={{ background: '#D6E2CA', color: '#16351D', borderRadius: '2px', padding: '0 1px' }}>
+      <mark style={{ background: '#D7EED9', color: '#0C4429', borderRadius: '2px', padding: '0 1px' }}>
         {text.slice(idx, idx + query.length)}
       </mark>
       {text.slice(idx + query.length)}

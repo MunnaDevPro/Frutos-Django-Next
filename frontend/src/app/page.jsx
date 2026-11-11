@@ -2,6 +2,7 @@ import HeroSection        from '@/app/components/HeroSection'
 import ProductGrid        from '@/app/components/ProductGrid'
 import LeftoverPackBanner from '@/app/components/LeftoverPackBanner'
 import HowItWorks         from '@/app/components/HowItWorks'
+import WhyChooseSection   from '@/app/components/WhyChooseSection'
 import OffersSection      from '@/app/components/OffersSection'
 
 import { getProducts, getCategories, getOffers } from '@/lib/api_product'
@@ -32,7 +33,7 @@ export default async function HomePage() {
   const isInternalWholesale = checkIsInternalWholesale(session)
 
   return (
-    <div style={{ backgroundColor: '#F2EFE2', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#EFF9F2', minHeight: '100vh' }}>
       <HeroSection
         hero={hero}
         featureCards={featureCards}
@@ -42,15 +43,18 @@ export default async function HomePage() {
         initialProducts={products}
         categories={categories}
         isInternalWholesaleUser={isInternalWholesale}
-        offersSlot={<OffersSection offers={offers} />}
       />
 
-      <LeftoverPackBanner banner={leftover_banner} />
+      <OffersSection offers={offers} />
 
       <HowItWorks
         heading={how_it_works?.heading}
         steps={normalizedSteps}
       />
+
+      <LeftoverPackBanner banner={leftover_banner} />
+
+      <WhyChooseSection />
     </div>
   )
 }
